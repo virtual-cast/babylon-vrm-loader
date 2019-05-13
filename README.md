@@ -8,9 +8,18 @@ This is **Work In Progress**.
 
 ## Features
 
+- supports `.vrm` or `.vci` file loading
+- supports MToonMaterial
+- TODO: BlendShape(MorphTarget) is broken
+
 ## Usage
 
-TBD
+```ts
+const scene = await BABYLON.SceneLoader.LoadAsync('file:', vrmFile, engine);
+const vrmManager = scene.metadata.vrmManagers[0];
+const hips = vrmManager.getBone('hips'); // returns Nullable<TransformNode>
+hips.translate(BABYLON.Vector3.Right(), 1.0);
+```
 
 ## Contributing
 
