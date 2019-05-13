@@ -1,0 +1,76 @@
+{
+    "name": "babylon-vrm-loader",
+    "version": "0.1.0",
+    "description": "babylon.js VRM Loader",
+    "license": "MIT",
+    "author": {
+        "email": "yamagishi.iloop@gmail.com",
+        "name": "Masaru Yamagishi",
+        "url": "https://github.com/il-m-yamagishi"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/virtual-cast/babylon-vrm-loader.git"
+    },
+    "keywords": [
+        "babylon.js",
+        "VRM"
+    ],
+    "files": [
+        "dist/index.d.ts",
+        "dist/index.js",
+        "dist/vrm-extension.d.ts",
+        "dist/vrm-file-loader.d.ts",
+        "dist/vrm-interfaces.d.ts"
+    ],
+    "typings": "dist/index.d.ts",
+    "main": "dist/index.js",
+    "dependencies": {
+        "@babylonjs/core": "^4.0.3",
+        "@babylonjs/loaders": "^4.0.3",
+        "babylon-mtoon-material": "^1.2.0"
+    },
+    "devDependencies": {
+        "@babylonjs/inspector": "^4.0.3",
+        "@semantic-release/commit-analyzer": "^6.1.0",
+        "@semantic-release/git": "^7.0.8",
+        "@semantic-release/github": "^5.2.10",
+        "@semantic-release/npm": "^5.1.4",
+        "@semantic-release/release-notes-generator": "^7.1.4",
+        "@types/node": "^12.0.0",
+        "cz-conventional-changelog": "2.1.0",
+        "raw-loader": "^2.0.0",
+        "semantic-release": "^15.13.3",
+        "ts-loader": "^6.0.0",
+        "tslint": "^5.16.0",
+        "typescript": "^3.4.5",
+        "webpack": "^4.30.0",
+        "webpack-cli": "^3.3.2",
+        "webpack-dev-server": "^3.3.1"
+    },
+    "scripts": {
+        "build": "webpack",
+        "lint": "tslint -p .",
+        "debug": "webpack-dev-server --config webpack.test.config.js",
+        "release": "semantic-release"
+    },
+    "sideEffects": [
+        "src/vcast-vci-material-unity.ts",
+        "src/vrm-extension.ts",
+        "src/vrm-file-loader.ts"
+    ],
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
+    },
+    "release": {
+        "plugins": [
+            "@semantic-release/commit-analyzer",
+            "@semantic-release/release-notes-generator",
+            "@semantic-release/github",
+            "@semantic-release/npm",
+            "@semantic-release/git"
+        ]
+    }
+}
