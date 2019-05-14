@@ -58,7 +58,7 @@
         "lint": "tslint -p .",
         "debug": "webpack-dev-server --config webpack.test.config.js",
         "release": "semantic-release",
-        "release:gh-pages": "gh-pages -d test -m \"ci(gh-pages): update gh-pages [skip ci]\""
+        "release:gh-pages": "gh-pages -d test -u \"Masaru Yamagishi <m-yamagishi@virtualcast.jp>\" -m \"ci(gh-pages): update gh-pages [skip ci]\""
     },
     "sideEffects": [
         "src/vcast-vci-material-unity.ts",
