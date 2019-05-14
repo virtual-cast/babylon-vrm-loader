@@ -12,3 +12,8 @@ build
 .history
 
 node_modules/
+
+test/main.js
+test/main.js.map
+test/vendors~main.js
+test/vendors~main.js.map

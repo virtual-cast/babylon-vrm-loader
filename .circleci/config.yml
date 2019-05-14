@@ -75,3 +75,5 @@ jobs:
             - v1-dependencies-
       - run: yarn build
       - run: yarn release
+      - run: yarn build:gh-pages
+      - run: yarn release:gh-pages
