@@ -6,7 +6,7 @@ import { Mesh } from '@babylonjs/core/Meshes/mesh';
 import { Nullable } from '@babylonjs/core/types';
 import { GLTFLoader, IMaterial } from '@babylonjs/loaders/glTF/2.0';
 import { MToonMaterial } from 'babylon-mtoon-material';
-import { IVRMMaterialProperty, IVRMMaterialPropertyShader, IVRMVectorMaterialProperty } from './vrm-interfaces';
+import { IVRMMaterialProperty, IVRMMaterialPropertyShader } from './vrm-interfaces';
 import { Engine } from '@babylonjs/core/Engines/engine';
 
 /**
@@ -93,31 +93,34 @@ export class VRMMaterialGenerator {
      * @param material 生成した MToonMaterial
      * @param prop 生成した MToonMaterial のマテリアルプロパティ
      */
-    private async loadMToonTexturesAsync(
+    private loadMToonTexturesAsync(
         context: string,
         material: MToonMaterial,
         prop: IVRMMaterialProperty,
     ): Promise<Material> {
         const promises: Array<Promise<BaseTexture>> = [];
+        if (!prop.vectorProperties._MainTex) {
+            return Promise.resolve(material);
+        }
+        // 全てのテクスチャの UV Offset & Scale はメインテクスチャのものを流用する
+        const uvOffsetScale = prop.vectorProperties._MainTex;
         for (const baseName of Object.keys(VRMMaterialGenerator.TEXTURE_MAP)) {
             const index = prop.textureProperties[baseName];
             if (typeof index === 'undefined') {
                 continue;
             }
             const propName = (VRMMaterialGenerator.TEXTURE_MAP as any)[baseName] as string;
-            const assignTexture = ((name: string, option?: IVRMVectorMaterialProperty) => {
+            const assignTexture = ((name: string) => {
                 return (babylonTexture: BaseTexture) => {
                     // 実際は Texture インスタンスが来るのでキャスト
                     const t = babylonTexture as Texture;
-                    if (!!option) {
-                        t.uOffset = option[0];
-                        t.vOffset = option[1];
-                        t.uScale = option[2];
-                        t.vScale = option[3];
-                    }
+                    t.uOffset = uvOffsetScale[0];
+                    t.vOffset = uvOffsetScale[1];
+                    t.uScale = uvOffsetScale[2];
+                    t.vScale = uvOffsetScale[3];
                     (material as any)[name] = t;
                 };
-            })(propName, prop.vectorProperties[baseName]);
+            })(propName);
 
             promises.push(this.loader.loadTextureInfoAsync(context, {
                 index,
