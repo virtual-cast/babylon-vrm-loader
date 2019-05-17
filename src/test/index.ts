@@ -79,7 +79,9 @@ async function main() {
     window.addEventListener('resize', () => {
         engine.resize();
     });
-    let fileCount = 0;
+    await SceneLoader.AppendAsync('./', 'AliciaSolid.vrm', scene);
+
+    let fileCount = 1;
     (document.getElementById('file-input') as HTMLInputElement).addEventListener('change', (evt) => {
         const file = (evt as any).target.files[0];
         console.log(`loads ${file.name} ${file.size} bytes`);
