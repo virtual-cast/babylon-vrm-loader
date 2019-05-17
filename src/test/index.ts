@@ -65,9 +65,11 @@ async function main() {
         shadowGenerator.addShadowCaster(shadowCaster);
     }
 
-    await scene.debugLayer.show({
-        globalRoot: document.getElementById('wrapper') as HTMLMainElement,
-    });
+    if (debugProperties.inspector) {
+        await scene.debugLayer.show({
+            globalRoot: document.getElementById('wrapper') as HTMLMainElement,
+        });
+    }
 
     // Expose current scene
     (window as any).currentScene = scene;
@@ -100,6 +102,7 @@ async function main() {
 interface DebugProperties {
     webgl1: boolean;
     shadow: boolean;
+    inspector: boolean;
 }
 
 function getDebugProperties(): DebugProperties {
@@ -108,6 +111,7 @@ function getDebugProperties(): DebugProperties {
     return {
         webgl1: href.includes('webgl1'),
         shadow: href.includes('shadow'),
+        inspector: href.includes('inspector'),
     };
 }
 
