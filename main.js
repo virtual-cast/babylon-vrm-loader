@@ -286,11 +286,14 @@ function main() {
                         shadowGenerator = new _babylonjs_core_Lights_Shadows_shadowGenerator__WEBPACK_IMPORTED_MODULE_6__["ShadowGenerator"](1024, directionalLight);
                         shadowGenerator.addShadowCaster(shadowCaster);
                     }
+                    if (!debugProperties.inspector) return [3 /*break*/, 2];
                     return [4 /*yield*/, scene.debugLayer.show({
                             globalRoot: document.getElementById('wrapper'),
                         })];
                 case 1:
                     _a.sent();
+                    _a.label = 2;
+                case 2:
                     // Expose current scene
                     window.currentScene = scene;
                     engine.runRenderLoop(function () {
@@ -300,7 +303,10 @@ function main() {
                     window.addEventListener('resize', function () {
                         engine.resize();
                     });
-                    fileCount = 0;
+                    return [4 /*yield*/, _babylonjs_core_Loading_sceneLoader__WEBPACK_IMPORTED_MODULE_7__["SceneLoader"].AppendAsync('./', 'AliciaSolid.vrm', scene)];
+                case 3:
+                    _a.sent();
+                    fileCount = 1;
                     document.getElementById('file-input').addEventListener('change', function (evt) {
                         var file = evt.target.files[0];
                         console.log("loads " + file.name + " " + file.size + " bytes");
@@ -324,6 +330,7 @@ function getDebugProperties() {
     return {
         webgl1: href.includes('webgl1'),
         shadow: href.includes('shadow'),
+        inspector: href.includes('inspector'),
     };
 }
 main().catch(function (reason) {
@@ -747,13 +754,11 @@ var VRMManager = /** @class */ (function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "VRMMaterialGenerator", function() { return VRMMaterialGenerator; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babylonjs/core/Maths/math */ "./node_modules/@babylonjs/core/Maths/math.js");
-/* harmony import */ var babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! babylon-mtoon-material */ "./node_modules/babylon-mtoon-material/dist/index.js");
-/* harmony import */ var babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _vrm_interfaces__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./vrm-interfaces */ "./src/vrm-interfaces.ts");
-/* harmony import */ var _babylonjs_core_Engines_engine__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babylonjs/core/Engines/engine */ "./node_modules/@babylonjs/core/Engines/engine.js");
-
+/* harmony import */ var _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babylonjs/core/Maths/math */ "./node_modules/@babylonjs/core/Maths/math.js");
+/* harmony import */ var babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! babylon-mtoon-material */ "./node_modules/babylon-mtoon-material/dist/index.js");
+/* harmony import */ var babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _vrm_interfaces__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./vrm-interfaces */ "./src/vrm-interfaces.ts");
+/* harmony import */ var _babylonjs_core_Engines_engine__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babylonjs/core/Engines/engine */ "./node_modules/@babylonjs/core/Engines/engine.js");
 
 
 
@@ -792,7 +797,7 @@ var VRMMaterialGenerator = /** @class */ (function () {
             return null;
         }
         assign(newMaterial);
-        if (newMaterial instanceof babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_2__["MToonMaterial"]) {
+        if (newMaterial instanceof babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_1__["MToonMaterial"]) {
             mesh.alphaIndex = materialProp.renderQueue;
             return this.loadMToonTexturesAsync(context, newMaterial, materialProp);
         }
@@ -820,38 +825,36 @@ var VRMMaterialGenerator = /** @class */ (function () {
      * @param prop 生成した MToonMaterial のマテリアルプロパティ
      */
     VRMMaterialGenerator.prototype.loadMToonTexturesAsync = function (context, material, prop) {
-        return tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"](this, void 0, void 0, function () {
-            var promises, _i, _a, baseName, index, propName, assignTexture;
-            return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_b) {
-                promises = [];
-                for (_i = 0, _a = Object.keys(VRMMaterialGenerator.TEXTURE_MAP); _i < _a.length; _i++) {
-                    baseName = _a[_i];
-                    index = prop.textureProperties[baseName];
-                    if (typeof index === 'undefined') {
-                        continue;
-                    }
-                    propName = VRMMaterialGenerator.TEXTURE_MAP[baseName];
-                    assignTexture = (function (name, option) {
-                        return function (babylonTexture) {
-                            // 実際は Texture インスタンスが来るのでキャスト
-                            var t = babylonTexture;
-                            if (!!option) {
-                                t.uOffset = option[0];
-                                t.vOffset = option[1];
-                                t.uScale = option[2];
-                                t.vScale = option[3];
-                            }
-                            material[name] = t;
-                        };
-                    })(propName, prop.vectorProperties[baseName]);
-                    promises.push(this.loader.loadTextureInfoAsync(context, {
-                        index: index,
-                        texCoord: 0,
-                    }, assignTexture));
-                }
-                return [2 /*return*/, Promise.all(promises).then(function () { return material; })];
-            });
-        });
+        var promises = [];
+        if (!prop.vectorProperties._MainTex) {
+            return Promise.resolve(material);
+        }
+        // 全てのテクスチャの UV Offset & Scale はメインテクスチャのものを流用する
+        var uvOffsetScale = prop.vectorProperties._MainTex;
+        for (var _i = 0, _a = Object.keys(VRMMaterialGenerator.TEXTURE_MAP); _i < _a.length; _i++) {
+            var baseName = _a[_i];
+            var index = prop.textureProperties[baseName];
+            if (typeof index === 'undefined') {
+                continue;
+            }
+            var propName = VRMMaterialGenerator.TEXTURE_MAP[baseName];
+            var assignTexture = (function (name) {
+                return function (babylonTexture) {
+                    // 実際は Texture インスタンスが来るのでキャスト
+                    var t = babylonTexture;
+                    t.uOffset = uvOffsetScale[0];
+                    t.vOffset = uvOffsetScale[1];
+                    t.uScale = uvOffsetScale[2];
+                    t.vScale = uvOffsetScale[3];
+                    material[name] = t;
+                };
+            })(propName);
+            promises.push(this.loader.loadTextureInfoAsync(context, {
+                index: index,
+                texCoord: 0,
+            }, assignTexture));
+        }
+        return Promise.all(promises).then(function () { return material; });
     };
     /**
      * シェーダ名からマテリアルを推測して生成する
@@ -861,12 +864,12 @@ var VRMMaterialGenerator = /** @class */ (function () {
      * @param prop 生成するマテリアルプロパティ
      */
     VRMMaterialGenerator.prototype.createMaterialByShader = function (context, material, babylonDrawMode, prop) {
-        if (prop.shader === _vrm_interfaces__WEBPACK_IMPORTED_MODULE_3__["IVRMMaterialPropertyShader"].VRMMToon) {
-            var mtoonMaterial = new babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_2__["MToonMaterial"](material.name || "material" + material.index, this.loader.babylonScene);
+        if (prop.shader === _vrm_interfaces__WEBPACK_IMPORTED_MODULE_2__["IVRMMaterialPropertyShader"].VRMMToon) {
+            var mtoonMaterial = new babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_1__["MToonMaterial"](material.name || "material" + material.index, this.loader.babylonScene);
             this.setMToonMaterialProperties(mtoonMaterial, prop);
             return mtoonMaterial;
         }
-        if (prop.shader === _vrm_interfaces__WEBPACK_IMPORTED_MODULE_3__["IVRMMaterialPropertyShader"].VRMUnlitTransparentZWrite) {
+        if (prop.shader === _vrm_interfaces__WEBPACK_IMPORTED_MODULE_2__["IVRMMaterialPropertyShader"].VRMUnlitTransparentZWrite) {
             var mat = this.loader.createMaterial(context, material, babylonDrawMode);
             // 通常マテリアルに Depth Write を強制
             mat.disableDepthWrite = false;
@@ -920,11 +923,11 @@ var VRMMaterialGenerator = /** @class */ (function () {
             material.alphaCutOff = prop.floatProperties._Cutoff;
         }
         if (typeof prop.vectorProperties._Color !== 'undefined') {
-            material.diffuseColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_1__["Color3"](prop.vectorProperties._Color[0], prop.vectorProperties._Color[1], prop.vectorProperties._Color[2]);
+            material.diffuseColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Color3"](prop.vectorProperties._Color[0], prop.vectorProperties._Color[1], prop.vectorProperties._Color[2]);
             material.alpha = prop.vectorProperties._Color[3];
         }
         if (typeof prop.vectorProperties._ShadeColor !== 'undefined') {
-            material.shadeColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_1__["Color3"](prop.vectorProperties._ShadeColor[0], prop.vectorProperties._ShadeColor[1], prop.vectorProperties._ShadeColor[2]);
+            material.shadeColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Color3"](prop.vectorProperties._ShadeColor[0], prop.vectorProperties._ShadeColor[1], prop.vectorProperties._ShadeColor[2]);
         }
         if (typeof prop.floatProperties._BumpScale !== 'undefined') {
             material.bumpScale = prop.floatProperties._BumpScale;
@@ -948,7 +951,7 @@ var VRMMaterialGenerator = /** @class */ (function () {
             material.indirectLightIntensity = prop.floatProperties._IndirectLightIntensity;
         }
         if (typeof prop.vectorProperties._EmissionColor !== 'undefined') {
-            material.emissiveColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_1__["Color3"](prop.vectorProperties._EmissionColor[0], prop.vectorProperties._EmissionColor[1], prop.vectorProperties._EmissionColor[2]);
+            material.emissiveColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Color3"](prop.vectorProperties._EmissionColor[0], prop.vectorProperties._EmissionColor[1], prop.vectorProperties._EmissionColor[2]);
         }
         if (typeof prop.floatProperties._OutlineWidth !== 'undefined') {
             material.outlineWidth = prop.floatProperties._OutlineWidth;
@@ -957,7 +960,7 @@ var VRMMaterialGenerator = /** @class */ (function () {
             material.outlineScaledMaxDistance = prop.floatProperties._OutlineScaledMaxDistance;
         }
         if (typeof prop.vectorProperties._OutlineColor !== 'undefined') {
-            material.outlineColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_1__["Color3"](prop.vectorProperties._OutlineColor[0], prop.vectorProperties._OutlineColor[1], prop.vectorProperties._OutlineColor[2]);
+            material.outlineColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Color3"](prop.vectorProperties._OutlineColor[0], prop.vectorProperties._OutlineColor[1], prop.vectorProperties._OutlineColor[2]);
         }
         if (typeof prop.floatProperties._OutlineLightingMix !== 'undefined') {
             material.outlineLightingMix = prop.floatProperties._OutlineLightingMix;
@@ -967,17 +970,17 @@ var VRMMaterialGenerator = /** @class */ (function () {
                 case 0: // Opaque
                     material.alphaBlend = false;
                     material.alphaTest = false;
-                    material.alphaMode = _babylonjs_core_Engines_engine__WEBPACK_IMPORTED_MODULE_4__["Engine"].ALPHA_DISABLE;
+                    material.alphaMode = _babylonjs_core_Engines_engine__WEBPACK_IMPORTED_MODULE_3__["Engine"].ALPHA_DISABLE;
                     break;
                 case 1: // TransparentCutout
                     material.alphaBlend = false;
                     material.alphaTest = true;
-                    material.alphaMode = _babylonjs_core_Engines_engine__WEBPACK_IMPORTED_MODULE_4__["Engine"].ALPHA_COMBINE;
+                    material.alphaMode = _babylonjs_core_Engines_engine__WEBPACK_IMPORTED_MODULE_3__["Engine"].ALPHA_COMBINE;
                     break;
                 case 2: // Transparent
                     material.alphaBlend = true;
                     material.alphaTest = false;
-                    material.alphaMode = _babylonjs_core_Engines_engine__WEBPACK_IMPORTED_MODULE_4__["Engine"].ALPHA_COMBINE;
+                    material.alphaMode = _babylonjs_core_Engines_engine__WEBPACK_IMPORTED_MODULE_3__["Engine"].ALPHA_COMBINE;
                     break;
             }
         }
