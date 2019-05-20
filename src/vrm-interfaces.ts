@@ -151,6 +151,9 @@ export interface IVRMMaterialPropertyFloatProperties {
     _ShadeToony?: number;
     _LightColorAttenuation?: number;
     _IndirectLightIntensity?: number;
+    _RimLightingMix?: number;
+    _RimFresnelPower?: number;
+    _RimLift?: number;
     _OutlineWidth?: number;
     _OutlineScaledMaxDistance?: number;
     _OutlineLightingMix?: number;
@@ -176,6 +179,8 @@ export interface IVRMMaterialPropertyVectorProperties {
     _BumpMap?: IVRMVectorMaterialProperty;
     _ReceiveShadowTexture?: IVRMVectorMaterialProperty;
     _ShadingGradeTexture?: IVRMVectorMaterialProperty;
+    _RimColor?: IVRMVectorMaterialProperty;
+    _RimTexture?: IVRMVectorMaterialProperty;
     _SphereAdd?: IVRMVectorMaterialProperty;
     _EmissionColor?: IVRMVectorMaterialProperty;
     _EmissionMap?: IVRMVectorMaterialProperty;
@@ -190,6 +195,7 @@ export interface IVRMMaterialPropertyTextureProperties {
     _BumpMap?: number;
     _ReceiveShadowTexture?: number;
     _ShadingGradeTexture?: number;
+    _RimTexture?: number;
     _SphereAdd?: number;
     _EmissionMap?: number;
     _OutlineWidthTexture?: number;

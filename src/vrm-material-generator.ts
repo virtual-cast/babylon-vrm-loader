@@ -6,33 +6,19 @@ import { Mesh } from '@babylonjs/core/Meshes/mesh';
 import { Nullable } from '@babylonjs/core/types';
 import { GLTFLoader, IMaterial } from '@babylonjs/loaders/glTF/2.0';
 import { MToonMaterial } from 'babylon-mtoon-material';
-import { IVRMMaterialProperty, IVRMMaterialPropertyShader } from './vrm-interfaces';
+import { IVRMMaterialProperty, IVRMMaterialPropertyShader, IVRMVectorMaterialProperty } from './vrm-interfaces';
 import { Engine } from '@babylonjs/core/Engines/engine';
 
 /**
  * VRM で指定される Material を生成する
- * [VRM が提供するシェーダ](https://dwango.github.io/vrm/vrm_spec/#vrm%E3%81%8C%E6%8F%90%E4%BE%9B%E3%81%99%E3%82%8B%E3%82%B7%E3%82%A7%E3%83%BC%E3%83%80%E3%83%BC) を特定し読み込む
+ * [VRM が提供するシェーダ](https://vrm.dev/vrm_spec/#vrm%E3%81%8C%E6%8F%90%E4%BE%9B%E3%81%99%E3%82%8B%E3%82%B7%E3%82%A7%E3%83%BC%E3%83%80%E3%83%BC) を特定し読み込む
  * - UnlitTexture: 不透明, VRM ファイル側で [KHR_materials_unlit](https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit/) が定義されているため、何もしない
  * - UnlitCutout: 透明度が閾値以下の部分を透明とする, 同上
  * - UnlitTransparent: アルファブレンド。ZWriteしない, 同上
  * - UnlitTransparentZWrite: アルファブレンド。ZWriteする, 同上に加え、プロパティで ZWrite を強制しています
- * - MToon: MToonMaterial を実装し差し替えています。
+ * - MToon: MToonMaterial を差し替えています。
  */
 export class VRMMaterialGenerator {
-    /**
-     * MToonMaterial テクスチャ名のマッピング
-     */
-    public static readonly TEXTURE_MAP = {
-        _MainTex: 'diffuseTexture',
-        _ShadeTexture: 'shadeTexture',
-        _EmissionMap: 'emissiveTexture',
-        _BumpMap: 'bumpTexture',
-        _ReceiveShadowTexture: 'receiveShadowTexture',
-        _ShadingGradeTexture: 'shadingGradeTexture',
-        _SphereAdd: 'matCapTexture',
-        _OutlineWidthTexture: 'outlineWidthTexture',
-    };
-
     /**
      * @inheritdoc
      */
@@ -51,21 +37,20 @@ export class VRMMaterialGenerator {
         babylonDrawMode: number,
         assign: (babylonMaterial: Material) => void,
     ): Nullable<Promise<Material>> {
-        const materials = this.getMaterialProperties();
-        if (!materials) {
-            return null;
-        }
-        const materialProp = this.findMaterialPropertyByName(material.name, materials);
+        const materialProp = this.findMaterialPropertyByName(
+            material.name,
+            this.getMaterialProperties(),
+        );
         if (!materialProp) {
             return null;
         }
+        mesh.alphaIndex = materialProp.renderQueue;
         const newMaterial = this.createMaterialByShader(context, material, babylonDrawMode, materialProp);
         if (!newMaterial) {
             return null;
         }
         assign(newMaterial);
         if (newMaterial instanceof MToonMaterial) {
-            mesh.alphaIndex = materialProp.renderQueue;
             return this.loadMToonTexturesAsync(context, newMaterial, materialProp);
         }
         return Promise.resolve(newMaterial);
@@ -74,9 +59,9 @@ export class VRMMaterialGenerator {
     /**
      * VRM または VCI からマテリアルプロパティの配列を探す
      */
-    private getMaterialProperties(): Nullable<IVRMMaterialProperty[]> {
+    private getMaterialProperties(): IVRMMaterialProperty[] {
         if (!this.loader.gltf.extensions) {
-            return null;
+            return [];
         }
         if (this.loader.gltf.extensions.VRM && this.loader.gltf.extensions.VRM.materialProperties) {
             return this.loader.gltf.extensions.VRM.materialProperties;
@@ -84,7 +69,25 @@ export class VRMMaterialGenerator {
         if (this.loader.gltf.extensions.VCAST_vci_material_unity && this.loader.gltf.extensions.VCAST_vci_material_unity.materials) {
             return this.loader.gltf.extensions.VCAST_vci_material_unity.materials;
         }
-        return null;
+        return [];
+    }
+
+    /**
+     * マテリアル名から MaterialProperty を探す
+     * @param materialName マテリアル名
+     * @param extension 拡張データ
+     */
+    private findMaterialPropertyByName(materialName: string | undefined, materials: IVRMMaterialProperty[]): Nullable<IVRMMaterialProperty> {
+        if (!materialName || !materials) {
+            return null;
+        }
+        const mats = materials.filter((v) => v.name === materialName);
+        if (mats.length === 0) {
+            return null;
+        } else if (mats.length >= 2) {
+            this.loader.log(`Duplicated vrm material name found: ${materialName}`);
+        }
+        return mats[mats.length - 1];
     }
 
     /**
@@ -99,34 +102,39 @@ export class VRMMaterialGenerator {
         prop: IVRMMaterialProperty,
     ): Promise<Material> {
         const promises: Array<Promise<BaseTexture>> = [];
-        if (!prop.vectorProperties._MainTex) {
-            return Promise.resolve(material);
-        }
         // 全てのテクスチャの UV Offset & Scale はメインテクスチャのものを流用する
         const uvOffsetScale = prop.vectorProperties._MainTex;
-        for (const baseName of Object.keys(VRMMaterialGenerator.TEXTURE_MAP)) {
-            const index = prop.textureProperties[baseName];
-            if (typeof index === 'undefined') {
-                continue;
-            }
-            const propName = (VRMMaterialGenerator.TEXTURE_MAP as any)[baseName] as string;
-            const assignTexture = ((name: string) => {
-                return (babylonTexture: BaseTexture) => {
-                    // 実際は Texture インスタンスが来るのでキャスト
-                    const t = babylonTexture as Texture;
-                    t.uOffset = uvOffsetScale[0];
-                    t.vOffset = uvOffsetScale[1];
-                    t.uScale = uvOffsetScale[2];
-                    t.vScale = uvOffsetScale[3];
-                    (material as any)[name] = t;
-                };
-            })(propName);
-
-            promises.push(this.loader.loadTextureInfoAsync(context, {
-                index,
-                texCoord: 0,
-            }, assignTexture));
+        if (!uvOffsetScale) {
+            return Promise.resolve(material);
         }
+        const applyTexture = (index: number | undefined, callback: (texture: BaseTexture) => void) => {
+            applyPropertyWhenDefined<number>(index, (value) => {
+                promises.push(this.loader.loadTextureInfoAsync(
+                    `${context}/textures/${index}`,
+                    { index: value },
+                    (babylonTexture: BaseTexture) => {
+                        // 実際は Texture インスタンスが来るのでキャスト
+                        const t = babylonTexture as Texture;
+                        t.uOffset = uvOffsetScale[0];
+                        t.vOffset = uvOffsetScale[1];
+                        t.uScale = uvOffsetScale[2];
+                        t.vScale = uvOffsetScale[3];
+                        callback(babylonTexture);
+                    },
+                ));
+            });
+        };
+
+        applyTexture(prop.textureProperties._MainTex, (texture) => material.diffuseTexture = texture);
+        applyTexture(prop.textureProperties._ShadeTexture, (texture) => material.shadeTexture = texture);
+        applyTexture(prop.textureProperties._BumpMap, (texture) => material.bumpTexture = texture);
+        applyTexture(prop.textureProperties._ReceiveShadowTexture, (texture) => material.receiveShadowTexture = texture);
+        applyTexture(prop.textureProperties._ShadingGradeTexture, (texture) => material.shadingGradeTexture = texture);
+        applyTexture(prop.textureProperties._RimTexture, (texture) => material.rimTexture = texture);
+        applyTexture(prop.textureProperties._SphereAdd, (texture) => material.matCapTexture = texture);
+        applyTexture(prop.textureProperties._EmissionMap, (texture) => material.emissiveTexture = texture);
+        applyTexture(prop.textureProperties._OutlineWidthTexture, (texture) => material.outlineWidthTexture = texture);
+
         return Promise.all(promises).then(() => material);
     }
 
@@ -145,7 +153,7 @@ export class VRMMaterialGenerator {
     ): Nullable<Material> {
         if (prop.shader === IVRMMaterialPropertyShader.VRMMToon) {
             const mtoonMaterial = new MToonMaterial(
-                material.name || `material${material.index}`,
+                material.name || `MToonMaterial${material.index}`,
                 this.loader.babylonScene,
             );
             this.setMToonMaterialProperties(mtoonMaterial, prop);
@@ -162,112 +170,45 @@ export class VRMMaterialGenerator {
     }
 
     /**
-     * マテリアル名から MaterialProperty を探す
-     * @param materialName マテリアル名
-     * @param extension 拡張データ
-     */
-    private findMaterialPropertyByName(materialName?: string, materials?: IVRMMaterialProperty[]): Nullable<IVRMMaterialProperty> {
-        if (!materialName || !materials) {
-            return null;
-        }
-        const mats = materials.filter(
-            (v) => v.name === materialName,
-        );
-        if (mats.length === 0) {
-            return null;
-        } else if (mats.length >= 2) {
-            this.loader.log('Duplicated name found' + materialName);
-        }
-        return mats[mats.length - 1];
-    }
-
-    /**
      * マテリアルに VRM プロパティを設定
      * VRM プロパティとマテリアルプロパティのマッピングを行っている
      * 初期値はマテリアル実装側に持っているため、値がある場合のみ上書きする
-     * @param material
-     * @param prop
      */
     private setMToonMaterialProperties(material: MToonMaterial, prop: IVRMMaterialProperty) {
-        if (typeof prop.floatProperties._DebugMode !== 'undefined') {
-            material.debugMode = prop.floatProperties._DebugMode;
-        }
-        if (typeof prop.floatProperties._OutlineWidthMode !== 'undefined') {
-            material.outlineWidthMode = prop.floatProperties._OutlineWidthMode;
-        }
-        if (typeof prop.floatProperties._OutlineColorMode !== 'undefined') {
-            material.outlineColorMode = prop.floatProperties._OutlineColorMode;
-        }
-        if (typeof prop.floatProperties._CullMode !== 'undefined') {
-            material.cullMode = prop.floatProperties._CullMode;
-        }
-        if (typeof prop.floatProperties._OutlineCullMode !== 'undefined') {
-            material.outlineCullMode = prop.floatProperties._OutlineCullMode;
-        }
-        if (typeof prop.floatProperties._Cutoff !== 'undefined') {
-            material.alphaCutOff = prop.floatProperties._Cutoff;
-        }
-        if (typeof prop.vectorProperties._Color !== 'undefined') {
-            material.diffuseColor = new Color3(
-                prop.vectorProperties._Color[0],
-                prop.vectorProperties._Color[1],
-                prop.vectorProperties._Color[2],
-            );
-            material.alpha = prop.vectorProperties._Color[3];
-        }
-        if (typeof prop.vectorProperties._ShadeColor !== 'undefined') {
-            material.shadeColor = new Color3(
-                prop.vectorProperties._ShadeColor[0],
-                prop.vectorProperties._ShadeColor[1],
-                prop.vectorProperties._ShadeColor[2],
-            );
-        }
-        if (typeof prop.floatProperties._BumpScale !== 'undefined') {
-            material.bumpScale = prop.floatProperties._BumpScale;
-        }
-        if (typeof prop.floatProperties._ReceiveShadowRate !== 'undefined') {
-            material.receiveShadowRate = prop.floatProperties._ReceiveShadowRate;
-        }
-        if (typeof prop.floatProperties._ShadingGradeRate !== 'undefined') {
-            material.shadingGradeRate = prop.floatProperties._ShadingGradeRate;
-        }
-        if (typeof prop.floatProperties._ShadeShift !== 'undefined') {
-            material.shadeShift = prop.floatProperties._ShadeShift;
-        }
-        if (typeof prop.floatProperties._ShadeToony !== 'undefined') {
-            material.shadeToony = prop.floatProperties._ShadeToony;
-        }
-        if (typeof prop.floatProperties._LightColorAttenuation !== 'undefined') {
-            material.lightColorAttenuation = prop.floatProperties._LightColorAttenuation;
-        }
-        if (typeof prop.floatProperties._IndirectLightIntensity !== 'undefined') {
-            material.indirectLightIntensity = prop.floatProperties._IndirectLightIntensity;
-        }
-        if (typeof prop.vectorProperties._EmissionColor !== 'undefined') {
-            material.emissiveColor = new Color3(
-                prop.vectorProperties._EmissionColor[0],
-                prop.vectorProperties._EmissionColor[1],
-                prop.vectorProperties._EmissionColor[2],
-            );
-        }
-        if (typeof prop.floatProperties._OutlineWidth !== 'undefined') {
-            material.outlineWidth = prop.floatProperties._OutlineWidth;
-        }
-        if (typeof prop.floatProperties._OutlineScaledMaxDistance !== 'undefined') {
-            material.outlineScaledMaxDistance = prop.floatProperties._OutlineScaledMaxDistance;
-        }
-        if (typeof prop.vectorProperties._OutlineColor !== 'undefined') {
-            material.outlineColor = new Color3(
-                prop.vectorProperties._OutlineColor[0],
-                prop.vectorProperties._OutlineColor[1],
-                prop.vectorProperties._OutlineColor[2],
-            );
-        }
-        if (typeof prop.floatProperties._OutlineLightingMix !== 'undefined') {
-            material.outlineLightingMix = prop.floatProperties._OutlineLightingMix;
-        }
-        if (typeof prop.floatProperties._BlendMode !== 'undefined') {
-            switch (prop.floatProperties._BlendMode) {
+        applyPropertyWhenDefined<number>(prop.floatProperties._Cutoff, (value) => material.alphaCutOff = value);
+        applyPropertyWhenDefined<IVRMVectorMaterialProperty>(prop.vectorProperties._Color, (value) => {
+            material.diffuseColor = new Color3(value[0], value[1], value[2]);
+            material.alpha = value[3];
+        });
+        applyPropertyWhenDefined<IVRMVectorMaterialProperty>(prop.vectorProperties._ShadeColor, (value) => {
+            material.shadeColor = new Color3(value[0], value[1], value[2]);
+        });
+        applyPropertyWhenDefined<number>(prop.floatProperties._BumpScale, (value) => material.bumpScale = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._ReceiveShadowRate, (value) => material.receiveShadowRate = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._ShadingGradeRate, (value) => material.shadingGradeRate = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._ShadeShift, (value) => material.shadeShift = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._ShadeToony, (value) => material.shadeToony = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._LightColorAttenuation, (value) => material.lightColorAttenuation = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._IndirectLightIntensity, (value) => material.indirectLightIntensity = value);
+        applyPropertyWhenDefined<IVRMVectorMaterialProperty>(prop.vectorProperties._RimColor, (value) => {
+            material.rimColor = new Color3(value[0], value[1], value[2]);
+        });
+        applyPropertyWhenDefined<number>(prop.floatProperties._RimLightingMix, (value) => material.rimLightingMix = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._RimFresnelPower, (value) => material.rimFresnelPower = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._RimLift, (value) => material.rimLift = value);
+        applyPropertyWhenDefined<IVRMVectorMaterialProperty>(prop.vectorProperties._EmissionColor, (value) => {
+            material.emissiveColor = new Color3(value[0], value[1], value[2]);
+        });
+        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineWidth, (value) => material.outlineWidth = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineScaledMaxDistance, (value) => material.outlineScaledMaxDistance = value);
+        applyPropertyWhenDefined<IVRMVectorMaterialProperty>(prop.vectorProperties._OutlineColor, (value) => {
+            material.outlineColor = new Color3(value[0], value[1], value[2]);
+        });
+        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineLightingMix, (value) => material.outlineLightingMix = value);
+
+        applyPropertyWhenDefined<number>(prop.floatProperties._DebugMode, (value) => material.debugMode = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._BlendMode, (value) => {
+            switch (value) {
                 case 0: // Opaque
                     material.alphaBlend = false;
                     material.alphaTest = false;
@@ -284,18 +225,28 @@ export class VRMMaterialGenerator {
                     material.alphaMode = Engine.ALPHA_COMBINE;
                     break;
             }
-        }
-        if (typeof prop.keywordMap._ALPHABLEND_ON !== 'undefined') {
-            material.alphaBlend = prop.keywordMap._ALPHABLEND_ON;
-        }
-        if (typeof prop.keywordMap._ALPHATEST_ON !== 'undefined') {
-            material.alphaTest = prop.keywordMap._ALPHATEST_ON;
-        }
-        if (typeof prop.floatProperties._ZWrite !== 'undefined') {
-            material.forceDepthWrite = prop.floatProperties._ZWrite === 1;
+        });
+        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineWidthMode, (value) => material.outlineWidthMode = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineColorMode, (value) => material.outlineColorMode = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._CullMode, (value) => material.cullMode = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineCullMode, (value) => material.outlineCullMode = value);
+        applyPropertyWhenDefined<boolean>(prop.keywordMap._ALPHABLEND_ON, (value) => material.alphaBlend = value);
+        applyPropertyWhenDefined<boolean>(prop.keywordMap._ALPHATEST_ON, (value) => material.alphaTest = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._ZWrite, (value) => {
+            material.forceDepthWrite = (Math.round(value) === 1);
             if (material.forceDepthWrite) {
                 material.disableDepthWrite = false;
             }
-        }
+        });
     }
+}
+
+/**
+ * プロパティが設定されていればコールバックを実行する
+ */
+function applyPropertyWhenDefined<T>(prop: T | undefined, callback: (value: T) => void) {
+    if (typeof prop === 'undefined') {
+        return;
+    }
+    callback(prop);
 }

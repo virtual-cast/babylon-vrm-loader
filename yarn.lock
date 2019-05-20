@@ -741,9 +741,9 @@ aws4@^1.8.0:
   integrity sha512-ReZxvNHIOv88FlT7rxcXIIC0fPt4KZqZbOlivyWtXLt8ESx84zd3kMC6iK5jVeS2qt+g7ftS7ye4fi06X5rtRQ==
 
 babylon-mtoon-material@^1.2.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/babylon-mtoon-material/-/babylon-mtoon-material-1.5.0.tgz#d1c09f5a44d3a37d21a432030dab523545d14007"
-  integrity sha512-i9dm3E9dThknMfBcvKap5zWTuQpVGxEyaCRROx45bJ4XtYjlg/sNMxAnRANF7o0oyMuaWrAAK3duSZSTPSLd8A==
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/babylon-mtoon-material/-/babylon-mtoon-material-1.5.3.tgz#d5e4b1076ca2a1061426c379eb46ee5a18c2b8cd"
+  integrity sha512-lweoFT/wgaq03q/6ynZgpu3s+J/5P63EBnAP1FX/R/yBHtsXng3iQp+/+PObfyNOLrNgSrPGvqGRk6nBzwBQlA==
   dependencies:
     "@babylonjs/core" "^4.0.3"
 
