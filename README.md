@@ -32,11 +32,26 @@ This loader is used as [THE SEED ONLINE](https://seed.online) web VRM/VCI/glb vi
 
 ## Usage
 
+### on browser
+
+TBD.
+
+### with npm/yarn
+
+```s
+$ npm install --save @babylonjs/core @babylonjs/loaders babylon-vrm-loader
+# or
+$ yarn add @babylonjs/core @babylonjs/loaders babylon-vrm-loader
+```
+
 ```ts
+import * as BABYLON from '@babylonjs/core'
+
 // has side-effect
 // ref. https://webpack.js.org/guides/tree-shaking#mark-the-file-as-side-effect-free
 import 'babylon-vrm-loader'
 
+// vrmFile is File object retrieved by <input type="file">.
 const scene = await BABYLON.SceneLoader.LoadAsync('file:', vrmFile, engine);
 const vrmManager = scene.metadata.vrmManagers[0];
 const hips = vrmManager.getBone('hips'); // returns Nullable<TransformNode>
