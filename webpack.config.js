@@ -1,14 +1,9 @@
 const resolve = require('path').resolve;
+const merge = require('webpack-merge');
 
-module.exports = {
+const baseConfig = {
     mode: 'production',
     entry: resolve(__dirname, 'src', 'index'),
-    output: {
-        library: 'babylon-vrm-loader',
-        libraryTarget: 'umd',
-        filename: 'index.js',
-        path: resolve(__dirname, 'dist'),
-    },
     module: {
         rules: [
             {
@@ -22,8 +17,40 @@ module.exports = {
         extensions: ['.js', '.ts'],
     },
     target: 'web',
-    externals: [
-        /^@babylonjs\/core.*$/,
-        /^@babylonjs\/loaders.*$/,
-    ],
 };
+
+module.exports = [
+    /**
+     * to UMD for npm
+     */
+    merge(baseConfig, {
+        output: {
+            library: 'babylon-vrm-loader',
+            libraryTarget: 'umd',
+            filename: 'index.module.js',
+            path: resolve(__dirname, 'dist'),
+        },
+        externals: [
+            /^@babylonjs.*$/,
+        ],
+    }),
+    /**
+     * to global
+     */
+    merge(baseConfig, {
+        output: {
+            library: 'VRMLoader',
+            libraryTarget: 'window',
+            filename: 'index.js',
+            path: resolve(__dirname, 'dist'),
+        },
+        externals: [
+            function (context, request, callback) {
+                if (/^@babylonjs.*$/.test(request)) {
+                    return callback(null, 'window BABYLON');
+                }
+                callback();
+            },
+        ],
+    }),
+];

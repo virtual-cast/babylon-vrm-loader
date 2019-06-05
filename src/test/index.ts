@@ -67,7 +67,7 @@ async function main() {
 
     if (debugProperties.inspector) {
         await scene.debugLayer.show({
-            globalRoot: document.getElementById('wrapper') as HTMLMainElement,
+            globalRoot: document.getElementById('wrapper') as HTMLElement,
         });
     }
 
