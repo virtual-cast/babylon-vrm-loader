@@ -44,7 +44,7 @@
         "@types/node": "^12.0.0",
         "cz-conventional-changelog": "2.1.0",
         "gh-pages": "^2.0.1",
-        "raw-loader": "^2.0.0",
+        "raw-loader": "^3.0.0",
         "semantic-release": "^15.13.3",
         "ts-loader": "^6.0.0",
         "tslint": "^5.16.0",
