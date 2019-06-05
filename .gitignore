@@ -11,6 +11,7 @@ nbproject
 build
 .history
 
+dist/
 node_modules/
 
 test/main.js

@@ -63,6 +63,8 @@
         "release:gh-pages": "gh-pages -d test -u \"Masaru Yamagishi <m-yamagishi@virtualcast.jp>\" -m \"ci(gh-pages): update gh-pages [skip ci]\""
     },
     "sideEffects": [
+        "dist/index.js",
+        "dist/index.module.js",
         "src/vcast-vci-material-unity.ts",
         "src/vrm-extension.ts",
         "src/vrm-file-loader.ts"

@@ -20,7 +20,7 @@ This loader is used as [THE SEED ONLINE](https://seed.online) web VRM/VCI/glb vi
 - TODO: [BlendShape](https://vrm.dev/univrm/components/univrm_blendshape/) morphing
 - TODO: [Secondary Animation](https://vrm.dev/univrm/components/univrm_secondary/)
 - TODO: WebXR sample with [First Person](https://vrm.dev/univrm/components/univrm_firstperson/)
-- TODO: Supports [VCI](https://github.com/virtual-cast/VCI) features(partial support)
+- Supports [VCI](https://github.com/virtual-cast/VCI) features(partial support)
     - `VCAST_vci_material_unity`
     - TODO: `VCAST_vci_meta`
     - TODO: `VCAST_vci_embedded_script`
@@ -34,7 +34,7 @@ This loader is used as [THE SEED ONLINE](https://seed.online) web VRM/VCI/glb vi
 
 ### on browser
 
-TBD.
+example is [here](https://codepen.io/anon/pen/zQXyxL?editors=1010).
 
 ### with npm/yarn
 
