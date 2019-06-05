@@ -47,14 +47,14 @@ module.exports = [
         externals: [
             function (context, request, callback) {
                 if (/^@babylonjs\/core.*$/.test(request)) {
-                    return callback(null, 'window BABYLON');
+                    return callback(null, 'var BABYLON');
                 }
                 // @see https://github.com/BabylonJS/Babylon.js/blob/master/Tools/Config/config.json#L415
                 if (/^@babylonjs\/loaders\/glTF\/2\.0.*$/.test(request)) {
-                    return callback(null, 'window LOADERS.GLTF2');
+                    return callback(null, 'var LOADERS.GLTF2');
                 }
                 if (/^@babylonjs\/loaders.*$/.test(request)) {
-                    return callback(null, 'window LOADERS');
+                    return callback(null, 'var LOADERS');
                 }
                 callback();
             },
