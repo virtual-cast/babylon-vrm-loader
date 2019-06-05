@@ -46,8 +46,11 @@ module.exports = [
         },
         externals: [
             function (context, request, callback) {
-                if (/^@babylonjs.*$/.test(request)) {
+                if (/^@babylonjs\/core.*$/.test(request)) {
                     return callback(null, 'window BABYLON');
+                }
+                if (/^@babylonjs\/loaders.*$/.test(request)) {
+                    return callback(null, 'window LOADERS');
                 }
                 callback();
             },
