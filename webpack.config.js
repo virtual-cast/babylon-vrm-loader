@@ -49,6 +49,10 @@ module.exports = [
                 if (/^@babylonjs\/core.*$/.test(request)) {
                     return callback(null, 'window BABYLON');
                 }
+                // @see https://github.com/BabylonJS/Babylon.js/blob/master/Tools/Config/config.json#L415
+                if (/^@babylonjs\/loaders\/glTF\/2\.0.*$/.test(request)) {
+                    return callback(null, 'window LOADERS.GLTF2');
+                }
                 if (/^@babylonjs\/loaders.*$/.test(request)) {
                     return callback(null, 'window LOADERS');
                 }
