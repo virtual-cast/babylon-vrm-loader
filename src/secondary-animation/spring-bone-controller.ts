@@ -14,7 +14,6 @@ type getBone = (nodeIndex: number) => Nullable<TransformNode>;
  * VRM SpringBone Controller
  */
 export class SpringBoneController {
-    public colliderGroups: ColliderGroup[];
     public springs: VRMSpringBone[];
 
     /**
@@ -25,14 +24,14 @@ export class SpringBoneController {
         public readonly ext: IVRMSecondaryAnimation,
         getBone: getBone,
     ) {
-        this.springs = this.constructSprings(getBone);
+        const colliderGroups = this.constructColliderGroups(getBone);
+        this.springs = this.constructSprings(getBone, colliderGroups);
     }
 
     /**
      * 破棄処理
      */
     public dispose() {
-        this.colliderGroups = [];
         this.springs = [];
     }
 
@@ -52,21 +51,41 @@ export class SpringBoneController {
      * @see https://docs.unity3d.com/ScriptReference/Time-deltaTime.html
      */
     public update(deltaTime: number) {
-        // TODO: ColliderGroups
-
         this.springs.forEach((spring) => {
             spring.update(deltaTime);
         });
     }
 
     /**
+     * ColliderGroups を構築
+     */
+    private constructColliderGroups(getBone: getBone) {
+        const colliderGroups: ColliderGroup[] = [];
+        this.ext.colliderGroups.forEach((colliderGroup) => {
+            const bone = getBone(colliderGroup.node) as TransformNode;
+            const g = new ColliderGroup(bone);
+            colliderGroup.colliders.forEach((collider) => {
+                g.addCollider(
+                    new Vector3(collider.offset.x, collider.offset.y, collider.offset.z),
+                    collider.radius,
+                );
+            });
+            colliderGroups.push(g);
+        });
+        return colliderGroups;
+    }
+
+    /**
      * Spring を構築
      */
-    private constructSprings(getBone: getBone) {
+    private constructSprings(getBone: getBone, colliderGroups: ColliderGroup[]) {
         const springs: VRMSpringBone[] = [];
         this.ext.boneGroups.forEach((spring) => {
             const bones = spring.bones.map((bone) => {
                 return getBone(bone) as TransformNode;
+            });
+            const springColliders = spring.colliderGroups.map<ColliderGroup>((g) => {
+                return colliderGroups[g];
             });
             springs.push(new VRMSpringBone(
                 spring.comment,
@@ -81,7 +100,7 @@ export class SpringBoneController {
                 getBone(spring.center),
                 spring.hitRadius,
                 bones,
-                [], // TODO: ColliderGroups
+                springColliders,
             ));
         });
         return springs;

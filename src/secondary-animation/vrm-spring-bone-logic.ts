@@ -48,7 +48,6 @@ export class VRMSpringBoneLogic {
         external: Vector3,
         colliders: SphereCollider[],
     ): void {
-        // ここで事前に `computeWorldMatrix` を実行する
         const absPos = this.transform.getAbsolutePosition();
         if (Number.isNaN(absPos.x)) {
             // TODO: 絶対座標を取得出来ないフレームは情報を更新しない
@@ -128,7 +127,17 @@ export class VRMSpringBoneLogic {
      * @param nextTail NextTail
      */
     private collide(colliders: SphereCollider[], nextTail: Vector3): Vector3 {
-        // TODO
+        colliders.forEach((collider) => {
+            const r = this.radius + collider.radius;
+            const normal = nextTail.subtract(collider.position);
+            if (normal.lengthSquared() < (r * r)) {
+                // ヒット。 Collider の半径方向に押し出す
+                const posFromCollider = collider.position.add(MathVector3.multiplyByFloat(normal.normalize(), r));
+                // 長さを boneLength に強制
+                const absPos = this.transform.absolutePosition;
+                nextTail = absPos.add(MathVector3.multiplyByFloat(posFromCollider.subtractInPlace(absPos).normalize(), this.boneLength));
+            }
+        });
         return nextTail;
     }
 }

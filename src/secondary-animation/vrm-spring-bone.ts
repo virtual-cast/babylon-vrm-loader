@@ -4,6 +4,7 @@ import { Nullable } from '@babylonjs/core/types';
 import { MathVector3 } from './math-vector3';
 import { SphereCollider } from './sphere-collider';
 import { VRMSpringBoneLogic } from './vrm-spring-bone-logic';
+import { ColliderGroup } from './collider-group';
 
 /**
  * @see https://github.com/vrm-c/UniVRM/blob/master/Assets/VRM/UniVRM/Scripts/SpringBone/VRMSpringBone.cs
@@ -22,7 +23,7 @@ export class VRMSpringBone {
         public readonly center: Nullable<TransformNode>,
         public readonly hitRadius: number,
         public readonly bones: Array<Nullable<TransformNode>>,
-        public readonly colliderGroups: number[],
+        public readonly colliderGroups: ColliderGroup[],
     ) {
         this.activeBones = this.bones.filter((bone) => bone !== null) as TransformNode[];
         this.activeBones.forEach((bone) => {
@@ -51,8 +52,22 @@ export class VRMSpringBone {
             this.setup();
         }
 
-        // TODO ColliderGroups
         const colliderList: SphereCollider[] = [];
+        this.colliderGroups.forEach((group) => {
+            if (!group) {
+                return;
+            }
+            const position = group.node.getAbsolutePosition();
+            if (Number.isNaN(position.x)) {
+                return;
+            }
+            group.colliders.forEach((collider) => {
+                colliderList.push(new SphereCollider(
+                    position.add(collider.offset),
+                    collider.radius,
+                ));
+            });
+        });
 
         const stiffness = this.stiffness * deltaTime;
         const external = MathVector3.multiplyByFloat(this.gravityDir, this.gravityPower * deltaTime);
