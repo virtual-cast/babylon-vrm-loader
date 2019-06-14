@@ -1,9 +1,9 @@
-import { IVRM } from './vrm-interfaces';
-import { Scene } from '@babylonjs/core/scene';
-import { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
 import { Mesh } from '@babylonjs/core/Meshes/mesh';
-import { Nullable } from '@babylonjs/core/types';
 import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
+import { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
+import { Scene } from '@babylonjs/core/scene';
+import { Nullable } from '@babylonjs/core/types';
+import { IVRM } from './vrm-interfaces';
 
 interface MorphTargetSetting {
     target: MorphTarget;
@@ -11,17 +11,24 @@ interface MorphTargetSetting {
 }
 
 interface MorphTargetMap {
-    [label: string]: MorphTargetSetting[];
+    [morphName: string]: MorphTargetSetting[];
 }
 
 interface TransformNodeMap {
-    [label: string]: TransformNode;
+    [humanBoneName: string]: TransformNode;
 }
 
 interface TransformNodeCache {
-    [node: number]: TransformNode;
+    [nodeIndex: number]: TransformNode;
 }
 
+interface MeshCache {
+    [meshIndex: number]: Mesh;
+}
+
+/**
+ * Unity Humanoid Bone 名
+ */
 export type HumanBoneName = 'hips' | 'leftUpperLeg' | 'rightUpperLeg' | 'leftLowerLeg' | 'rightLowerLeg' | 'leftFoot' | 'rightFoot' | 'spine' | 'chest' | 'neck' | 'head' | 'leftShoulder' | 'rightShoulder' | 'leftUpperArm' | 'rightUpperArm' | 'leftLowerArm' | 'rightLowerArm' | 'leftHand' | 'rightHand' | 'leftToes' | 'rightToes' | 'leftEye' | 'rightEye' | 'jaw' | 'leftThumbProximal' | 'leftThumbIntermediate' | 'leftThumbDistal' | 'leftIndexProximal' | 'leftIndexIntermediate' | 'leftIndexDistal' | 'leftMiddleProximal' | 'leftMiddleIntermediate' | 'leftMiddleDistal' | 'leftRingProximal' | 'leftRingIntermediate' | 'leftRingDistal' | 'leftLittleProximal' | 'leftLittleIntermediate' | 'leftLittleDistal' | 'rightThumbProximal' | 'rightThumbIntermediate' | 'rightThumbDistal' | 'rightIndexProximal' | 'rightIndexIntermediate' | 'rightIndexDistal' | 'rightMiddleProximal' | 'rightMiddleIntermediate' | 'rightMiddleDistal' | 'rightRingProximal' | 'rightRingIntermediate' | 'rightRingDistal' | 'rightLittleProximal' | 'rightLittleIntermediate' | 'rightLittleDistal' | 'upperChest' | string;
 
 /**
@@ -31,23 +38,38 @@ export class VRMManager {
     private morphTargetMap: MorphTargetMap = {};
     private presetMorphTargetMap: MorphTargetMap = {};
     private transformNodeMap: TransformNodeMap = {};
-    private transformNodeCache: Nullable<TransformNodeCache> = null;
+    private transformNodeCache: TransformNodeCache = {};
+    private meshCache: MeshCache = {};
 
+    /**
+     *
+     * @param ext glTF.extensions.VRM の中身 json
+     * @param scene
+     * @param meshesFrom この番号以降のメッシュがこの VRM に該当する
+     * @param transformNodesFrom この番号以降の TransformNode がこの VRM に該当する
+     */
     public constructor(
         public readonly ext: IVRM,
         public readonly scene: Scene,
         private readonly meshesFrom: number,
         private readonly transformNodesFrom: number,
     ) {
+        this.meshCache = this.constructMeshCache();
+        this.transformNodeCache = this.constructTransformNodeCache();
+
         this.constructMorphTargetMap();
         this.constructTransformNodeMap();
     }
 
+    /**
+     * 破棄処理
+     */
     public dispose(): void {
         this.morphTargetMap = {};
         this.presetMorphTargetMap = {};
         this.transformNodeMap = {};
-        this.transformNodeCache = null;
+        this.transformNodeCache = {};
+        this.meshCache = {};
     }
 
     /**
@@ -84,6 +106,24 @@ export class VRMManager {
      */
     public getBone(name: HumanBoneName): Nullable<TransformNode> {
         return this.transformNodeMap[name] || null;
+    }
+
+    /**
+     * node 番号から該当する TransformNode を探す
+     * 数が多くなるのでキャッシュに参照を持つ構造にする
+     * gltf の node 番号は `metadata.gltf.pointers` に記録されている
+     * @param nodeIndex
+     */
+    public findTransformNode(nodeIndex: number): Nullable<TransformNode> {
+        return this.transformNodeCache[nodeIndex] || null;
+    }
+
+    /**
+     * mesh 番号からメッシュを探す
+     * gltf の mesh 番号は `metadata.gltf.pointers` に記録されている
+     */
+    public findMesh(meshIndex: number): Nullable<Mesh> {
+        return this.meshCache[meshIndex] || null;
     }
 
     /**
@@ -140,55 +180,46 @@ export class VRMManager {
     }
 
     /**
-     * node 番号から該当する TransformNode を探す
-     * 数が多くなるのでキャッシュに参照を持つ構造にする
-     * gltf の node 番号は `metadata.gltf.pointers` に記録されている
-     * @param nodeIndex
+     * node 番号と TransformNode を紐づける
      */
-    private findTransformNode(nodeIndex: number): Nullable<TransformNode> {
-        if (!this.transformNodeCache) {
-            this.transformNodeCache = this.scene.transformNodes.filter((n, index) => {
-                return index >= this.transformNodesFrom
-                    && !!n.metadata
-                    && !!n.metadata.gltf
-                    && !!n.metadata.gltf.pointers
-                    && n.metadata.gltf.pointers.length !== 0;
-            }).reduce<TransformNodeCache>((prev: TransformNodeCache, curr: TransformNode) => {
-                let nodeIndex = -1;
-                for (const p of curr.metadata.gltf.pointers) {
-                    if (p.startsWith(`/nodes/`)) {
-                        nodeIndex = parseInt((p as string).substr(7), 10);
-                    }
+    private constructTransformNodeCache() {
+        const cache: TransformNodeCache = {};
+        for (let index = this.transformNodesFrom; index < this.scene.transformNodes.length; index++) {
+            const node = this.scene.transformNodes[index];
+            // ポインタが登録されていないものは省略
+            if (!node || !node.metadata || !node.metadata.gltf || !node.metadata.gltf.pointers || node.metadata.gltf.pointers.length === 0) {
+                continue;
+            }
+            for (const pointer of node.metadata.gltf.pointers) {
+                if (pointer.startsWith('/nodes/')) {
+                    const nodeIndex = parseInt((pointer as string).substr(7), 10);
+                    cache[nodeIndex] = node;
+                    break;
                 }
-                if (nodeIndex !== -1) {
-                    prev[nodeIndex] = curr;
-                }
-                return prev;
-            }, {});
+            }
         }
-        return this.transformNodeCache[nodeIndex] || null;
+        return cache;
     }
 
     /**
-     * mesh 番号からメッシュを探す
-     * gltf の mesh 番号は `metadata.gltf.pointers` に記録されている
+     * mesh 番号と Mesh を紐づける
      */
-    private findMesh(meshIndex: number): Nullable<Mesh> {
-        const mesh = this.scene.meshes.find((m, index) => {
-            if (index < this.meshesFrom || !m.metadata || !m.metadata.gltf || !m.metadata.gltf.pointers || m.metadata.gltf.pointers.length < 1) {
-                return false;
+    private constructMeshCache() {
+        const cache: MeshCache = {};
+        for (let index = this.meshesFrom; index < this.scene.meshes.length; index++) {
+            const mesh = this.scene.meshes[index];
+            // ポインタが登録されていないものは省略
+            if (!mesh || !mesh.metadata || !mesh.metadata.gltf || !mesh.metadata.gltf.pointers || mesh.metadata.gltf.pointers.length === 0) {
+                continue;
             }
-            const pointers: string[] = m.metadata.gltf.pointers;
-            for (const p of pointers) {
-                if (p.startsWith(`/meshes/${meshIndex}`)) {
-                    return true;
+            for (const pointer of mesh.metadata.gltf.pointers) {
+                if (pointer.startsWith('/meshes/')) {
+                    const nodeIndex = parseInt((pointer as string).substr(8), 10);
+                    cache[nodeIndex] = mesh as Mesh;
+                    break;
                 }
             }
-            return false;
-        });
-        if (mesh) {
-            return mesh as Mesh;
         }
-        return null;
+        return cache;
     }
 }
