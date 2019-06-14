@@ -1,8 +1,10 @@
+import { Vector3 } from '@babylonjs/core/Maths/math';
 import { Mesh } from '@babylonjs/core/Meshes/mesh';
 import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
 import { Scene } from '@babylonjs/core/scene';
 import { Nullable } from '@babylonjs/core/types';
+import { SpringBoneController } from './secondary-animation/spring-bone-controller';
 import { IVRM } from './vrm-interfaces';
 
 interface MorphTargetSetting {
@@ -42,6 +44,11 @@ export class VRMManager {
     private meshCache: MeshCache = {};
 
     /**
+     * Secondary Animation として定義されている VRM Spring Bone のコントローラ
+     */
+    public readonly springBoneController: SpringBoneController;
+
+    /**
      *
      * @param ext glTF.extensions.VRM の中身 json
      * @param scene
@@ -56,9 +63,23 @@ export class VRMManager {
     ) {
         this.meshCache = this.constructMeshCache();
         this.transformNodeCache = this.constructTransformNodeCache();
+        this.springBoneController = new SpringBoneController(
+            this.ext.secondaryAnimation,
+            this.findTransformNode.bind(this),
+        );
+        this.springBoneController.setup();
 
         this.constructMorphTargetMap();
         this.constructTransformNodeMap();
+    }
+
+    /**
+     * Secondary Animation を更新する
+     *
+     * @param deltaTime 前フレームからの経過秒数(sec)
+     */
+    public update(deltaTime: number): void {
+        this.springBoneController.update(deltaTime);
     }
 
     /**
@@ -70,6 +91,8 @@ export class VRMManager {
         this.transformNodeMap = {};
         this.transformNodeCache = {};
         this.meshCache = {};
+
+        this.springBoneController.dispose();
     }
 
     /**
@@ -98,6 +121,35 @@ export class VRMManager {
         this.presetMorphTargetMap[label].forEach((setting) => {
             setting.target.influence = Math.max(0, Math.min(1, value)) * (setting.weight / 100);
         });
+    }
+
+    /**
+     * 一人称時のカメラ位置を絶対座標として取得する
+     *
+     * firstPersonBone が未設定の場合は null を返す
+     *
+     * @returns 一人称時のカメラの現在における絶対座標
+     */
+    public getFirstPersonCameraPosition(): Nullable<Vector3> {
+        const firstPersonBone = this.getFirstPersonBone();
+        if (!firstPersonBone) {
+            return null;
+        }
+
+        let basePos = firstPersonBone.getAbsolutePosition();
+        const offsetPos = this.ext.firstPerson.firstPersonBoneOffset;
+        return new Vector3(
+            basePos.x + offsetPos.x,
+            basePos.y + offsetPos.y,
+            basePos.z + offsetPos.z,
+        );
+    }
+
+    /**
+     * 一人称時に頭とみなす TransformNode を取得する
+     */
+    public getFirstPersonBone(): Nullable<TransformNode> {
+        return this.findTransformNode(this.ext.firstPerson.firstPersonBone) || null;
     }
 
     /**
