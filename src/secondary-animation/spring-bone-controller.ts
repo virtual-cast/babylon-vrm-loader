@@ -67,7 +67,8 @@ export class SpringBoneController {
             const g = new ColliderGroup(bone);
             colliderGroup.colliders.forEach((collider) => {
                 g.addCollider(
-                    new Vector3(collider.offset.x, collider.offset.y, collider.offset.z),
+                    // Unity 座標系からの変換のため X, Z 軸を反転
+                    new Vector3(-collider.offset.x, collider.offset.y, -collider.offset.z),
                     collider.radius,
                 );
             });
@@ -82,7 +83,7 @@ export class SpringBoneController {
     private constructSprings(getBone: getBone, colliderGroups: ColliderGroup[]) {
         const springs: VRMSpringBone[] = [];
         this.ext.boneGroups.forEach((spring) => {
-            const bones = spring.bones.map((bone) => {
+            const rootBones = spring.bones.map((bone) => {
                 return getBone(bone) as TransformNode;
             });
             const springColliders = spring.colliderGroups.map<ColliderGroup>((g) => {
@@ -100,7 +101,7 @@ export class SpringBoneController {
                 spring.dragForce,
                 getBone(spring.center),
                 spring.hitRadius,
-                bones,
+                rootBones,
                 springColliders,
             ));
         });

@@ -45,7 +45,7 @@ export class MathQuaternion {
         const axis = Vector3.Cross(from, to).normalize();
         const a = Vector3.Dot(from, to);
         const b = from.length() * to.length();
-        const phi = Math.acos((a > 0.999 ? 1 : a) / (b > 0.999 ? 1 : b));
+        const phi = Math.acos(Math.max(0.0, Math.min(1.0, a / b)));
         const sin = Math.sin(phi / 2);
         return new Quaternion(
             sin * axis.x,

@@ -5,8 +5,11 @@ import { Collider } from './collider';
 export class ColliderGroup {
     public readonly colliders: Collider[] = [];
 
+    /**
+     * @param transform 基準点となる TransformNode
+     */
     public constructor(
-        public readonly node: TransformNode,
+        public readonly transform: TransformNode,
     ) {
     }
 
