@@ -15,9 +15,10 @@ import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
  */
 export class VRMSpringBone {
     public verlets: VRMSpringBoneLogic[] = [];
-    private initialLocalRotations: Array<Nullable<Quaternion>> = [];
+    private initialLocalRotations: Quaternion[] = [];
     private activeBones: TransformNode[] = [];
 
+    /** @hidden */
     private drawGizmo = false;
     private boneGizmoList: Mesh[] = [];
     private colliderGizmoList: Mesh[] = [];
@@ -35,19 +36,22 @@ export class VRMSpringBone {
     ) {
         this.activeBones = this.bones.filter((bone) => bone !== null) as TransformNode[];
         this.activeBones.forEach((bone) => {
-            this.initialLocalRotations.push(bone.rotationQuaternion && bone.rotationQuaternion.clone() || bone.rotationQuaternion);
+            bone.rotationQuaternion = bone.rotationQuaternion || bone.rotation.toQuaternion();
+            this.initialLocalRotations.push(bone.rotationQuaternion.clone());
         });
     }
 
     public setup(force = false): void {
         if (!force) {
             this.activeBones.forEach((bone, index) => {
-                bone.rotationQuaternion = this.initialLocalRotations[index] && this.initialLocalRotations[index]!.clone() || null;
+                bone.rotationQuaternion = this.initialLocalRotations[index]!.clone();
             });
         }
         this.verlets = [];
 
-        this.activeBones.forEach((bone) => {
+        this.activeBones.forEach((bone, index) => {
+            this.initialLocalRotations[index]! = bone.rotationQuaternion!;
+
             this.setupRecursive(this.center, bone);
         });
     }
@@ -101,7 +105,7 @@ export class VRMSpringBone {
                     external,
                     colliderList,
                 );
-                if (this.drawGizmo) {
+                if (this.drawGizmo && this.boneGizmoList[index]) {
                     this.boneGizmoList[index].position = verlet.transform.absolutePosition;
                     this.boneGizmoList[index].rotationQuaternion = verlet.transform.rotationQuaternion;
                 }

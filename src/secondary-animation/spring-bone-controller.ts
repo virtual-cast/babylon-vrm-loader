@@ -47,10 +47,12 @@ export class SpringBoneController {
     /**
      * 全ての Spring を更新する
      *
-     * @param deltaTime 前フレームからの経過時間(sec) Unity の Time.deltaTime と同義
+     * @param deltaTime 前フレームからの経過時間(msec)
      * @see https://docs.unity3d.com/ScriptReference/Time-deltaTime.html
      */
     public async update(deltaTime: number): Promise<void> {
+        // ポーズ後のあらぶり防止のため clamp
+        deltaTime = Math.max(0.0, Math.min(16.666, deltaTime)) / 1000;
         const promises = this.springs.map<Promise<void>>((spring) => {
             return spring.update(deltaTime);
         });
@@ -94,9 +96,10 @@ export class SpringBoneController {
                 spring.stiffiness,
                 spring.gravityPower,
                 new Vector3(
-                    spring.gravityDir.x,
+                    // Unity 座標系からの変換のため X, Z 軸を反転
+                    -spring.gravityDir.x,
                     spring.gravityDir.y,
-                    spring.gravityDir.z,
+                    -spring.gravityDir.z,
                 ).normalize(),
                 spring.dragForce,
                 getBone(spring.center),
