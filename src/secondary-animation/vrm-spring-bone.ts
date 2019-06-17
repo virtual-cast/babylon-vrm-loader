@@ -44,7 +44,7 @@ export class VRMSpringBone {
         });
     }
 
-    public update(deltaTime: number): void {
+    public async update(deltaTime: number): Promise<void> {
         if (this.verlets.length === 0) {
             if (this.activeBones.length === 0) {
                 return;
@@ -72,15 +72,20 @@ export class VRMSpringBone {
         const stiffness = this.stiffness * deltaTime;
         const external = MathVector3.multiplyByFloat(this.gravityDir, this.gravityPower * deltaTime);
 
-        this.verlets.forEach((verlet) => {
-            verlet.update(
-                this.center,
-                stiffness,
-                this.dragForce,
-                external,
-                colliderList,
-            );
+        const promises = this.verlets.map<Promise<void>>((verlet) => {
+            return new Promise<void>((resolve) => {
+                verlet.update(
+                    this.center,
+                    stiffness,
+                    this.dragForce,
+                    external,
+                    colliderList,
+                );
+                resolve();
+            });
         });
+
+        return Promise.all(promises).then(() => { /* Do Nothing */ });
     }
 
     private setupRecursive(center: Nullable<TransformNode>, parent: TransformNode): void {

@@ -78,8 +78,8 @@ export class VRMManager {
      *
      * @param deltaTime 前フレームからの経過秒数(sec)
      */
-    public update(deltaTime: number): void {
-        this.springBoneController.update(deltaTime);
+    public async update(deltaTime: number): Promise<void> {
+        await this.springBoneController.update(deltaTime);
     }
 
     /**

@@ -50,10 +50,11 @@ export class SpringBoneController {
      * @param deltaTime 前フレームからの経過時間(sec) Unity の Time.deltaTime と同義
      * @see https://docs.unity3d.com/ScriptReference/Time-deltaTime.html
      */
-    public update(deltaTime: number) {
-        this.springs.forEach((spring) => {
-            spring.update(deltaTime);
+    public async update(deltaTime: number): Promise<void> {
+        const promises = this.springs.map<Promise<void>>((spring) => {
+            return spring.update(deltaTime);
         });
+        return Promise.all(promises).then(() => { /* Do nothing */ });
     }
 
     /**
