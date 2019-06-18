@@ -157,6 +157,9 @@ export interface IVRMMaterialPropertyFloatProperties {
     _OutlineWidth?: number;
     _OutlineScaledMaxDistance?: number;
     _OutlineLightingMix?: number;
+    _UvAnimScrollX?: number;
+    _UvAnimScrollY?: number;
+    _UvAnimRotation?: number;
     _DebugMode?: number;
     _BlendMode?: number;
     _OutlineWidthMode?: number;
@@ -186,6 +189,7 @@ export interface IVRMMaterialPropertyVectorProperties {
     _EmissionMap?: IVRMVectorMaterialProperty;
     _OutlineWidthTexture?: IVRMVectorMaterialProperty;
     _OutlineColor?: IVRMVectorMaterialProperty;
+    _UvAnimMaskTexture?: IVRMVectorMaterialProperty;
     [prop: string]: IVRMVectorMaterialProperty | undefined;
 }
 
@@ -199,6 +203,7 @@ export interface IVRMMaterialPropertyTextureProperties {
     _SphereAdd?: number;
     _EmissionMap?: number;
     _OutlineWidthTexture?: number;
+    _UvAnimMaskTexture?: number;
     [prop: string]: number | undefined;
 }
 
