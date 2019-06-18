@@ -134,6 +134,7 @@ export class VRMMaterialGenerator {
         applyTexture(prop.textureProperties._SphereAdd, (texture) => material.matCapTexture = texture);
         applyTexture(prop.textureProperties._EmissionMap, (texture) => material.emissiveTexture = texture);
         applyTexture(prop.textureProperties._OutlineWidthTexture, (texture) => material.outlineWidthTexture = texture);
+        applyTexture(prop.textureProperties._UvAnimMaskTexture, (texture) => material.uvAnimationMaskTexture = texture);
 
         return Promise.all(promises).then(() => material);
     }
@@ -205,6 +206,9 @@ export class VRMMaterialGenerator {
             material.outlineColor = new Color3(value[0], value[1], value[2]);
         });
         applyPropertyWhenDefined<number>(prop.floatProperties._OutlineLightingMix, (value) => material.outlineLightingMix = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._UvAnimScrollX, (value) => material.uvAnimationScrollX = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._UvAnimScrollY, (value) => material.uvAnimationScrollY = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._UvAnimRotation, (value) => material.uvAnimationRotation = value);
 
         applyPropertyWhenDefined<number>(prop.floatProperties._DebugMode, (value) => material.debugMode = value);
         applyPropertyWhenDefined<number>(prop.floatProperties._BlendMode, (value) => {
