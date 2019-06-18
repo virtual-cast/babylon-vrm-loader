@@ -82,13 +82,19 @@ export class VRMSpringBone {
 
                 if (this.drawGizmo) {
                     if (this.colliderGizmoList.length < colliderList.length) {
-                        this.colliderGizmoList.push(MeshBuilder.CreateSphere(`colliderGizmo`, {
-                            segments: 6,
-                            diameter: collider.radius * 2,
+                        const mesh = MeshBuilder.CreateSphere(`${group.transform.name}_colliderGizmo`, {
+                            segments: 8,
+                            diameter: 1,
                             updatable: true,
-                        }, group.transform.getScene()));
+                        }, group.transform.getScene());
+                        const mat = new StandardMaterial(group.transform.name + '_colliderGizmomat', group.transform.getScene());
+                        mat.emissiveColor = Color3.Yellow();
+                        mat.wireframe = true;
+                        mesh.material = mat;
+                        this.colliderGizmoList.push(mesh);
                     }
                     this.colliderGizmoList[colliderList.length - 1].position = pos;
+                    this.colliderGizmoList[colliderList.length - 1].scaling = new Vector3(collider.radius * 2, collider.radius * 2, collider.radius * 2);
                 }
             });
         });
@@ -142,15 +148,14 @@ export class VRMSpringBone {
         }
 
         if (this.drawGizmo) {
-            const boneGizmo = MeshBuilder.CreateCylinder(parent.name + '_colliderGizmo', {
+            const boneGizmo = MeshBuilder.CreateSphere(parent.name + '_boneGizmo', {
+                segments: 8,
                 diameter: this.hitRadius * 2,
-                height: this.hitRadius * 2,
-                tessellation: 6,
                 updatable: true,
-            });
-            boneGizmo.visibility = 0.5;
-            const mat = new StandardMaterial(parent.name + '_ColliderGizmomat', parent.getScene());
-            mat.diffuseColor = new Color3(1, 0, 0);
+            }, parent.getScene());
+            const mat = new StandardMaterial(parent.name + '_boneGizmomat', parent.getScene());
+            mat.emissiveColor = Color3.Red();
+            mat.wireframe = true;
             boneGizmo.material = mat;
             this.boneGizmoList.push(boneGizmo);
         }
