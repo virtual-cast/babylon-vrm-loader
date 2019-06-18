@@ -129,10 +129,11 @@ export class VRMSpringBoneLogic {
     private collide(colliders: SphereCollider[], nextTail: Vector3): Vector3 {
         colliders.forEach((collider) => {
             const r = this.radius + collider.radius;
-            const normal = nextTail.subtract(collider.position);
-            if (normal.lengthSquared() < (r * r)) {
+            const axis = nextTail.subtract(collider.position);
+            // 少数誤差許容のため 2 cm 判定を小さくする
+            if (axis.lengthSquared() <= (r * r) - 0.02) {
                 // ヒット。 Collider の半径方向に押し出す
-                const posFromCollider = collider.position.add(MathVector3.multiplyByFloat(normal.normalize(), r));
+                const posFromCollider = collider.position.add(MathVector3.multiplyByFloat(axis.normalize(), r));
                 // 長さを boneLength に強制
                 const absPos = this.transform.absolutePosition;
                 nextTail = absPos.add(MathVector3.multiplyByFloat(posFromCollider.subtractInPlace(absPos).normalize(), this.boneLength));
