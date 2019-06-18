@@ -1,6 +1,6 @@
 {
     "name": "babylon-vrm-loader",
-    "version": "1.3.1",
+    "version": "1.3.2",
     "description": "babylon.js VRM Loader",
     "license": "MIT",
     "author": {
