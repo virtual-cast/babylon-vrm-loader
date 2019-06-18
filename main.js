@@ -1567,6 +1567,7 @@ var VRMMaterialGenerator = /** @class */ (function () {
         applyTexture(prop.textureProperties._SphereAdd, function (texture) { return material.matCapTexture = texture; });
         applyTexture(prop.textureProperties._EmissionMap, function (texture) { return material.emissiveTexture = texture; });
         applyTexture(prop.textureProperties._OutlineWidthTexture, function (texture) { return material.outlineWidthTexture = texture; });
+        applyTexture(prop.textureProperties._UvAnimMaskTexture, function (texture) { return material.uvAnimationMaskTexture = texture; });
         return Promise.all(promises).then(function () { return material; });
     };
     /**
@@ -1627,6 +1628,9 @@ var VRMMaterialGenerator = /** @class */ (function () {
             material.outlineColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Color3"](value[0], value[1], value[2]);
         });
         applyPropertyWhenDefined(prop.floatProperties._OutlineLightingMix, function (value) { return material.outlineLightingMix = value; });
+        applyPropertyWhenDefined(prop.floatProperties._UvAnimScrollX, function (value) { return material.uvAnimationScrollX = value; });
+        applyPropertyWhenDefined(prop.floatProperties._UvAnimScrollY, function (value) { return material.uvAnimationScrollY = value; });
+        applyPropertyWhenDefined(prop.floatProperties._UvAnimRotation, function (value) { return material.uvAnimationRotation = value; });
         applyPropertyWhenDefined(prop.floatProperties._DebugMode, function (value) { return material.debugMode = value; });
         applyPropertyWhenDefined(prop.floatProperties._BlendMode, function (value) {
             switch (value) {
