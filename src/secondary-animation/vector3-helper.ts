@@ -1,9 +1,9 @@
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Vector3 } from '@babylonjs/core/Maths/math';
 
 /**
  * Vector3 Helper
  */
-export class MathVector3 {
+export class Vector3Helper {
     /**
      * Vector3 * float
      *

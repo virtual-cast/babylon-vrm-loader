@@ -1,14 +1,13 @@
-import { Quaternion, Vector3, Color3 } from '@babylonjs/core/Maths/math';
+import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
+import { Color3, Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
+import { Mesh } from '@babylonjs/core/Meshes/mesh';
+import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
 import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import { Nullable } from '@babylonjs/core/types';
-import { MathVector3 } from './math-vector3';
-import { SphereCollider } from './sphere-collider';
-import { VRMSpringBoneLogic } from './vrm-spring-bone-logic';
 import { ColliderGroup } from './collider-group';
-
-import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
-import { Mesh } from '@babylonjs/core/Meshes/mesh';
-import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
+import { SphereCollider } from './sphere-collider';
+import { Vector3Helper } from './vector3-helper';
+import { VRMSpringBoneLogic } from './vrm-spring-bone-logic';
 
 /**
  * @see https://github.com/vrm-c/UniVRM/blob/master/Assets/VRM/UniVRM/Scripts/SpringBone/VRMSpringBone.cs
@@ -23,6 +22,20 @@ export class VRMSpringBone {
     private boneGizmoList: Mesh[] = [];
     private colliderGizmoList: Mesh[] = [];
 
+    /**
+     * @see https://vrm.dev/en/vrm_spec/
+     * @param comment Annotation comment
+     * @param stiffness The resilience of the swaying object (the power of returning to the initial pose).
+     * @param gravityPower The strength of gravity.
+     * @param gravityDir The direction of gravity. Set (0, -1, 0) for simulating the gravity. Set (1, 0, 0) for simulating the wind.
+     * @param dragForce The resistance (deceleration) of automatic animation.
+     * @param center The reference point of a swaying object can be set at any location except the origin.
+     *               When implementing UI moving with warp,
+     *               the parent node to move with warp can be specified if you don't want to make the object swaying with warp movement.
+     * @param hitRadius The radius of the sphere used for the collision detection with colliders.
+     * @param bones Specify the node index of the root bone of the swaying object.
+     * @param colliderGroups Specify the index of the collider group for collisions with swaying objects.
+     */
     public constructor(
         public readonly comment: string,
         public readonly stiffness: number,
@@ -41,6 +54,11 @@ export class VRMSpringBone {
         });
     }
 
+    /**
+     * Initialize bones
+     *
+     * @param force Force reset rotation
+     */
     public setup(force = false): void {
         if (!force) {
             this.activeBones.forEach((bone, index) => {
@@ -56,6 +74,11 @@ export class VRMSpringBone {
         });
     }
 
+    /**
+     * Update bones
+     *
+     * @param deltaTime
+     */
     public async update(deltaTime: number): Promise<void> {
         if (this.verlets.length === 0) {
             if (this.activeBones.length === 0) {
@@ -100,7 +123,7 @@ export class VRMSpringBone {
         });
 
         const stiffness = this.stiffness * deltaTime;
-        const external = MathVector3.multiplyByFloat(this.gravityDir, this.gravityPower * deltaTime);
+        const external = Vector3Helper.multiplyByFloat(this.gravityDir, this.gravityPower * deltaTime);
 
         const promises = this.verlets.map<Promise<void>>((verlet, index) => {
             return new Promise<void>((resolve) => {
@@ -124,10 +147,10 @@ export class VRMSpringBone {
 
     private setupRecursive(center: Nullable<TransformNode>, parent: TransformNode): void {
         if (parent.getChildTransformNodes().length === 0) {
-            // 末尾
+            // Leaf
             const ancestor = parent.parent as TransformNode;
             const delta = parent.getAbsolutePosition().subtract(ancestor.getAbsolutePosition()).normalize();
-            const childPosition = parent.position.add(MathVector3.multiplyByFloat(delta, 0.07));
+            const childPosition = parent.position.add(Vector3Helper.multiplyByFloat(delta, 0.07));
             this.verlets.push(new VRMSpringBoneLogic(
                 center,
                 this.hitRadius,
@@ -135,7 +158,7 @@ export class VRMSpringBone {
                 childPosition,
             ));
         } else {
-            // 末尾以外
+            // Not leaf
             const firstChild = parent.getChildTransformNodes().shift()!;
             const localPosition = firstChild.position;
             const scale = firstChild.scaling;

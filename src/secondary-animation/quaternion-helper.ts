@@ -1,9 +1,9 @@
-import { Vector3, Quaternion } from "@babylonjs/core/Maths/math";
+import { Vector3, Quaternion } from '@babylonjs/core/Maths/math';
 
 /**
  * Quaternion Helper
  */
-export class MathQuaternion {
+export class QuaternionHelper {
     /**
      * Rotates the point point with rotation.
      *

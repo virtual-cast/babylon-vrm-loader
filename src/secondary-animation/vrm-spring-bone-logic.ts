@@ -1,15 +1,21 @@
 import { Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
 import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import { Nullable } from '@babylonjs/core/types';
-import { MathQuaternion } from './math-quaternion';
-import { MathVector3 } from './math-vector3';
+import { QuaternionHelper } from './quaternion-helper';
 import { SphereCollider } from './sphere-collider';
+import { Vector3Helper } from './vector3-helper';
 
 /**
  * Verlet Spring Bone Logic
  */
 export class VRMSpringBoneLogic {
+    /**
+     * Cloned initial local rotation
+     */
     private readonly localRotation: Quaternion;
+    /**
+     * Reference of parent rotation
+     */
     private readonly parentRotation: Quaternion;
     private readonly boneAxis: Vector3;
     private readonly boneLength: number;
@@ -17,13 +23,19 @@ export class VRMSpringBoneLogic {
     private currentTail: Vector3;
     private prevTail: Vector3;
 
+    /**
+     * @param center Center reference of TransformNode
+     * @param radius Collision Radius
+     * @param transform Base TransformNode
+     * @param localChildPosition
+     */
     public constructor(
         center: Nullable<TransformNode>,
         public readonly radius: number,
         public readonly transform: TransformNode,
         localChildPosition: Vector3,
     ) {
-        // rotationQuaternion は optional なので、なければ初期化する
+        // Initialize rotationQuaternion when not initialized
         if (!transform.rotationQuaternion) {
             transform.rotationQuaternion = transform.rotation.toQuaternion();
         }
@@ -41,6 +53,15 @@ export class VRMSpringBoneLogic {
         this.boneLength = localChildPosition.length();
     }
 
+    /**
+     * Update Tail position
+     *
+     * @param center Center reference of TransformNode
+     * @param stiffnessForce Current frame stiffness
+     * @param dragForce Current frame drag force
+     * @param external Current frame external force
+     * @param colliders Current frame colliders
+     */
     public update(
         center: Nullable<TransformNode>,
         stiffnessForce: number,
@@ -50,7 +71,7 @@ export class VRMSpringBoneLogic {
     ): void {
         const absPos = this.transform.getAbsolutePosition();
         if (Number.isNaN(absPos.x)) {
-            // TODO: 絶対座標を取得出来ないフレームは情報を更新しない
+            // Do not update when absolute position is invalid
             return;
         }
         const currentTail = this.getCenterTranslatedWorldPos(center, this.currentTail);
@@ -61,14 +82,14 @@ export class VRMSpringBoneLogic {
         {
             // 減衰付きで前のフレームの移動を継続
             const attenuation = 1.0 - dragForce;
-            const delta = MathVector3.multiplyByFloat(currentTail.subtract(prevTail), attenuation);
+            const delta = Vector3Helper.multiplyByFloat(currentTail.subtract(prevTail), attenuation);
             nextTail.addInPlace(delta);
         }
         {
             // 親の回転による子ボーンの移動目標
             const rotation = this.parentRotation.multiply(this.localRotation); // parentRotation * localRotation
-            const rotatedVec = MathQuaternion.multiplyWithVector3(rotation, this.boneAxis); // rotation * boneAxis
-            const stiffedVec = MathVector3.multiplyByFloat(rotatedVec, stiffnessForce); // rotatedVec * stiffnessForce
+            const rotatedVec = QuaternionHelper.multiplyWithVector3(rotation, this.boneAxis); // rotation * boneAxis
+            const stiffedVec = Vector3Helper.multiplyByFloat(rotatedVec, stiffnessForce); // rotatedVec * stiffnessForce
             nextTail.addInPlace(stiffedVec); // nextTail + stiffedVec
         }
         {
@@ -79,7 +100,7 @@ export class VRMSpringBoneLogic {
         {
             // 長さを boneLength に強制
             const normalized = nextTail.subtract(absPos).normalize();
-            nextTail = absPos.add(MathVector3.multiplyByFloat(normalized, this.boneLength));
+            nextTail = absPos.add(Vector3Helper.multiplyByFloat(normalized, this.boneLength));
         }
 
         {
@@ -115,9 +136,9 @@ export class VRMSpringBoneLogic {
      */
     private transformToRotation(nextTail: Vector3): Quaternion {
         const rotation = this.parentRotation.multiply(this.localRotation);
-        const fromAxis = MathQuaternion.multiplyWithVector3(rotation, this.boneAxis);
+        const fromAxis = QuaternionHelper.multiplyWithVector3(rotation, this.boneAxis);
         const toAxis = nextTail.subtract(this.transform.absolutePosition).normalize();
-        const result = MathQuaternion.fromToRotation(fromAxis, toAxis);
+        const result = QuaternionHelper.fromToRotation(fromAxis, toAxis);
         return result.multiplyInPlace(rotation);
     }
 
@@ -133,10 +154,10 @@ export class VRMSpringBoneLogic {
             // 少数誤差許容のため 2 cm 判定を小さくする
             if (axis.lengthSquared() <= (r * r) - 0.02) {
                 // ヒット。 Collider の半径方向に押し出す
-                const posFromCollider = collider.position.add(MathVector3.multiplyByFloat(axis.normalize(), r));
+                const posFromCollider = collider.position.add(Vector3Helper.multiplyByFloat(axis.normalize(), r));
                 // 長さを boneLength に強制
                 const absPos = this.transform.absolutePosition;
-                nextTail = absPos.add(MathVector3.multiplyByFloat(posFromCollider.subtractInPlace(absPos).normalize(), this.boneLength));
+                nextTail = absPos.add(Vector3Helper.multiplyByFloat(posFromCollider.subtractInPlace(absPos).normalize(), this.boneLength));
             }
         });
         return nextTail;

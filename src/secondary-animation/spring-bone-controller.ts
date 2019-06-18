@@ -6,7 +6,7 @@ import { ColliderGroup } from './collider-group';
 import { VRMSpringBone } from './vrm-spring-bone';
 
 /**
- * nodeIndex からボーンを取得する関数
+ * function to get bone from nodeIndex
  */
 type getBone = (nodeIndex: number) => Nullable<TransformNode>;
 
@@ -14,11 +14,14 @@ type getBone = (nodeIndex: number) => Nullable<TransformNode>;
  * VRM SpringBone Controller
  */
 export class SpringBoneController {
-    public springs: VRMSpringBone[];
+    /**
+     * Spring Bone List
+     */
+    private springs: VRMSpringBone[];
 
     /**
-     * @param ext SecondaryAnimation オブジェクト
-     * @param getBone nodeIndex からボーンを取得する関数
+     * @param ext SecondaryAnimation Object
+     * @param getBone
      */
     public constructor(
         public readonly ext: IVRMSecondaryAnimation,
@@ -28,15 +31,12 @@ export class SpringBoneController {
         this.springs = this.constructSprings(getBone, colliderGroups);
     }
 
-    /**
-     * 破棄処理
-     */
     public dispose() {
         this.springs = [];
     }
 
     /**
-     * 全ての Spring を初期状態にする
+     * Initialize SpringBones
      */
     public setup(force = false) {
         this.springs.forEach((spring) => {
@@ -45,9 +45,9 @@ export class SpringBoneController {
     }
 
     /**
-     * 全ての Spring を更新する
+     * Update all SpringBones
      *
-     * @param deltaTime 前フレームからの経過時間(msec)
+     * @param deltaTime Elapsed sec from previous frame
      * @see https://docs.unity3d.com/ScriptReference/Time-deltaTime.html
      */
     public async update(deltaTime: number): Promise<void> {
@@ -59,9 +59,6 @@ export class SpringBoneController {
         return Promise.all(promises).then(() => { /* Do nothing */ });
     }
 
-    /**
-     * ColliderGroups を構築
-     */
     private constructColliderGroups(getBone: getBone) {
         const colliderGroups: ColliderGroup[] = [];
         this.ext.colliderGroups.forEach((colliderGroup) => {
@@ -79,9 +76,6 @@ export class SpringBoneController {
         return colliderGroups;
     }
 
-    /**
-     * Spring を構築
-     */
     private constructSprings(getBone: getBone, colliderGroups: ColliderGroup[]) {
         const springs: VRMSpringBone[] = [];
         this.ext.boneGroups.forEach((spring) => {
