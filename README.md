@@ -18,7 +18,7 @@ This loader is used as [THE SEED ONLINE](https://seed.online) web VRM/VCI/glb vi
 - Supports [MToonMaterial](https://github.com/virtual-cast/babylon-mtoon-material)
 - Get bone([TransformNode](https://doc.babylonjs.com/api/classes/babylon.transformnode)) from Unity Humanoid bone mapping name
 - TODO: [BlendShape](https://vrm.dev/univrm/components/univrm_blendshape/) morphing
-- TODO: [Secondary Animation](https://vrm.dev/univrm/components/univrm_secondary/)
+- [Secondary Animation](https://vrm.dev/univrm/components/univrm_secondary/)
 - TODO: WebXR sample with [First Person](https://vrm.dev/univrm/components/univrm_firstperson/)
 - Supports [VCI](https://github.com/virtual-cast/VCI) features(partial support)
     - `VCAST_vci_material_unity`
@@ -56,6 +56,11 @@ const scene = await BABYLON.SceneLoader.LoadAsync('file:', vrmFile, engine);
 const vrmManager = scene.metadata.vrmManagers[0];
 const hips = vrmManager.getBone('hips'); // returns Nullable<TransformNode>
 hips.translate(BABYLON.Vector3.Right(), 1.0);
+
+// Update secondary animation
+scene.onBeforeRenderObservable.add(() => {
+    vrmManager.update(scene.getEngine().getDeltaTime());
+});
 ```
 
 ## Contributing
