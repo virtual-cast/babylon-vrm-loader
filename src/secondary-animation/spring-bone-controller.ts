@@ -85,10 +85,10 @@ export class SpringBoneController {
     private constructSprings(getBone: getBone, colliderGroups: ColliderGroup[]) {
         const springs: VRMSpringBone[] = [];
         this.ext.boneGroups.forEach((spring) => {
-            const rootBones = spring.bones.map((bone) => {
+            const rootBones = (spring.bones || []).map((bone) => {
                 return getBone(bone) as TransformNode;
             });
-            const springColliders = spring.colliderGroups.map<ColliderGroup>((g) => {
+            const springColliders = (spring.colliderGroups || []).map<ColliderGroup>((g) => {
                 return colliderGroups[g];
             });
             springs.push(new VRMSpringBone(
