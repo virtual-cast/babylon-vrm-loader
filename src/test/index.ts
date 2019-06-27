@@ -80,8 +80,11 @@ async function main() {
         if (!scene.metadata || !scene.metadata.vrmManagers) {
             return;
         }
-        const vrmManager = scene.metadata.vrmManagers[scene.metadata.vrmManagers.length - 1] as VRMManager;
-        vrmManager.update(scene.getEngine().getDeltaTime());
+        const managers = scene.metadata.vrmManagers as VRMManager[];
+        const deltaTime = scene.getEngine().getDeltaTime();
+        managers.forEach((manager) => {
+            manager.update(deltaTime);
+        });
     });
     engine.runRenderLoop(() => {
         scene.render();

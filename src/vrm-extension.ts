@@ -38,7 +38,9 @@ export class VRM implements IGLTFLoaderExtension {
     public constructor(
         private loader: GLTFLoader,
     ) {
-        this.meshesFrom = this.loader.babylonScene.meshes.length;
+        // GLTFLoader has already added rootMesh as __root__ before load extension
+        // @see glTFLoader._loadData
+        this.meshesFrom = this.loader.babylonScene.meshes.length - 1;
         this.transformNodesFrom = this.loader.babylonScene.transformNodes.length;
     }
 
