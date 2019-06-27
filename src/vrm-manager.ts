@@ -109,7 +109,7 @@ export class VRMManager {
      */
     public morphing(label: string, value: number): void {
         if (!this.morphTargetMap[label]) {
-            throw new Error(`Unknown morph label ${label}`);
+            return;
         }
         this.morphTargetMap[label].forEach((setting) => {
             setting.target.influence = Math.max(0, Math.min(1, value)) * (setting.weight / 100);
@@ -123,11 +123,18 @@ export class VRMManager {
      */
     public morphingPreset(label: string, value: number): void {
         if (!this.presetMorphTargetMap[label]) {
-            throw new Error(`Unknown preset morph label ${label}`);
+            return;
         }
         this.presetMorphTargetMap[label].forEach((setting) => {
             setting.target.influence = Math.max(0, Math.min(1, value)) * (setting.weight / 100);
         });
+    }
+
+    /**
+     * list morphing name
+     */
+    public getMorphingList(): string[] {
+        return Object.keys(this.morphTargetMap);
     }
 
     /**
