@@ -165,32 +165,671 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/index.ts":
-/*!**********************!*\
-  !*** ./src/index.ts ***!
-  \**********************/
-/*! exports provided: VCAST_vci_material_unity, VRM, VRMFileLoader, IVRMMaterialPropertyShader, VRMManager, VRMMaterialGenerator */
+/***/ "./src/errors.ts":
+/*!***********************!*\
+  !*** ./src/errors.ts ***!
+  \***********************/
+/*! exports provided: BoneNotFoundError */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _vcast_vci_material_unity__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./vcast-vci-material-unity */ "./src/vcast-vci-material-unity.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VCAST_vci_material_unity", function() { return _vcast_vci_material_unity__WEBPACK_IMPORTED_MODULE_0__["VCAST_vci_material_unity"]; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BoneNotFoundError", function() { return BoneNotFoundError; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 
-/* harmony import */ var _vrm_extension__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./vrm-extension */ "./src/vrm-extension.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRM", function() { return _vrm_extension__WEBPACK_IMPORTED_MODULE_1__["VRM"]; });
+/**
+ * Throws when mandatory bone could not find
+ */
+var BoneNotFoundError = /** @class */ (function (_super) {
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](BoneNotFoundError, _super);
+    function BoneNotFoundError(boneName) {
+        var _this = _super.call(this, "Bone:" + boneName + " NotFound") || this;
+        _this.boneName = boneName;
+        _this.name = 'BoneNotFoundError';
+        return _this;
+    }
+    return BoneNotFoundError;
+}(Error));
 
-/* harmony import */ var _vrm_file_loader__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./vrm-file-loader */ "./src/vrm-file-loader.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMFileLoader", function() { return _vrm_file_loader__WEBPACK_IMPORTED_MODULE_2__["VRMFileLoader"]; });
 
-/* harmony import */ var _vrm_interfaces__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./vrm-interfaces */ "./src/vrm-interfaces.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "IVRMMaterialPropertyShader", function() { return _vrm_interfaces__WEBPACK_IMPORTED_MODULE_3__["IVRMMaterialPropertyShader"]; });
 
-/* harmony import */ var _vrm_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./vrm-manager */ "./src/vrm-manager.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMManager", function() { return _vrm_manager__WEBPACK_IMPORTED_MODULE_4__["VRMManager"]; });
+/***/ }),
 
-/* harmony import */ var _vrm_material_generator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./vrm-material-generator */ "./src/vrm-material-generator.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMMaterialGenerator", function() { return _vrm_material_generator__WEBPACK_IMPORTED_MODULE_5__["VRMMaterialGenerator"]; });
+/***/ "./src/humanoid-bone.ts":
+/*!******************************!*\
+  !*** ./src/humanoid-bone.ts ***!
+  \******************************/
+/*! exports provided: HumanoidBone */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HumanoidBone", function() { return HumanoidBone; });
+/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./errors */ "./src/errors.ts");
+
+/**
+ * HumanoidBone を取得するメソッド群
+ * @see https://docs.unity3d.com/ja/2018.3/ScriptReference/HumanBodyBones.html
+ */
+var HumanoidBone = /** @class */ (function () {
+    function HumanoidBone(nodeMap) {
+        this.nodeMap = nodeMap;
+    }
+    HumanoidBone.prototype.dispose = function () {
+        delete this.nodeMap;
+    };
+    Object.defineProperty(HumanoidBone.prototype, "hips", {
+        /**
+         * 尻
+         */
+        get: function () {
+            return this.getMandatoryBone('hips');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftUpperLeg", {
+        /**
+         * 左太もも
+         */
+        get: function () {
+            return this.getMandatoryBone('leftUpperLeg');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightUpperLeg", {
+        /**
+         * 右太もも
+         */
+        get: function () {
+            return this.getMandatoryBone('rightUpperLeg');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftLowerLeg", {
+        /**
+         * 左ひざ
+         */
+        get: function () {
+            return this.getMandatoryBone('leftLowerLeg');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightLowerLeg", {
+        /**
+         * 右ひざ
+         */
+        get: function () {
+            return this.getMandatoryBone('rightLowerLeg');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftFoot", {
+        /**
+         * 左足首
+         */
+        get: function () {
+            return this.getMandatoryBone('leftFoot');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightFoot", {
+        /**
+         * 右足首
+         */
+        get: function () {
+            return this.getMandatoryBone('rightFoot');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "spine", {
+        /**
+         * 脊椎の第一
+         */
+        get: function () {
+            return this.getMandatoryBone('spine');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "chest", {
+        /**
+         * 胸
+         */
+        get: function () {
+            return this.getMandatoryBone('chest');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "neck", {
+        /**
+         * 首
+         */
+        get: function () {
+            return this.getMandatoryBone('neck');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "head", {
+        /**
+         * 頭
+         */
+        get: function () {
+            return this.getMandatoryBone('head');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftShoulder", {
+        /**
+         * 左肩
+         */
+        get: function () {
+            return this.getMandatoryBone('leftShoulder');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightShoulder", {
+        /**
+         * 右肩
+         */
+        get: function () {
+            return this.getMandatoryBone('rightShoulder');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftUpperArm", {
+        /**
+         * 左上腕
+         */
+        get: function () {
+            return this.getMandatoryBone('leftUpperArm');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightUpperArm", {
+        /**
+         * 右上腕
+         */
+        get: function () {
+            return this.getMandatoryBone('rightUpperArm');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftLowerArm", {
+        /**
+         * 左ひじ
+         */
+        get: function () {
+            return this.getMandatoryBone('leftLowerArm');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightLowerArm", {
+        /**
+         * 右ひじ
+         */
+        get: function () {
+            return this.getMandatoryBone('rightLowerArm');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftHand", {
+        /**
+         * 左手首
+         */
+        get: function () {
+            return this.getMandatoryBone('leftHand');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightHand", {
+        /**
+         * 右手首
+         */
+        get: function () {
+            return this.getMandatoryBone('rightHand');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftToes", {
+        /**
+         * 左つま先(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftToes');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightToes", {
+        /**
+         * 右つま先(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightToes');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftEye", {
+        /**
+         * 左目(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftEye');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightEye", {
+        /**
+         * 右目(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightEye');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "jaw", {
+        /**
+         * 顎(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('jaw');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftThumbProximal", {
+        /**
+         * 左親指第一指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftThumbProximal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftThumbIntermediate", {
+        /**
+         * 左親指第二指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftThumbIntermediate');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftThumbDistal", {
+        /**
+         * 左親指第三指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftThumbDistal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftIndexProximal", {
+        /**
+         * 左人差し指第一指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftIndexProximal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftIndexIntermediate", {
+        /**
+         * 左人差し指第二指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftIndexIntermediate');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftIndexDistal", {
+        /**
+         * 左人差し指第三指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftIndexDistal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftMiddleProximal", {
+        /**
+         * 左中指第一指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftMiddleProximal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftMiddleIntermediate", {
+        /**
+         * 左中指第二指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftMiddleIntermediate');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftMiddleDistal", {
+        /**
+         * 左中指第三指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftMiddleDistal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftRingProximal", {
+        /**
+         * 左薬指第一指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftRingProximal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftRingIntermediate", {
+        /**
+         * 左薬指第二指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftRingIntermediate');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftRingDistal", {
+        /**
+         * 左薬指第三指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftRingDistal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftLittleProximal", {
+        /**
+         * 左小指第一指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftLittleProximal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftLittleIntermediate", {
+        /**
+         * 左小指第二指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftLittleIntermediate');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "leftLittleDistal", {
+        /**
+         * 左小指第三指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('leftLittleDistal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightThumbProximal", {
+        /**
+         * 右親指第一指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightThumbProximal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightThumbIntermediate", {
+        /**
+         * 右親指第二指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightThumbIntermediate');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightThumbDistal", {
+        /**
+         * 右親指第三指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightThumbDistal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightIndexProximal", {
+        /**
+         * 右人差し指第一指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightIndexProximal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightIndexIntermediate", {
+        /**
+         * 右人差し指第二指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightIndexIntermediate');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightIndexDistal", {
+        /**
+         * 右人差し指第三指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightIndexDistal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightMiddleProximal", {
+        /**
+         * 右中指第一指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightMiddleProximal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightMiddleIntermediate", {
+        /**
+         * 右中指第二指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightMiddleIntermediate');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightMiddleDistal", {
+        /**
+         * 右中指第三指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightMiddleDistal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightRingProximal", {
+        /**
+         * 右薬指第一指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightRingProximal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightRingIntermediate", {
+        /**
+         * 右薬指第二指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightRingIntermediate');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightRingDistal", {
+        /**
+         * 右薬指第三指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightRingDistal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightLittleProximal", {
+        /**
+         * 右小指第一指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightLittleProximal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightLittleIntermediate", {
+        /**
+         * 右小指第二指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightLittleIntermediate');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "rightLittleDistal", {
+        /**
+         * 右小指第三指骨(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('rightLittleDistal');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HumanoidBone.prototype, "upperChest", {
+        /**
+         * 上胸(Optional)
+         */
+        get: function () {
+            return this.getOptionalBone('upperChest');
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /**
+     * 必須ボーンを取得する。取得出来ない場合は例外を発生する
+     *
+     * @throws BoneNotFoundError
+     * @param name HumanoidBoneName
+     */
+    HumanoidBone.prototype.getMandatoryBone = function (name) {
+        var node = this.nodeMap[name];
+        if (!node) {
+            throw new _errors__WEBPACK_IMPORTED_MODULE_0__["BoneNotFoundError"](name);
+        }
+        return node;
+    };
+    /**
+     * オプショナルボーンを取得する
+     *
+     * @param name HumanoidBoneName
+     */
+    HumanoidBone.prototype.getOptionalBone = function (name) {
+        return this.nodeMap[name] || null;
+    };
+    return HumanoidBone;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/index.ts":
+/*!**********************!*\
+  !*** ./src/index.ts ***!
+  \**********************/
+/*! exports provided: BoneNotFoundError, HumanoidBone, VCAST_vci_material_unity, VRM, VRMFileLoader, IVRMMaterialPropertyShader, VRMManager, VRMMaterialGenerator */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./errors */ "./src/errors.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "BoneNotFoundError", function() { return _errors__WEBPACK_IMPORTED_MODULE_0__["BoneNotFoundError"]; });
+
+/* harmony import */ var _humanoid_bone__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./humanoid-bone */ "./src/humanoid-bone.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HumanoidBone", function() { return _humanoid_bone__WEBPACK_IMPORTED_MODULE_1__["HumanoidBone"]; });
+
+/* harmony import */ var _vcast_vci_material_unity__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./vcast-vci-material-unity */ "./src/vcast-vci-material-unity.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VCAST_vci_material_unity", function() { return _vcast_vci_material_unity__WEBPACK_IMPORTED_MODULE_2__["VCAST_vci_material_unity"]; });
+
+/* harmony import */ var _vrm_extension__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./vrm-extension */ "./src/vrm-extension.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRM", function() { return _vrm_extension__WEBPACK_IMPORTED_MODULE_3__["VRM"]; });
+
+/* harmony import */ var _vrm_file_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./vrm-file-loader */ "./src/vrm-file-loader.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMFileLoader", function() { return _vrm_file_loader__WEBPACK_IMPORTED_MODULE_4__["VRMFileLoader"]; });
+
+/* harmony import */ var _vrm_interfaces__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./vrm-interfaces */ "./src/vrm-interfaces.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "IVRMMaterialPropertyShader", function() { return _vrm_interfaces__WEBPACK_IMPORTED_MODULE_5__["IVRMMaterialPropertyShader"]; });
+
+/* harmony import */ var _vrm_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./vrm-manager */ "./src/vrm-manager.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMManager", function() { return _vrm_manager__WEBPACK_IMPORTED_MODULE_6__["VRMManager"]; });
+
+/* harmony import */ var _vrm_material_generator__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./vrm-material-generator */ "./src/vrm-material-generator.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMMaterialGenerator", function() { return _vrm_material_generator__WEBPACK_IMPORTED_MODULE_7__["VRMMaterialGenerator"]; });
+
+
 
 
 
@@ -928,6 +1567,17 @@ function main() {
                 case 2:
                     // Expose current scene
                     window.currentScene = scene;
+                    scene.onBeforeRenderObservable.add(function () {
+                        // SpringBone
+                        if (!scene.metadata || !scene.metadata.vrmManagers) {
+                            return;
+                        }
+                        var managers = scene.metadata.vrmManagers;
+                        var deltaTime = scene.getEngine().getDeltaTime();
+                        managers.forEach(function (manager) {
+                            manager.update(deltaTime);
+                        });
+                    });
                     engine.runRenderLoop(function () {
                         scene.render();
                         shadowCaster.rotate(_babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_8__["Vector3"].Up(), 0.01);
@@ -1076,7 +1726,9 @@ var VRM = /** @class */ (function () {
          * この TransformNode index 以降が読み込み対象
          */
         this.transformNodesFrom = 0;
-        this.meshesFrom = this.loader.babylonScene.meshes.length;
+        // GLTFLoader has already added rootMesh as __root__ before load extension
+        // @see glTFLoader._loadData
+        this.meshesFrom = this.loader.babylonScene.meshes.length - 1;
         this.transformNodesFrom = this.loader.babylonScene.transformNodes.length;
     }
     /**
@@ -1209,6 +1861,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babylonjs/core/Maths/math */ "./node_modules/@babylonjs/core/Maths/math.js");
 /* harmony import */ var _secondary_animation_spring_bone_controller__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./secondary-animation/spring-bone-controller */ "./src/secondary-animation/spring-bone-controller.ts");
+/* harmony import */ var _humanoid_bone__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./humanoid-bone */ "./src/humanoid-bone.ts");
+
 
 
 
@@ -1239,6 +1893,7 @@ var VRMManager = /** @class */ (function () {
         this.springBoneController.setup();
         this.constructMorphTargetMap();
         this.constructTransformNodeMap();
+        this._humanoidBone = new _humanoid_bone__WEBPACK_IMPORTED_MODULE_3__["HumanoidBone"](this.transformNodeMap);
     }
     /**
      * Secondary Animation を更新する
@@ -1261,12 +1916,14 @@ var VRMManager = /** @class */ (function () {
      * 破棄処理
      */
     VRMManager.prototype.dispose = function () {
-        this.morphTargetMap = {};
-        this.presetMorphTargetMap = {};
-        this.transformNodeMap = {};
-        this.transformNodeCache = {};
-        this.meshCache = {};
         this.springBoneController.dispose();
+        this._humanoidBone.dispose();
+        delete this.morphTargetMap;
+        delete this.presetMorphTargetMap;
+        delete this.transformNodeMap;
+        delete this.transformNodeCache;
+        delete this.meshCache;
+        delete this._rootMesh;
     };
     /**
      * モーフィングを行う
@@ -1275,7 +1932,7 @@ var VRMManager = /** @class */ (function () {
      */
     VRMManager.prototype.morphing = function (label, value) {
         if (!this.morphTargetMap[label]) {
-            throw new Error("Unknown morph label " + label);
+            return;
         }
         this.morphTargetMap[label].forEach(function (setting) {
             setting.target.influence = Math.max(0, Math.min(1, value)) * (setting.weight / 100);
@@ -1288,11 +1945,17 @@ var VRMManager = /** @class */ (function () {
      */
     VRMManager.prototype.morphingPreset = function (label, value) {
         if (!this.presetMorphTargetMap[label]) {
-            throw new Error("Unknown preset morph label " + label);
+            return;
         }
         this.presetMorphTargetMap[label].forEach(function (setting) {
             setting.target.influence = Math.max(0, Math.min(1, value)) * (setting.weight / 100);
         });
+    };
+    /**
+     * list morphing name
+     */
+    VRMManager.prototype.getMorphingList = function () {
+        return Object.keys(this.morphTargetMap);
     };
     /**
      * 一人称時のカメラ位置を絶対座標として取得する
@@ -1314,15 +1977,39 @@ var VRMManager = /** @class */ (function () {
      * 一人称時に頭とみなす TransformNode を取得する
      */
     VRMManager.prototype.getFirstPersonBone = function () {
-        return this.findTransformNode(this.ext.firstPerson.firstPersonBone) || null;
+        return this.findTransformNode(this.ext.firstPerson.firstPersonBone);
     };
     /**
      * ボーン名からそのボーンに該当する TransformNode を取得する
+     *
      * @param name HumanBoneName
+     * @deprecated Use humanoidBone getter instead. This method will delete at v2.
      */
     VRMManager.prototype.getBone = function (name) {
         return this.transformNodeMap[name] || null;
     };
+    Object.defineProperty(VRMManager.prototype, "humanoidBone", {
+        /**
+         * Get HumanoidBone Methods
+         */
+        get: function () {
+            return this._humanoidBone;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(VRMManager.prototype, "rootMesh", {
+        /**
+         * VRM Root mesh
+         *
+         * Useful for Model Transformation
+         */
+        get: function () {
+            return this._rootMesh;
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * node 番号から該当する TransformNode を探す
      * 数が多くなるのでキャッシュに参照を持つ構造にする
@@ -1421,6 +2108,10 @@ var VRMManager = /** @class */ (function () {
         var cache = {};
         for (var index = this.meshesFrom; index < this.scene.meshes.length; index++) {
             var mesh = this.scene.meshes[index];
+            if (mesh.id === '__root__') {
+                this._rootMesh = mesh;
+                continue;
+            }
             // ポインタが登録されていないものは省略
             if (!mesh || !mesh.metadata || !mesh.metadata.gltf || !mesh.metadata.gltf.pointers || mesh.metadata.gltf.pointers.length === 0) {
                 continue;
