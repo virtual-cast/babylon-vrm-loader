@@ -5,6 +5,7 @@ import { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
 import { Scene } from '@babylonjs/core/scene';
 import { Nullable } from '@babylonjs/core/types';
 import { SpringBoneController } from './secondary-animation/spring-bone-controller';
+import { HumanoidBone } from './humanoid-bone';
 import { IVRM } from './vrm-interfaces';
 
 interface MorphTargetSetting {
@@ -42,6 +43,8 @@ export class VRMManager {
     private transformNodeMap: TransformNodeMap = {};
     private transformNodeCache: TransformNodeCache = {};
     private meshCache: MeshCache = {};
+    private _humanoidBone: HumanoidBone;
+    private _rootMesh: Mesh;
 
     /**
      * Secondary Animation として定義されている VRM Spring Bone のコントローラ
@@ -71,6 +74,8 @@ export class VRMManager {
 
         this.constructMorphTargetMap();
         this.constructTransformNodeMap();
+
+        this._humanoidBone = new HumanoidBone(this.transformNodeMap);
     }
 
     /**
@@ -86,13 +91,15 @@ export class VRMManager {
      * 破棄処理
      */
     public dispose(): void {
-        this.morphTargetMap = {};
-        this.presetMorphTargetMap = {};
-        this.transformNodeMap = {};
-        this.transformNodeCache = {};
-        this.meshCache = {};
-
         this.springBoneController.dispose();
+        this._humanoidBone.dispose();
+
+        delete this.morphTargetMap;
+        delete this.presetMorphTargetMap;
+        delete this.transformNodeMap;
+        delete this.transformNodeCache;
+        delete this.meshCache;
+        delete this._rootMesh;
     }
 
     /**
@@ -102,7 +109,7 @@ export class VRMManager {
      */
     public morphing(label: string, value: number): void {
         if (!this.morphTargetMap[label]) {
-            throw new Error(`Unknown morph label ${label}`);
+            return;
         }
         this.morphTargetMap[label].forEach((setting) => {
             setting.target.influence = Math.max(0, Math.min(1, value)) * (setting.weight / 100);
@@ -116,11 +123,18 @@ export class VRMManager {
      */
     public morphingPreset(label: string, value: number): void {
         if (!this.presetMorphTargetMap[label]) {
-            throw new Error(`Unknown preset morph label ${label}`);
+            return;
         }
         this.presetMorphTargetMap[label].forEach((setting) => {
             setting.target.influence = Math.max(0, Math.min(1, value)) * (setting.weight / 100);
         });
+    }
+
+    /**
+     * list morphing name
+     */
+    public getMorphingList(): string[] {
+        return Object.keys(this.morphTargetMap);
     }
 
     /**
@@ -149,15 +163,33 @@ export class VRMManager {
      * 一人称時に頭とみなす TransformNode を取得する
      */
     public getFirstPersonBone(): Nullable<TransformNode> {
-        return this.findTransformNode(this.ext.firstPerson.firstPersonBone) || null;
+        return this.findTransformNode(this.ext.firstPerson.firstPersonBone);
     }
 
     /**
      * ボーン名からそのボーンに該当する TransformNode を取得する
+     *
      * @param name HumanBoneName
+     * @deprecated Use humanoidBone getter instead. This method will delete at v2.
      */
     public getBone(name: HumanBoneName): Nullable<TransformNode> {
         return this.transformNodeMap[name] || null;
+    }
+
+    /**
+     * Get HumanoidBone Methods
+     */
+    public get humanoidBone(): HumanoidBone {
+        return this._humanoidBone;
+    }
+
+    /**
+     * VRM Root mesh
+     *
+     * Useful for Model Transformation
+     */
+    public get rootMesh(): Mesh {
+        return this._rootMesh;
     }
 
     /**
@@ -260,6 +292,10 @@ export class VRMManager {
         const cache: MeshCache = {};
         for (let index = this.meshesFrom; index < this.scene.meshes.length; index++) {
             const mesh = this.scene.meshes[index];
+            if (mesh.id === '__root__') {
+                this._rootMesh = mesh as Mesh;
+                continue;
+            }
             // ポインタが登録されていないものは省略
             if (!mesh || !mesh.metadata || !mesh.metadata.gltf || !mesh.metadata.gltf.pointers || mesh.metadata.gltf.pointers.length === 0) {
                 continue;

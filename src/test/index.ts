@@ -8,6 +8,7 @@ import { SceneLoader } from '@babylonjs/core/Loading/sceneLoader';
 import { Vector3 } from '@babylonjs/core/Maths/math';
 import { Mesh } from '@babylonjs/core/Meshes/mesh';
 import { Scene } from '@babylonjs/core/scene';
+import { VRMManager } from '../vrm-manager';
 
 import '@babylonjs/core/Helpers/sceneHelpers';
 import '@babylonjs/core/Meshes/Builders/sphereBuilder';
@@ -74,6 +75,17 @@ async function main() {
     // Expose current scene
     (window as any).currentScene = scene;
 
+    scene.onBeforeRenderObservable.add(() => {
+        // SpringBone
+        if (!scene.metadata || !scene.metadata.vrmManagers) {
+            return;
+        }
+        const managers = scene.metadata.vrmManagers as VRMManager[];
+        const deltaTime = scene.getEngine().getDeltaTime();
+        managers.forEach((manager) => {
+            manager.update(deltaTime);
+        });
+    });
     engine.runRenderLoop(() => {
         scene.render();
         shadowCaster.rotate(Vector3.Up(), 0.01);
