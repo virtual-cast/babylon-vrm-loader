@@ -26,7 +26,7 @@ interface TransformNodeCache {
 }
 
 interface MeshCache {
-    [meshIndex: number]: Mesh;
+    [meshIndex: number]: Mesh[];
 }
 
 /**
@@ -205,8 +205,17 @@ export class VRMManager {
     /**
      * mesh 番号からメッシュを探す
      * gltf の mesh 番号は `metadata.gltf.pointers` に記録されている
+     * @deprecated Use findMeshes instead. This method has broken.
      */
     public findMesh(meshIndex: number): Nullable<Mesh> {
+        return this.meshCache[meshIndex] && this.meshCache[meshIndex][0] || null;
+    }
+
+    /**
+     * mesh 番号からメッシュを探す
+     * gltf の mesh 番号は `metadata.gltf.pointers` に記録されている
+     */
+    public findMeshes(meshIndex: number): Nullable<Mesh[]> {
         return this.meshCache[meshIndex] || null;
     }
 
@@ -222,29 +231,31 @@ export class VRMManager {
                 return;
             }
             g.binds.forEach((b) => {
-                const mesh = this.findMesh(b.mesh);
-                if (!mesh) {
+                const meshes = this.findMeshes(b.mesh);
+                if (!meshes) {
                     console.log(`Undefined BlendShapeBind Mesh`, b);
                     return;
                 }
-                const morphTargetManager = mesh.morphTargetManager;
-                if (!morphTargetManager) {
-                    console.log(`Undefined morphTargetManager`, b);
-                    return;
-                }
-                const target = morphTargetManager.getTarget(b.index);
-                this.morphTargetMap[g.name] = this.morphTargetMap[g.name] || [];
-                this.morphTargetMap[g.name].push({
-                    target,
-                    weight: b.weight,
-                });
-                if (g.presetName) {
-                    this.presetMorphTargetMap[g.presetName] = this.morphTargetMap[g.presetName] || [];
-                    this.presetMorphTargetMap[g.presetName].push({
+                meshes.forEach((mesh) => {
+                    const morphTargetManager = mesh.morphTargetManager;
+                    if (!morphTargetManager) {
+                        console.log(`Undefined morphTargetManager`, b);
+                        return;
+                    }
+                    const target = morphTargetManager.getTarget(b.index);
+                    this.morphTargetMap[g.name] = this.morphTargetMap[g.name] || [];
+                    this.morphTargetMap[g.name].push({
                         target,
                         weight: b.weight,
                     });
-                }
+                    if (g.presetName) {
+                        this.presetMorphTargetMap[g.presetName] = this.presetMorphTargetMap[g.presetName] || [];
+                        this.presetMorphTargetMap[g.presetName].push({
+                            target,
+                            weight: b.weight,
+                        });
+                    }
+                });
             });
             // TODO: materialValues
         });
@@ -301,9 +312,11 @@ export class VRMManager {
                 continue;
             }
             for (const pointer of mesh.metadata.gltf.pointers) {
-                if (pointer.startsWith('/meshes/')) {
-                    const nodeIndex = parseInt((pointer as string).substr(8), 10);
-                    cache[nodeIndex] = mesh as Mesh;
+                const match = (pointer as string).match(/^\/meshes\/(\d+).+$/);
+                if (match) {
+                    const nodeIndex = parseInt(match[1], 10);
+                    cache[nodeIndex] = cache[nodeIndex] || [];
+                    cache[nodeIndex].push(mesh as Mesh);
                     break;
                 }
             }
