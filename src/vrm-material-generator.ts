@@ -216,7 +216,6 @@ export class VRMMaterialGenerator {
                 case 0: // Opaque
                     material.alphaBlend = false;
                     material.alphaTest = false;
-                    material.alphaMode = Engine.ALPHA_DISABLE;
                     break;
                 case 1: // TransparentCutout
                     material.alphaBlend = false;
