@@ -2340,7 +2340,6 @@ var VRMMaterialGenerator = /** @class */ (function () {
                 case 0: // Opaque
                     material.alphaBlend = false;
                     material.alphaTest = false;
-                    material.alphaMode = _babylonjs_core_Engines_engine__WEBPACK_IMPORTED_MODULE_3__["Engine"].ALPHA_DISABLE;
                     break;
                 case 1: // TransparentCutout
                     material.alphaBlend = false;
