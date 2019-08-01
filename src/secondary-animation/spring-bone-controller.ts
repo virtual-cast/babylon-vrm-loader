@@ -60,6 +60,9 @@ export class SpringBoneController {
     }
 
     private constructColliderGroups(getBone: getBone) {
+        if (!this.ext.colliderGroups || !this.ext.colliderGroups.length) {
+            return [];
+        }
         const colliderGroups: ColliderGroup[] = [];
         this.ext.colliderGroups.forEach((colliderGroup) => {
             const bone = getBone(colliderGroup.node) as TransformNode;
@@ -77,6 +80,9 @@ export class SpringBoneController {
     }
 
     private constructSprings(getBone: getBone, colliderGroups: ColliderGroup[]) {
+        if (!this.ext.boneGroups || !this.ext.boneGroups.length) {
+            return [];
+        }
         const springs: VRMSpringBone[] = [];
         this.ext.boneGroups.forEach((spring) => {
             const rootBones = (spring.bones || []).map((bone) => {
