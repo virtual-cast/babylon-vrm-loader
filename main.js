@@ -1070,6 +1070,9 @@ var SpringBoneController = /** @class */ (function () {
         });
     };
     SpringBoneController.prototype.constructColliderGroups = function (getBone) {
+        if (!this.ext.colliderGroups || !this.ext.colliderGroups.length) {
+            return [];
+        }
         var colliderGroups = [];
         this.ext.colliderGroups.forEach(function (colliderGroup) {
             var bone = getBone(colliderGroup.node);
@@ -1084,6 +1087,9 @@ var SpringBoneController = /** @class */ (function () {
         return colliderGroups;
     };
     SpringBoneController.prototype.constructSprings = function (getBone, colliderGroups) {
+        if (!this.ext.boneGroups || !this.ext.boneGroups.length) {
+            return [];
+        }
         var springs = [];
         this.ext.boneGroups.forEach(function (spring) {
             var rootBones = (spring.bones || []).map(function (bone) {
