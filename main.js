@@ -181,7 +181,7 @@ __webpack_require__.r(__webpack_exports__);
  * Throws when mandatory bone could not find
  */
 var BoneNotFoundError = /** @class */ (function (_super) {
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](BoneNotFoundError, _super);
+    Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"])(BoneNotFoundError, _super);
     function BoneNotFoundError(boneName) {
         var _this = _super.call(this, "Bone:" + boneName + " NotFound") || this;
         _this.boneName = boneName;
@@ -1057,9 +1057,9 @@ var SpringBoneController = /** @class */ (function () {
      * @see https://docs.unity3d.com/ScriptReference/Time-deltaTime.html
      */
     SpringBoneController.prototype.update = function (deltaTime) {
-        return tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"](this, void 0, void 0, function () {
+        return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function () {
             var promises;
-            return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
+            return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"])(this, function (_a) {
                 // ポーズ後のあらぶり防止のため clamp
                 deltaTime = Math.max(0.0, Math.min(16.666, deltaTime)) / 1000;
                 promises = this.springs.map(function (spring) {
@@ -1383,10 +1383,10 @@ var VRMSpringBone = /** @class */ (function () {
      * @param deltaTime
      */
     VRMSpringBone.prototype.update = function (deltaTime) {
-        return tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"](this, void 0, void 0, function () {
+        return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function () {
             var colliderList, stiffness, external, promises;
             var _this = this;
-            return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
+            return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"])(this, function (_a) {
                 if (this.verlets.length === 0) {
                     if (this.activeBones.length === 0) {
                         return [2 /*return*/];
@@ -1521,9 +1521,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function main() {
-    return tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"](this, void 0, void 0, function () {
+    return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function () {
         var debugProperties, canvas, engine, scene, camera, directionalLight, hemisphericLight, pointLight, standardMaterialSphere, shadowCaster, shadowGenerator, fileCount;
-        return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
+        return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"])(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     debugProperties = getDebugProperties();
@@ -1811,7 +1811,7 @@ __webpack_require__.r(__webpack_exports__);
  * 拡張子を変更しただけ
  */
 var VRMFileLoader = /** @class */ (function (_super) {
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](VRMFileLoader, _super);
+    Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"])(VRMFileLoader, _super);
     function VRMFileLoader() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.name = 'vrm';
@@ -1907,8 +1907,8 @@ var VRMManager = /** @class */ (function () {
      * @param deltaTime 前フレームからの経過秒数(sec)
      */
     VRMManager.prototype.update = function (deltaTime) {
-        return tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"](this, void 0, void 0, function () {
-            return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
+        return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function () {
+            return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"])(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.springBoneController.update(deltaTime)];
                     case 1:
