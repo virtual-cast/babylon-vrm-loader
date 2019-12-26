@@ -17,15 +17,8 @@
         "VRM"
     ],
     "files": [
-        "dist/index.d.ts",
-        "dist/index.js",
-        "dist/index.module.js",
-        "dist/vcast-vci-material-unity.d.ts",
-        "dist/vrm-extension.d.ts",
-        "dist/vrm-file-loader.d.ts",
-        "dist/vrm-interfaces.d.ts",
-        "dist/vrm-manager.d.ts",
-        "dist/vrm-material-generator.d.ts"
+        "dist/**/*",
+        "!dist/test/**/*"
     ],
     "typings": "dist/index.d.ts",
     "main": "dist/index.module.js",
