@@ -35,6 +35,10 @@ This loader is used as [THE SEED ONLINE](https://seed.online) web VRM/VCI/glb vi
 
 example is [here](https://codepen.io/anon/pen/zQXyxL?editors=1010).
 
+### on Babylon.js Playgound
+
+example is [here](https://playground.babylonjs.com/#K5W35Y).
+
 ### with npm/yarn
 
 ```s
