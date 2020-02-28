@@ -77,7 +77,7 @@
                     "assets": [
                         [
                             "dist",
-                            "!**/test/index.d.ts"
+                            "!dist/test/**"
                         ]
                     ]
                 }
