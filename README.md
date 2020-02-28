@@ -6,8 +6,6 @@
 
 VRM porting to babylon.js.
 
-This is **Work In Progress**.
-
 This loader is used as [THE SEED ONLINE](https://seed.online) web VRM/VCI/glb viewer.
 
 ## Features
