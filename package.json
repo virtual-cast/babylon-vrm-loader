@@ -76,8 +76,8 @@
                 {
                     "assets": [
                         [
-                            "dist",
-                            "!dist/test/**"
+                            "dist/index.js",
+                            "dist/index.module.js"
                         ]
                     ]
                 }
