@@ -23,12 +23,12 @@
     "typings": "dist/index.d.ts",
     "main": "dist/index.module.js",
     "dependencies": {
-        "babylon-mtoon-material": "^1.2.0"
+        "babylon-mtoon-material": "^2.0.0"
     },
     "devDependencies": {
-        "@babylonjs/core": "^4.0.0",
-        "@babylonjs/inspector": "^4.0.0",
-        "@babylonjs/loaders": "^4.0.0",
+        "@babylonjs/core": "^4.1.0-beta.18",
+        "@babylonjs/inspector": "^4.1.0-beta.18",
+        "@babylonjs/loaders": "^4.1.0-beta.18",
         "@semantic-release/commit-analyzer": "^6.1.0",
         "@semantic-release/git": "^7.0.8",
         "@semantic-release/github": "^5.2.10",
@@ -87,7 +87,7 @@
         ]
     },
     "peerDependencies": {
-        "@babylonjs/core": "^4.0.0",
-        "@babylonjs/loaders": "^4.0.0"
+        "@babylonjs/core": "^4.1.0-beta.18",
+        "@babylonjs/loaders": "^4.1.0-beta.18"
     }
 }
