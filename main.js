@@ -225,7 +225,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('hips');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftUpperLeg", {
@@ -235,7 +235,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('leftUpperLeg');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightUpperLeg", {
@@ -245,7 +245,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('rightUpperLeg');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftLowerLeg", {
@@ -255,7 +255,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('leftLowerLeg');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightLowerLeg", {
@@ -265,7 +265,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('rightLowerLeg');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftFoot", {
@@ -275,7 +275,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('leftFoot');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightFoot", {
@@ -285,7 +285,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('rightFoot');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "spine", {
@@ -295,7 +295,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('spine');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "chest", {
@@ -305,7 +305,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('chest');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "neck", {
@@ -315,7 +315,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('neck');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "head", {
@@ -325,7 +325,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('head');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftShoulder", {
@@ -335,7 +335,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('leftShoulder');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightShoulder", {
@@ -345,7 +345,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('rightShoulder');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftUpperArm", {
@@ -355,7 +355,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('leftUpperArm');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightUpperArm", {
@@ -365,7 +365,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('rightUpperArm');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftLowerArm", {
@@ -375,7 +375,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('leftLowerArm');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightLowerArm", {
@@ -385,7 +385,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('rightLowerArm');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftHand", {
@@ -395,7 +395,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('leftHand');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightHand", {
@@ -405,7 +405,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getMandatoryBone('rightHand');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftToes", {
@@ -415,7 +415,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftToes');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightToes", {
@@ -425,7 +425,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightToes');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftEye", {
@@ -435,7 +435,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftEye');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightEye", {
@@ -445,7 +445,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightEye');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "jaw", {
@@ -455,7 +455,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('jaw');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftThumbProximal", {
@@ -465,7 +465,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftThumbProximal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftThumbIntermediate", {
@@ -475,7 +475,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftThumbIntermediate');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftThumbDistal", {
@@ -485,7 +485,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftThumbDistal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftIndexProximal", {
@@ -495,7 +495,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftIndexProximal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftIndexIntermediate", {
@@ -505,7 +505,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftIndexIntermediate');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftIndexDistal", {
@@ -515,7 +515,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftIndexDistal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftMiddleProximal", {
@@ -525,7 +525,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftMiddleProximal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftMiddleIntermediate", {
@@ -535,7 +535,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftMiddleIntermediate');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftMiddleDistal", {
@@ -545,7 +545,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftMiddleDistal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftRingProximal", {
@@ -555,7 +555,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftRingProximal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftRingIntermediate", {
@@ -565,7 +565,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftRingIntermediate');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftRingDistal", {
@@ -575,7 +575,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftRingDistal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftLittleProximal", {
@@ -585,7 +585,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftLittleProximal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftLittleIntermediate", {
@@ -595,7 +595,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftLittleIntermediate');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "leftLittleDistal", {
@@ -605,7 +605,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('leftLittleDistal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightThumbProximal", {
@@ -615,7 +615,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightThumbProximal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightThumbIntermediate", {
@@ -625,7 +625,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightThumbIntermediate');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightThumbDistal", {
@@ -635,7 +635,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightThumbDistal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightIndexProximal", {
@@ -645,7 +645,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightIndexProximal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightIndexIntermediate", {
@@ -655,7 +655,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightIndexIntermediate');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightIndexDistal", {
@@ -665,7 +665,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightIndexDistal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightMiddleProximal", {
@@ -675,7 +675,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightMiddleProximal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightMiddleIntermediate", {
@@ -685,7 +685,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightMiddleIntermediate');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightMiddleDistal", {
@@ -695,7 +695,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightMiddleDistal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightRingProximal", {
@@ -705,7 +705,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightRingProximal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightRingIntermediate", {
@@ -715,7 +715,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightRingIntermediate');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightRingDistal", {
@@ -725,7 +725,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightRingDistal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightLittleProximal", {
@@ -735,7 +735,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightLittleProximal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightLittleIntermediate", {
@@ -745,7 +745,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightLittleIntermediate');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "rightLittleDistal", {
@@ -755,7 +755,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('rightLittleDistal');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(HumanoidBone.prototype, "upperChest", {
@@ -765,7 +765,7 @@ var HumanoidBone = /** @class */ (function () {
         get: function () {
             return this.getOptionalBone('upperChest');
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     /**
@@ -800,7 +800,7 @@ var HumanoidBone = /** @class */ (function () {
 /*!**********************!*\
   !*** ./src/index.ts ***!
   \**********************/
-/*! exports provided: BoneNotFoundError, HumanoidBone, VCAST_vci_material_unity, VRM, VRMFileLoader, IVRMMaterialPropertyShader, VRMManager, VRMMaterialGenerator */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -814,20 +814,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _vcast_vci_material_unity__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./vcast-vci-material-unity */ "./src/vcast-vci-material-unity.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VCAST_vci_material_unity", function() { return _vcast_vci_material_unity__WEBPACK_IMPORTED_MODULE_2__["VCAST_vci_material_unity"]; });
 
-/* harmony import */ var _vrm_extension__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./vrm-extension */ "./src/vrm-extension.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRM", function() { return _vrm_extension__WEBPACK_IMPORTED_MODULE_3__["VRM"]; });
+/* harmony import */ var _vci_interfaces__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./vci-interfaces */ "./src/vci-interfaces.ts");
+/* harmony import */ var _vci_interfaces__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_vci_interfaces__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _vci_interfaces__WEBPACK_IMPORTED_MODULE_3__) if(["BoneNotFoundError","HumanoidBone","VCAST_vci_material_unity","default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _vci_interfaces__WEBPACK_IMPORTED_MODULE_3__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _vrm_extension__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./vrm-extension */ "./src/vrm-extension.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRM", function() { return _vrm_extension__WEBPACK_IMPORTED_MODULE_4__["VRM"]; });
 
-/* harmony import */ var _vrm_file_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./vrm-file-loader */ "./src/vrm-file-loader.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMFileLoader", function() { return _vrm_file_loader__WEBPACK_IMPORTED_MODULE_4__["VRMFileLoader"]; });
+/* harmony import */ var _vrm_file_loader__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./vrm-file-loader */ "./src/vrm-file-loader.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMFileLoader", function() { return _vrm_file_loader__WEBPACK_IMPORTED_MODULE_5__["VRMFileLoader"]; });
 
-/* harmony import */ var _vrm_interfaces__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./vrm-interfaces */ "./src/vrm-interfaces.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "IVRMMaterialPropertyShader", function() { return _vrm_interfaces__WEBPACK_IMPORTED_MODULE_5__["IVRMMaterialPropertyShader"]; });
+/* harmony import */ var _vrm_interfaces__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./vrm-interfaces */ "./src/vrm-interfaces.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "IVRMMaterialPropertyShader", function() { return _vrm_interfaces__WEBPACK_IMPORTED_MODULE_6__["IVRMMaterialPropertyShader"]; });
 
-/* harmony import */ var _vrm_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./vrm-manager */ "./src/vrm-manager.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMManager", function() { return _vrm_manager__WEBPACK_IMPORTED_MODULE_6__["VRMManager"]; });
+/* harmony import */ var _vrm_manager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./vrm-manager */ "./src/vrm-manager.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMManager", function() { return _vrm_manager__WEBPACK_IMPORTED_MODULE_7__["VRMManager"]; });
 
-/* harmony import */ var _vrm_material_generator__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./vrm-material-generator */ "./src/vrm-material-generator.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMMaterialGenerator", function() { return _vrm_material_generator__WEBPACK_IMPORTED_MODULE_7__["VRMMaterialGenerator"]; });
+/* harmony import */ var _vrm_material_generator__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./vrm-material-generator */ "./src/vrm-material-generator.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMMaterialGenerator", function() { return _vrm_material_generator__WEBPACK_IMPORTED_MODULE_8__["VRMMaterialGenerator"]; });
+
 
 
 
@@ -1686,6 +1690,17 @@ _babylonjs_loaders_glTF_2_0__WEBPACK_IMPORTED_MODULE_0__["GLTFLoader"].RegisterE
 
 /***/ }),
 
+/***/ "./src/vci-interfaces.ts":
+/*!*******************************!*\
+  !*** ./src/vci-interfaces.ts ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+
+
+/***/ }),
+
 /***/ "./src/vrm-extension.ts":
 /*!******************************!*\
   !*** ./src/vrm-extension.ts ***!
@@ -2001,7 +2016,7 @@ var VRMManager = /** @class */ (function () {
         get: function () {
             return this._humanoidBone;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(VRMManager.prototype, "rootMesh", {
@@ -2013,7 +2028,7 @@ var VRMManager = /** @class */ (function () {
         get: function () {
             return this._rootMesh;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     /**
