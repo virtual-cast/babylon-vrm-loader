@@ -21,7 +21,7 @@ workflows:
 jobs:
   build:
     docker:
-      - image: circleci/node:8
+      - image: circleci/node:12
     working_directory: ~/repo
     steps:
       - checkout
@@ -43,7 +43,7 @@ jobs:
 
   lint:
     docker:
-      - image: circleci/node:8
+      - image: circleci/node:12
     working_directory: ~/repo
     steps:
       - checkout
@@ -64,7 +64,7 @@ jobs:
 
   release:
     docker:
-      - image: circleci/node:8
+      - image: circleci/node:12
     working_directory: ~/repo
     steps:
       - checkout
