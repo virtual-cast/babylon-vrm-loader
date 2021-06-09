@@ -33,7 +33,7 @@ export class VCAST_vci_material_unity implements IGLTFLoaderExtension {
      * @inheritdoc
      */
     public dispose(): void {
-        delete this.loader;
+        (this.loader as any) = null;
     }
 
     /**

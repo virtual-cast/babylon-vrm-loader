@@ -23,29 +23,29 @@
     "typings": "dist/index.d.ts",
     "main": "dist/index.module.js",
     "dependencies": {
-        "babylon-mtoon-material": "^2.0.0"
+        "babylon-mtoon-material": "^3.0.0"
     },
     "devDependencies": {
-        "@babylonjs/core": "^4.1.0-beta.18",
-        "@babylonjs/inspector": "^4.1.0-beta.18",
-        "@babylonjs/loaders": "^4.1.0-beta.18",
-        "@semantic-release/commit-analyzer": "^6.1.0",
-        "@semantic-release/git": "^7.0.8",
-        "@semantic-release/github": "^5.2.10",
-        "@semantic-release/npm": "^5.1.4",
-        "@semantic-release/release-notes-generator": "^7.1.4",
-        "@types/node": "^12.0.0",
-        "cz-conventional-changelog": "2.1.0",
-        "gh-pages": "^2.0.1",
-        "raw-loader": "^3.0.0",
-        "semantic-release": "^17.2.3",
-        "ts-loader": "^6.0.0",
-        "tslint": "^5.16.0",
-        "typescript": "^3.4.5",
+        "@babylonjs/core": "~4.2.0",
+        "@babylonjs/inspector": "~4.2.0",
+        "@babylonjs/loaders": "~4.2.0",
+        "@semantic-release/commit-analyzer": "^8.0.1",
+        "@semantic-release/git": "^9.0.0",
+        "@semantic-release/github": "^7.2.3",
+        "@semantic-release/npm": "^7.1.3",
+        "@semantic-release/release-notes-generator": "^9.0.2",
+        "@types/node": "^15.12.2",
+        "cz-conventional-changelog": "3.3.0",
+        "gh-pages": "^3.2.0",
+        "raw-loader": "^4.0.2",
+        "semantic-release": "^17.4.3",
+        "ts-loader": "^8.2.0",
+        "tslint": "^6.1.3",
+        "typescript": "^4.3.2",
         "webpack": "^4.30.0",
-        "webpack-cli": "^3.3.2",
-        "webpack-dev-server": "^3.3.1",
-        "webpack-merge": "^4.2.1"
+        "webpack-cli": "^3.2.1",
+        "webpack-dev-server": "^3.11.2",
+        "webpack-merge": "^5.8.0"
     },
     "scripts": {
         "build": "webpack",
@@ -87,7 +87,7 @@
         ]
     },
     "peerDependencies": {
-        "@babylonjs/core": "^4.1.0-beta.18",
-        "@babylonjs/loaders": "^4.1.0-beta.18"
+        "@babylonjs/core": "~4.2.0",
+        "@babylonjs/loaders": "~4.2.0"
     }
 }

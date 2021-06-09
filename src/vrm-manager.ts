@@ -94,12 +94,12 @@ export class VRMManager {
         this.springBoneController.dispose();
         this._humanoidBone.dispose();
 
-        delete this.morphTargetMap;
-        delete this.presetMorphTargetMap;
-        delete this.transformNodeMap;
-        delete this.transformNodeCache;
-        delete this.meshCache;
-        delete this._rootMesh;
+        (this.morphTargetMap as any) = null;
+        (this.presetMorphTargetMap as any) = null;
+        (this.transformNodeMap as any) = null;
+        (this.transformNodeCache as any) = null;
+        (this.meshCache as any) = null;
+        (this._rootMesh as any) = null;
     }
 
     /**

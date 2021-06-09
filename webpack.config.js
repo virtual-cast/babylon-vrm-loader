@@ -1,5 +1,5 @@
-const resolve = require('path').resolve;
-const merge = require('webpack-merge');
+const { resolve } = require('path');
+const { merge } = require('webpack-merge');
 
 const baseConfig = {
     mode: 'production',
