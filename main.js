@@ -216,7 +216,7 @@ var HumanoidBone = /** @class */ (function () {
         this.nodeMap = nodeMap;
     }
     HumanoidBone.prototype.dispose = function () {
-        delete this.nodeMap;
+        this.nodeMap = null;
     };
     Object.defineProperty(HumanoidBone.prototype, "hips", {
         /**
@@ -787,7 +787,7 @@ var HumanoidBone = /** @class */ (function () {
      * @param name HumanoidBoneName
      */
     HumanoidBone.prototype.getOptionalBone = function (name) {
-        return this.nodeMap[name] || null;
+        return this.nodeMap && this.nodeMap[name] || null;
     };
     return HumanoidBone;
 }());
@@ -800,7 +800,7 @@ var HumanoidBone = /** @class */ (function () {
 /*!**********************!*\
   !*** ./src/index.ts ***!
   \**********************/
-/*! no static exports found */
+/*! exports provided: BoneNotFoundError, HumanoidBone, VCAST_vci_material_unity, VRM, VRMFileLoader, IVRMMaterialPropertyShader, VRMManager, VRMMaterialGenerator */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -815,9 +815,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VCAST_vci_material_unity", function() { return _vcast_vci_material_unity__WEBPACK_IMPORTED_MODULE_2__["VCAST_vci_material_unity"]; });
 
 /* harmony import */ var _vci_interfaces__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./vci-interfaces */ "./src/vci-interfaces.ts");
-/* harmony import */ var _vci_interfaces__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_vci_interfaces__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _vci_interfaces__WEBPACK_IMPORTED_MODULE_3__) if(["BoneNotFoundError","HumanoidBone","VCAST_vci_material_unity","default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _vci_interfaces__WEBPACK_IMPORTED_MODULE_3__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _vrm_extension__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./vrm-extension */ "./src/vrm-extension.ts");
+/* empty/unused harmony star reexport *//* harmony import */ var _vrm_extension__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./vrm-extension */ "./src/vrm-extension.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRM", function() { return _vrm_extension__WEBPACK_IMPORTED_MODULE_4__["VRM"]; });
 
 /* harmony import */ var _vrm_file_loader__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./vrm-file-loader */ "./src/vrm-file-loader.ts");
@@ -1672,7 +1670,7 @@ var VCAST_vci_material_unity = /** @class */ (function () {
      * @inheritdoc
      */
     VCAST_vci_material_unity.prototype.dispose = function () {
-        delete this.loader;
+        this.loader = null;
     };
     /**
      * @inheritdoc
@@ -1694,8 +1692,11 @@ _babylonjs_loaders_glTF_2_0__WEBPACK_IMPORTED_MODULE_0__["GLTFLoader"].RegisterE
 /*!*******************************!*\
   !*** ./src/vci-interfaces.ts ***!
   \*******************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
 
 
 
@@ -1756,7 +1757,7 @@ var VRM = /** @class */ (function () {
      * @inheritdoc
      */
     VRM.prototype.dispose = function () {
-        delete this.loader;
+        this.loader = null;
     };
     /**
      * @inheritdoc
@@ -1939,12 +1940,12 @@ var VRMManager = /** @class */ (function () {
     VRMManager.prototype.dispose = function () {
         this.springBoneController.dispose();
         this._humanoidBone.dispose();
-        delete this.morphTargetMap;
-        delete this.presetMorphTargetMap;
-        delete this.transformNodeMap;
-        delete this.transformNodeCache;
-        delete this.meshCache;
-        delete this._rootMesh;
+        this.morphTargetMap = null;
+        this.presetMorphTargetMap = null;
+        this.transformNodeMap = null;
+        this.transformNodeCache = null;
+        this.meshCache = null;
+        this._rootMesh = null;
     };
     /**
      * モーフィングを行う
