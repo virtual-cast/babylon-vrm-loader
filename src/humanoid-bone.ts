@@ -14,7 +14,7 @@ export class HumanoidBone {
     public constructor(private nodeMap: TransformNodeMap) {}
 
     public dispose() {
-        delete this.nodeMap;
+        (this.nodeMap as any) = null;
     }
 
     /**
@@ -368,6 +368,6 @@ export class HumanoidBone {
      * @param name HumanoidBoneName
      */
     private getOptionalBone(name: string): Nullable<TransformNode> {
-        return this.nodeMap[name] || null;
+        return this.nodeMap && this.nodeMap[name] || null;
     }
 }

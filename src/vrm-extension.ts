@@ -48,7 +48,7 @@ export class VRM implements IGLTFLoaderExtension {
      * @inheritdoc
      */
     public dispose(): void {
-        delete this.loader;
+        (this.loader as any) = null;
     }
 
     /**

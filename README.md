@@ -8,6 +8,14 @@ VRM porting to babylon.js.
 
 This loader is used as [THE SEED ONLINE](https://seed.online) web VRM/VCI/glb viewer.
 
+## Supported version table
+
+|babylon.js version|babylon-vrm-loader version|
+|---|---|
+|~4.1.0|<1.5.0|
+|~4.2.0|^1.5.0|
+|~5.0.0|unreleased(will be ^1.6.0)|
+
 ## Features
 
 - Supports `.vrm` file loading
