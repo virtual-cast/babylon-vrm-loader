@@ -2283,7 +2283,12 @@ var VRMMaterialGenerator = /** @class */ (function () {
                 }));
             });
         };
-        applyTexture(prop.textureProperties._MainTex, function (texture) { return material.diffuseTexture = texture; });
+        applyTexture(prop.textureProperties._MainTex, function (texture) {
+            if (material.alphaBlend || material.alphaTest) {
+                texture.hasAlpha = true;
+            }
+            material.diffuseTexture = texture;
+        });
         applyTexture(prop.textureProperties._ShadeTexture, function (texture) { return material.shadeTexture = texture; });
         applyTexture(prop.textureProperties._BumpMap, function (texture) { return material.bumpTexture = texture; });
         applyTexture(prop.textureProperties._ReceiveShadowTexture, function (texture) { return material.receiveShadowTexture = texture; });
