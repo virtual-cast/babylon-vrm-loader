@@ -7,6 +7,7 @@ import { Nullable } from '@babylonjs/core/types';
 import { SpringBoneController } from './secondary-animation/spring-bone-controller';
 import { HumanoidBone } from './humanoid-bone';
 import { IVRM } from './vrm-interfaces';
+import { MaterialValueBindingMerger } from './material-value-binding-merger';
 
 interface MorphTargetSetting {
     target: MorphTarget;
@@ -15,6 +16,10 @@ interface MorphTargetSetting {
 
 interface MorphTargetMap {
     [morphName: string]: MorphTargetSetting[];
+}
+
+interface MaterialValueBindingMergerMap {
+    [morphName: string]: MaterialValueBindingMerger;
 }
 
 interface TransformNodeMap {
@@ -39,6 +44,7 @@ export type HumanBoneName = 'hips' | 'leftUpperLeg' | 'rightUpperLeg' | 'leftLow
  */
 export class VRMManager {
     private morphTargetMap: MorphTargetMap = {};
+    private materialValueBindingMergerMap: MaterialValueBindingMergerMap = {};
     private presetMorphTargetMap: MorphTargetMap = {};
     private transformNodeMap: TransformNodeMap = {};
     private transformNodeCache: TransformNodeCache = {};
@@ -57,12 +63,14 @@ export class VRMManager {
      * @param scene
      * @param meshesFrom この番号以降のメッシュがこの VRM に該当する
      * @param transformNodesFrom この番号以降の TransformNode がこの VRM に該当する
+     * @param materialsNodesFrom この番号以降の Material がこの VRM に該当する
      */
     public constructor(
         public readonly ext: IVRM,
         public readonly scene: Scene,
         private readonly meshesFrom: number,
         private readonly transformNodesFrom: number,
+        private readonly materialsNodesFrom: number,
     ) {
         this.meshCache = this.constructMeshCache();
         this.transformNodeCache = this.constructTransformNodeCache();
@@ -73,6 +81,7 @@ export class VRMManager {
         this.springBoneController.setup();
 
         this.constructMorphTargetMap();
+        this.constructMaterialValueBindingMergerMap();
         this.constructTransformNodeMap();
 
         this._humanoidBone = new HumanoidBone(this.transformNodeMap);
@@ -95,6 +104,7 @@ export class VRMManager {
         this._humanoidBone.dispose();
 
         (this.morphTargetMap as any) = null;
+        (this.materialValueBindingMergerMap as any) = null;
         (this.presetMorphTargetMap as any) = null;
         (this.transformNodeMap as any) = null;
         (this.transformNodeCache as any) = null;
@@ -108,12 +118,15 @@ export class VRMManager {
      * @param value 値(0〜1)
      */
     public morphing(label: string, value: number): void {
-        if (!this.morphTargetMap[label]) {
-            return;
+        const v = Math.max(0, Math.min(1, value));
+        if (this.morphTargetMap[label]) {
+            this.morphTargetMap[label].forEach((setting) => {
+                setting.target.influence = v * (setting.weight / 100);
+            });
         }
-        this.morphTargetMap[label].forEach((setting) => {
-            setting.target.influence = Math.max(0, Math.min(1, value)) * (setting.weight / 100);
-        });
+        if (this.materialValueBindingMergerMap[label]) {
+            this.materialValueBindingMergerMap[label].morphing(v);
+        }
     }
 
     /**
@@ -257,7 +270,25 @@ export class VRMManager {
                     }
                 });
             });
-            // TODO: materialValues
+        });
+    }
+
+    /**
+     * 事前に MaterialValueBindingMerger とモーフ名を紐付ける
+     */
+    private constructMaterialValueBindingMergerMap() {
+        if (!this.ext.blendShapeMaster || !this.ext.blendShapeMaster.blendShapeGroups) {
+            return;
+        }
+        const materials = this.scene.materials.slice(this.materialsNodesFrom);
+        this.ext.blendShapeMaster.blendShapeGroups.forEach((g) => {
+            if (!g.materialValues) {
+                return;
+            }
+            this.materialValueBindingMergerMap[g.name] = new MaterialValueBindingMerger(
+                materials,
+                g.materialValues
+            )
         });
     }
 
