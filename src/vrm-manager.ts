@@ -288,7 +288,7 @@ export class VRMManager {
             this.materialValueBindingMergerMap[g.name] = new MaterialValueBindingMerger(
                 materials,
                 g.materialValues
-            )
+            );
         });
     }
 
