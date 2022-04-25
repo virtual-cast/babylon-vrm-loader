@@ -31,6 +31,10 @@ export class VRM implements IGLTFLoaderExtension {
      * この TransformNode index 以降が読み込み対象
      */
     private transformNodesFrom = 0;
+    /**
+     * この Material index 以降が読み込み対象
+     */
+    private materialsFrom = 0;
 
     /**
      * @inheritdoc
@@ -42,6 +46,7 @@ export class VRM implements IGLTFLoaderExtension {
         // @see glTFLoader._loadData
         this.meshesFrom = this.loader.babylonScene.meshes.length - 1;
         this.transformNodesFrom = this.loader.babylonScene.transformNodes.length;
+        this.materialsFrom = this.loader.babylonScene.materials.length;
     }
 
     /**
@@ -64,6 +69,7 @@ export class VRM implements IGLTFLoaderExtension {
             this.loader.babylonScene,
             this.meshesFrom,
             this.transformNodesFrom,
+            this.materialsFrom,
         );
         scene.metadata = scene.metadata || {};
         scene.metadata.vrmManagers = scene.metadata.vrmManagers || [];
