@@ -10,7 +10,6 @@ type SupportedMaterial = MToonMaterial | PBRMaterial;
  */
 type Setter = (value: number, firstValue: boolean) => void;
 
-
 const PBRMaterialTextureMap: {[propertyName: string]: keyof PBRMaterial} = {
     _MainTex: 'albedoTexture',
 };
@@ -90,10 +89,10 @@ export class MaterialValueBindingMerger {
             const valueName = materialValue.propertyName;
             // Unity と座標系が異なるため、テクスチャの vOffset を反転する
             if (material instanceof PBRMaterial) {
-                if (Object.keys(PBRMaterialTextureMap).some(k => valueName.startsWith(k))) {
+                if (Object.keys(PBRMaterialTextureMap).some((k) => valueName.startsWith(k))) {
                     targetValue.w *= -1;
                 }
-            } else if (Object.keys(MToonMaterialTextureMap).some(k => valueName.startsWith(k))) {
+            } else if (Object.keys(MToonMaterialTextureMap).some((k) => valueName.startsWith(k))) {
                 targetValue.w *= -1;
             }
             if (valueName.endsWith('_ST_S')) {
@@ -233,7 +232,7 @@ export class MaterialValueBindingMerger {
             return this.convertColorIntoVector4(material[MToonMaterialColorMap[key]], material.alpha);
         }
         return null;
-    };
+    }
 
     /**
      * Texture を Vector4 に変換する
@@ -281,7 +280,7 @@ export class MaterialValueBindingMerger {
                 if (key === '_Color') {
                     material.alpha = value.w;
                 }
-                this.updateColor(material[PBRMaterialColorMap[key]], value)
+                this.updateColor(material[PBRMaterialColorMap[key]], value);
             }
             return;
         }
