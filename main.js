@@ -800,7 +800,7 @@ var HumanoidBone = /** @class */ (function () {
 /*!**********************!*\
   !*** ./src/index.ts ***!
   \**********************/
-/*! exports provided: BoneNotFoundError, HumanoidBone, VCAST_vci_material_unity, VRM, VRMFileLoader, IVRMMaterialPropertyShader, VRMManager, VRMMaterialGenerator */
+/*! exports provided: BoneNotFoundError, HumanoidBone, MaterialValueBindingMerger, VCAST_vci_material_unity, VRM, VRMFileLoader, IVRMMaterialPropertyShader, VRMManager, VRMMaterialGenerator */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -811,33 +811,343 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _humanoid_bone__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./humanoid-bone */ "./src/humanoid-bone.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HumanoidBone", function() { return _humanoid_bone__WEBPACK_IMPORTED_MODULE_1__["HumanoidBone"]; });
 
-/* harmony import */ var _vcast_vci_material_unity__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./vcast-vci-material-unity */ "./src/vcast-vci-material-unity.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VCAST_vci_material_unity", function() { return _vcast_vci_material_unity__WEBPACK_IMPORTED_MODULE_2__["VCAST_vci_material_unity"]; });
+/* harmony import */ var _material_value_binding_merger__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./material-value-binding-merger */ "./src/material-value-binding-merger.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "MaterialValueBindingMerger", function() { return _material_value_binding_merger__WEBPACK_IMPORTED_MODULE_2__["MaterialValueBindingMerger"]; });
 
-/* harmony import */ var _vci_interfaces__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./vci-interfaces */ "./src/vci-interfaces.ts");
-/* empty/unused harmony star reexport *//* harmony import */ var _vrm_extension__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./vrm-extension */ "./src/vrm-extension.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRM", function() { return _vrm_extension__WEBPACK_IMPORTED_MODULE_4__["VRM"]; });
+/* harmony import */ var _vcast_vci_material_unity__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./vcast-vci-material-unity */ "./src/vcast-vci-material-unity.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VCAST_vci_material_unity", function() { return _vcast_vci_material_unity__WEBPACK_IMPORTED_MODULE_3__["VCAST_vci_material_unity"]; });
 
-/* harmony import */ var _vrm_file_loader__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./vrm-file-loader */ "./src/vrm-file-loader.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMFileLoader", function() { return _vrm_file_loader__WEBPACK_IMPORTED_MODULE_5__["VRMFileLoader"]; });
+/* harmony import */ var _vci_interfaces__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./vci-interfaces */ "./src/vci-interfaces.ts");
+/* empty/unused harmony star reexport *//* harmony import */ var _vrm_extension__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./vrm-extension */ "./src/vrm-extension.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRM", function() { return _vrm_extension__WEBPACK_IMPORTED_MODULE_5__["VRM"]; });
 
-/* harmony import */ var _vrm_interfaces__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./vrm-interfaces */ "./src/vrm-interfaces.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "IVRMMaterialPropertyShader", function() { return _vrm_interfaces__WEBPACK_IMPORTED_MODULE_6__["IVRMMaterialPropertyShader"]; });
+/* harmony import */ var _vrm_file_loader__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./vrm-file-loader */ "./src/vrm-file-loader.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMFileLoader", function() { return _vrm_file_loader__WEBPACK_IMPORTED_MODULE_6__["VRMFileLoader"]; });
 
-/* harmony import */ var _vrm_manager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./vrm-manager */ "./src/vrm-manager.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMManager", function() { return _vrm_manager__WEBPACK_IMPORTED_MODULE_7__["VRMManager"]; });
+/* harmony import */ var _vrm_interfaces__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./vrm-interfaces */ "./src/vrm-interfaces.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "IVRMMaterialPropertyShader", function() { return _vrm_interfaces__WEBPACK_IMPORTED_MODULE_7__["IVRMMaterialPropertyShader"]; });
 
-/* harmony import */ var _vrm_material_generator__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./vrm-material-generator */ "./src/vrm-material-generator.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMMaterialGenerator", function() { return _vrm_material_generator__WEBPACK_IMPORTED_MODULE_8__["VRMMaterialGenerator"]; });
+/* harmony import */ var _vrm_manager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./vrm-manager */ "./src/vrm-manager.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMManager", function() { return _vrm_manager__WEBPACK_IMPORTED_MODULE_8__["VRMManager"]; });
 
-
-
-
-
+/* harmony import */ var _vrm_material_generator__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./vrm-material-generator */ "./src/vrm-material-generator.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "VRMMaterialGenerator", function() { return _vrm_material_generator__WEBPACK_IMPORTED_MODULE_9__["VRMMaterialGenerator"]; });
 
 
 
 
+
+
+
+
+
+
+
+
+
+/***/ }),
+
+/***/ "./src/material-value-binding-merger.ts":
+/*!**********************************************!*\
+  !*** ./src/material-value-binding-merger.ts ***!
+  \**********************************************/
+/*! exports provided: MaterialValueBindingMerger */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MaterialValueBindingMerger", function() { return MaterialValueBindingMerger; });
+/* harmony import */ var _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babylonjs/core/Maths/math */ "./node_modules/@babylonjs/core/Maths/math.js");
+/* harmony import */ var _babylonjs_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babylonjs/core */ "./node_modules/@babylonjs/core/index.js");
+/* harmony import */ var babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! babylon-mtoon-material */ "./node_modules/babylon-mtoon-material/dist/index.module.js");
+/* harmony import */ var babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_2__);
+
+
+
+var PBRMaterialTextureMap = {
+    _MainTex: 'albedoTexture',
+};
+var PBRMaterialColorMap = {
+    _Color: 'albedoColor',
+};
+var MToonMaterialTextureMap = {
+    _MainTex: 'diffuseTexture',
+    _EmissionMap: 'emissiveTexture',
+    _BumpMap: 'bumpTexture',
+    _ShadeTexture: 'shadeTexture',
+    _ReceiveShadowTexture: 'receiveShadowTexture',
+    _ShadingGradeTexture: 'shadingGradeTexture',
+    _RimTexture: 'rimTexture',
+    _SphereAdd: 'matCapTexture',
+    _OutlineWidthTexture: 'outlineWidthTexture',
+    _UvAnimMaskTexture: 'uvAnimationMaskTexture',
+};
+var MToonMaterialColorMap = {
+    _Color: 'diffuseColor',
+    _ShadeColor: 'shadeColor',
+    _RimColor: 'rimColor',
+    _EmissionColor: 'emissiveColor',
+    _OutlineColor: 'outlineColor',
+};
+/**
+ * @see https://github.com/vrm-c/UniVRM/blob/4ffd97c2e9339683ce9bf21e73f510bd90c2a5b2/Assets/VRM/Runtime/BlendShape/MaterialValueBindingMerger.cs
+ */
+var MaterialValueBindingMerger = /** @class */ (function () {
+    /**
+     * @param materials VRMの全 Material
+     * @param materialValues
+     */
+    function MaterialValueBindingMerger(materials, materialValues) {
+        var _this = this;
+        this.materialValues = materialValues;
+        this.m_materialMap = {};
+        this.m_materialSetterMap = {};
+        this.m_materialValueMap = {};
+        this.m_used = {};
+        this.baseValueCache = {};
+        this.materialValuesToApply = {};
+        if (materials.length === 0 || materialValues.length === 0) {
+            return;
+        }
+        // プロパティ名の変換に対応している MToonMaterial と PBRMaterial を保存する
+        materials.forEach(function (material) {
+            if (material instanceof babylon_mtoon_material__WEBPACK_IMPORTED_MODULE_2__["MToonMaterial"] || material instanceof _babylonjs_core__WEBPACK_IMPORTED_MODULE_1__["PBRMaterial"]) {
+                _this.m_materialMap[material.name] = material;
+            }
+        });
+        materialValues.forEach(function (materialValue) {
+            var bindingKey = _this.makeBindingKey(materialValue);
+            if (_this.m_materialSetterMap[bindingKey]) {
+                return;
+            }
+            var material = _this.m_materialMap[materialValue.materialName];
+            if (!material) {
+                return;
+            }
+            var baseValue = _this.getMaterialProperty(material, materialValue.propertyName);
+            if (!baseValue || materialValue.targetValue.length !== 4) {
+                return;
+            }
+            // モーフィング用に baseValue (初期値) と materialValue を保存する
+            _this.baseValueCache[bindingKey] = baseValue;
+            _this.materialValuesToApply[bindingKey] = materialValue;
+            var targetValue = _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector4"].FromArray(materialValue.targetValue);
+            var valueName = materialValue.propertyName;
+            // Unity と座標系が異なるため、テクスチャの vOffset を反転する
+            if (material instanceof _babylonjs_core__WEBPACK_IMPORTED_MODULE_1__["PBRMaterial"]) {
+                if (Object.keys(PBRMaterialTextureMap).some(function (k) { return valueName.startsWith(k); })) {
+                    targetValue.w *= -1;
+                }
+            }
+            else if (Object.keys(MToonMaterialTextureMap).some(function (k) { return valueName.startsWith(k); })) {
+                targetValue.w *= -1;
+            }
+            if (valueName.endsWith('_ST_S')) {
+                // テクスチャの u方向 のみ更新する
+                var setter = function (value, firstValue) {
+                    var propValue = firstValue
+                        ? baseValue.add((targetValue.subtract(baseValue)).scale(value))
+                        : _this.getMaterialProperty(material, valueName).add(targetValue.subtract(baseValue).scale(value));
+                    var src = _this.getMaterialProperty(material, valueName);
+                    src.x = propValue.x;
+                    src.z = propValue.z;
+                    _this.updateMaterialProperty(material, valueName, src);
+                };
+                _this.m_materialSetterMap[bindingKey] = setter;
+            }
+            else if (valueName.endsWith('_ST_T')) {
+                // テクスチャの v方向 のみ更新する
+                var setter = function (value, firstValue) {
+                    var propValue = firstValue
+                        ? baseValue.add((targetValue.subtract(baseValue)).scale(value))
+                        : _this.getMaterialProperty(material, valueName).add(targetValue.subtract(baseValue).scale(value));
+                    var src = _this.getMaterialProperty(material, valueName);
+                    src.y = propValue.y;
+                    src.w = propValue.w;
+                    _this.updateMaterialProperty(material, valueName, src);
+                };
+                _this.m_materialSetterMap[bindingKey] = setter;
+            }
+            else {
+                var setter = function (value, firstValue) {
+                    var propValue = firstValue
+                        ? baseValue.add((targetValue.subtract(baseValue)).scale(value))
+                        : _this.getMaterialProperty(material, valueName).add(targetValue.subtract(baseValue).scale(value));
+                    _this.updateMaterialProperty(material, valueName, propValue);
+                };
+                _this.m_materialSetterMap[bindingKey] = setter;
+            }
+        });
+    }
+    /**
+     * UniVRM では Dictionary のキー用のクラスを定義しているが、文字列で代用する
+     * MaterialValueBinding.BaseValue は対応するプロパティの初期値なので無視できる
+     */
+    MaterialValueBindingMerger.prototype.makeBindingKey = function (materialValue) {
+        return materialValue.materialName + "_" + materialValue.propertyName + "_" + materialValue.targetValue.join('-');
+    };
+    /**
+     * UniVRM では Dictionary のキー用のクラスを定義しているが、文字列で代用する
+     */
+    MaterialValueBindingMerger.prototype.makeTargetKey = function (materialValue) {
+        return materialValue.materialName + "_" + materialValue.propertyName;
+    };
+    /**
+     * モーフィングを行う
+     * @param value 値(0〜1)
+     */
+    MaterialValueBindingMerger.prototype.morphing = function (value) {
+        this.accumulateValue(value);
+        this.apply();
+    };
+    /**
+     * materialValue ごとに重みを計算する
+     */
+    MaterialValueBindingMerger.prototype.accumulateValue = function (value) {
+        var _this = this;
+        this.materialValues.forEach(function (materialValue) {
+            var bindingKey = _this.makeBindingKey(materialValue);
+            if (_this.m_materialValueMap[bindingKey]) {
+                _this.m_materialValueMap[bindingKey] += value;
+            }
+            else {
+                _this.m_materialValueMap[bindingKey] = value;
+            }
+        });
+    };
+    /**
+     * Material のプロパティを更新する
+     */
+    MaterialValueBindingMerger.prototype.apply = function () {
+        var _this = this;
+        this.m_used = {};
+        Object.entries(this.materialValuesToApply).forEach(function (_a) {
+            var bindingKey = _a[0], materialValue = _a[1];
+            var targetKey = _this.makeTargetKey(materialValue);
+            if (!(targetKey in _this.m_used)) {
+                var material = _this.m_materialMap[materialValue.materialName];
+                var value = _this.baseValueCache[bindingKey].clone();
+                // 対象のプロパティを初期値に戻す
+                var valueName = materialValue.propertyName;
+                if (valueName.endsWith('_ST_S')) {
+                    var v = _this.getMaterialProperty(material, valueName);
+                    value.y = v.y;
+                    value.w = v.w;
+                }
+                else if (valueName.endsWith('_ST_T')) {
+                    var v = _this.getMaterialProperty(material, valueName);
+                    value.x = v.x;
+                    value.z = v.z;
+                }
+                _this.updateMaterialProperty(material, valueName, value);
+                _this.m_used[targetKey] = true;
+            }
+            var setter = _this.m_materialSetterMap[bindingKey];
+            if (setter) {
+                setter(_this.m_materialValueMap[bindingKey], false);
+            }
+        });
+        this.m_materialValueMap = {};
+    };
+    /**
+     * マテリアルのテクスチャか色に対応する Vector4 を取得する
+     */
+    MaterialValueBindingMerger.prototype.getMaterialProperty = function (material, propertyName) {
+        var match = propertyName.match(/^(_[^_]+)/);
+        if (!match || !match[1]) {
+            return null;
+        }
+        var key = match[1];
+        if (material instanceof _babylonjs_core__WEBPACK_IMPORTED_MODULE_1__["PBRMaterial"]) {
+            if (PBRMaterialTextureMap[key]) {
+                return this.convertTextureIntoVector4WhenNotNull(material[PBRMaterialTextureMap[key]]);
+            }
+            if (PBRMaterialColorMap[key]) {
+                return this.convertColorIntoVector4(material[PBRMaterialColorMap[key]], material.alpha);
+            }
+            return null;
+        }
+        // MToonMaterial
+        if (MToonMaterialTextureMap[key]) {
+            return this.convertTextureIntoVector4WhenNotNull(material[MToonMaterialTextureMap[key]]);
+        }
+        if (MToonMaterialColorMap[key]) {
+            return this.convertColorIntoVector4(material[MToonMaterialColorMap[key]], material.alpha);
+        }
+        return null;
+    };
+    /**
+     * Texture を Vector4 に変換する
+     */
+    MaterialValueBindingMerger.prototype.convertTextureIntoVector4WhenNotNull = function (texture) {
+        if (!texture) {
+            return null;
+        }
+        var t = texture;
+        return new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector4"](t.uScale, t.vScale, t.uOffset, t.vOffset);
+    };
+    /**
+     * Color3 に alpha を加えて Vector4 に変換する
+     */
+    MaterialValueBindingMerger.prototype.convertColorIntoVector4 = function (color, alpha) {
+        return new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector4"](color.r, color.g, color.b, alpha);
+    };
+    /**
+     * マテリアルのテクスチャか色を更新する
+     */
+    MaterialValueBindingMerger.prototype.updateMaterialProperty = function (material, propertyName, value) {
+        var match = propertyName.match(/^(_[^_]+)/);
+        if (!match || !match[1]) {
+            return;
+        }
+        var key = match[1];
+        if (material instanceof _babylonjs_core__WEBPACK_IMPORTED_MODULE_1__["PBRMaterial"]) {
+            if (PBRMaterialTextureMap[key]) {
+                this.updateTextureWhenNotNull(material[PBRMaterialTextureMap[key]], value);
+                return;
+            }
+            if (PBRMaterialColorMap[key]) {
+                if (key === '_Color') {
+                    material.alpha = value.w;
+                }
+                this.updateColor(material[PBRMaterialColorMap[key]], value);
+            }
+            return;
+        }
+        // MToonMaterial
+        if (MToonMaterialTextureMap[key]) {
+            this.updateTextureWhenNotNull(material[MToonMaterialTextureMap[key]], value);
+            return;
+        }
+        if (MToonMaterialColorMap[key]) {
+            if (key === '_Color') {
+                material.alpha = value.w;
+            }
+            this.updateColor(material[MToonMaterialColorMap[key]], value);
+        }
+    };
+    /**
+     * Texture を Vector4 で更新する
+     */
+    MaterialValueBindingMerger.prototype.updateTextureWhenNotNull = function (texture, value) {
+        if (texture) {
+            var t = texture;
+            t.uScale = value.x;
+            t.vScale = value.y;
+            t.uOffset = value.z;
+            t.vOffset = value.w;
+        }
+    };
+    /**
+     * Color3 を Vector4 で更新する
+     */
+    MaterialValueBindingMerger.prototype.updateColor = function (color, value) {
+        color.r = value.x;
+        color.g = value.y;
+        color.b = value.z;
+    };
+    return MaterialValueBindingMerger;
+}());
 
 
 
@@ -1748,10 +2058,15 @@ var VRM = /** @class */ (function () {
          * この TransformNode index 以降が読み込み対象
          */
         this.transformNodesFrom = 0;
+        /**
+         * この Material index 以降が読み込み対象
+         */
+        this.materialsFrom = 0;
         // GLTFLoader has already added rootMesh as __root__ before load extension
         // @see glTFLoader._loadData
         this.meshesFrom = this.loader.babylonScene.meshes.length - 1;
         this.transformNodesFrom = this.loader.babylonScene.transformNodes.length;
+        this.materialsFrom = this.loader.babylonScene.materials.length;
     }
     /**
      * @inheritdoc
@@ -1768,7 +2083,7 @@ var VRM = /** @class */ (function () {
             return;
         }
         var scene = this.loader.babylonScene;
-        var manager = new _vrm_manager__WEBPACK_IMPORTED_MODULE_1__["VRMManager"](this.loader.gltf.extensions[NAME], this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom);
+        var manager = new _vrm_manager__WEBPACK_IMPORTED_MODULE_1__["VRMManager"](this.loader.gltf.extensions[NAME], this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom, this.materialsFrom);
         scene.metadata = scene.metadata || {};
         scene.metadata.vrmManagers = scene.metadata.vrmManagers || [];
         scene.metadata.vrmManagers.push(manager);
@@ -1884,6 +2199,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babylonjs/core/Maths/math */ "./node_modules/@babylonjs/core/Maths/math.js");
 /* harmony import */ var _secondary_animation_spring_bone_controller__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./secondary-animation/spring-bone-controller */ "./src/secondary-animation/spring-bone-controller.ts");
 /* harmony import */ var _humanoid_bone__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./humanoid-bone */ "./src/humanoid-bone.ts");
+/* harmony import */ var _material_value_binding_merger__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./material-value-binding-merger */ "./src/material-value-binding-merger.ts");
+
 
 
 
@@ -1898,13 +2215,16 @@ var VRMManager = /** @class */ (function () {
      * @param scene
      * @param meshesFrom この番号以降のメッシュがこの VRM に該当する
      * @param transformNodesFrom この番号以降の TransformNode がこの VRM に該当する
+     * @param materialsNodesFrom この番号以降の Material がこの VRM に該当する
      */
-    function VRMManager(ext, scene, meshesFrom, transformNodesFrom) {
+    function VRMManager(ext, scene, meshesFrom, transformNodesFrom, materialsNodesFrom) {
         this.ext = ext;
         this.scene = scene;
         this.meshesFrom = meshesFrom;
         this.transformNodesFrom = transformNodesFrom;
+        this.materialsNodesFrom = materialsNodesFrom;
         this.morphTargetMap = {};
+        this.materialValueBindingMergerMap = {};
         this.presetMorphTargetMap = {};
         this.transformNodeMap = {};
         this.transformNodeCache = {};
@@ -1914,6 +2234,7 @@ var VRMManager = /** @class */ (function () {
         this.springBoneController = new _secondary_animation_spring_bone_controller__WEBPACK_IMPORTED_MODULE_2__["SpringBoneController"](this.ext.secondaryAnimation, this.findTransformNode.bind(this));
         this.springBoneController.setup();
         this.constructMorphTargetMap();
+        this.constructMaterialValueBindingMergerMap();
         this.constructTransformNodeMap();
         this._humanoidBone = new _humanoid_bone__WEBPACK_IMPORTED_MODULE_3__["HumanoidBone"](this.transformNodeMap);
     }
@@ -1941,6 +2262,7 @@ var VRMManager = /** @class */ (function () {
         this.springBoneController.dispose();
         this._humanoidBone.dispose();
         this.morphTargetMap = null;
+        this.materialValueBindingMergerMap = null;
         this.presetMorphTargetMap = null;
         this.transformNodeMap = null;
         this.transformNodeCache = null;
@@ -1953,12 +2275,15 @@ var VRMManager = /** @class */ (function () {
      * @param value 値(0〜1)
      */
     VRMManager.prototype.morphing = function (label, value) {
-        if (!this.morphTargetMap[label]) {
-            return;
+        var v = Math.max(0, Math.min(1, value));
+        if (this.morphTargetMap[label]) {
+            this.morphTargetMap[label].forEach(function (setting) {
+                setting.target.influence = v * (setting.weight / 100);
+            });
         }
-        this.morphTargetMap[label].forEach(function (setting) {
-            setting.target.influence = Math.max(0, Math.min(1, value)) * (setting.weight / 100);
-        });
+        if (this.materialValueBindingMergerMap[label]) {
+            this.materialValueBindingMergerMap[label].morphing(v);
+        }
     };
     /**
      * プリセットモーフのモーフィングを行う
@@ -2095,7 +2420,22 @@ var VRMManager = /** @class */ (function () {
                     }
                 });
             });
-            // TODO: materialValues
+        });
+    };
+    /**
+     * 事前に MaterialValueBindingMerger とモーフ名を紐付ける
+     */
+    VRMManager.prototype.constructMaterialValueBindingMergerMap = function () {
+        var _this = this;
+        if (!this.ext.blendShapeMaster || !this.ext.blendShapeMaster.blendShapeGroups) {
+            return;
+        }
+        var materials = this.scene.materials.slice(this.materialsNodesFrom);
+        this.ext.blendShapeMaster.blendShapeGroups.forEach(function (g) {
+            if (!g.materialValues) {
+                return;
+            }
+            _this.materialValueBindingMergerMap[g.name] = new _material_value_binding_merger__WEBPACK_IMPORTED_MODULE_4__["MaterialValueBindingMerger"](materials, g.materialValues);
         });
     };
     /**
