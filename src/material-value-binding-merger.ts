@@ -135,7 +135,7 @@ export class MaterialValueBindingMerger {
      * UniVRM では Dictionary のキー用のクラスを定義しているが、文字列で代用する
      * MaterialValueBinding.BaseValue は対応するプロパティの初期値なので無視できる
      */
-     private makeBindingKey(materialValue: IVRMBlendShapeMaterialBind): string {
+    private makeBindingKey(materialValue: IVRMBlendShapeMaterialBind): string {
         return `${materialValue.materialName}_${materialValue.propertyName}_${materialValue.targetValue.join('-')}`;
     }
 
