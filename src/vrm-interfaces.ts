@@ -92,6 +92,7 @@ export interface IVRMBlendShapeGroup {
     presetName: string;
     binds: IVRMBlendShapeBind[];
     materialValues: IVRMBlendShapeMaterialBind[];
+    isBinary: boolean;
 }
 
 export interface IVRMBlendShapeBind {
