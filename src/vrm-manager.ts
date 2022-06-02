@@ -9,6 +9,10 @@ import { HumanoidBone } from './humanoid-bone';
 import { IVRM } from './vrm-interfaces';
 import { MaterialValueBindingMerger } from './material-value-binding-merger';
 
+interface IsBinaryMap {
+    [morphName: string]: boolean;
+}
+
 interface MorphTargetSetting {
     target: MorphTarget;
     weight: number;
@@ -43,6 +47,7 @@ export type HumanBoneName = 'hips' | 'leftUpperLeg' | 'rightUpperLeg' | 'leftLow
  * VRM キャラクターを動作させるためのマネージャ
  */
 export class VRMManager {
+    private isBinaryMorphMap: IsBinaryMap = {};
     private morphTargetMap: MorphTargetMap = {};
     private materialValueBindingMergerMap: MaterialValueBindingMergerMap = {};
     private presetMorphTargetMap: MorphTargetMap = {};
@@ -80,8 +85,11 @@ export class VRMManager {
         );
         this.springBoneController.setup();
 
-        this.constructMorphTargetMap();
-        this.constructMaterialValueBindingMergerMap();
+        if (this.ext.blendShapeMaster && this.ext.blendShapeMaster.blendShapeGroups) {
+            this.constructIsBinaryMap();
+            this.constructMorphTargetMap();
+            this.constructMaterialValueBindingMergerMap();
+        }
         this.constructTransformNodeMap();
 
         this._humanoidBone = new HumanoidBone(this.transformNodeMap);
@@ -118,7 +126,7 @@ export class VRMManager {
      * @param value 値(0〜1)
      */
     public morphing(label: string, value: number): void {
-        const v = Math.max(0, Math.min(1, value));
+        const v = this.calcMorphValue(label, value);
         if (this.morphTargetMap[label]) {
             this.morphTargetMap[label].forEach((setting) => {
                 setting.target.influence = v * (setting.weight / 100);
@@ -138,9 +146,23 @@ export class VRMManager {
         if (!this.presetMorphTargetMap[label]) {
             return;
         }
+        const v = this.calcMorphValue(label, value);
         this.presetMorphTargetMap[label].forEach((setting) => {
-            setting.target.influence = Math.max(0, Math.min(1, value)) * (setting.weight / 100);
+            setting.target.influence = v * (setting.weight / 100);
         });
+    }
+
+    /**
+     * モーフィング用の値を計算する
+     * @param label モーフ名
+     * @param value 値
+     */
+    private calcMorphValue(label: string, value: number): number {
+        const v = Math.max(0.0, Math.min(1.0, value));
+        if (this.isBinaryMorphMap[label]) {
+            return v > 0.5 ? 1.0 : 0.0;
+        }
+        return v;
     }
 
     /**
@@ -233,12 +255,18 @@ export class VRMManager {
     }
 
     /**
+     * 事前に MorphTarget と isBinary を紐付ける
+     */
+    private constructIsBinaryMap(): void {
+        this.ext.blendShapeMaster.blendShapeGroups.forEach((g) => {
+            this.isBinaryMorphMap[g.name] = g.isBinary;
+        });
+    }
+
+    /**
      * 事前に MorphTarget と BlendShape を紐付ける
      */
     private constructMorphTargetMap(): void {
-        if (!this.ext.blendShapeMaster || !this.ext.blendShapeMaster.blendShapeGroups) {
-            return;
-        }
         this.ext.blendShapeMaster.blendShapeGroups.forEach((g) => {
             if (!g.binds) {
                 return;
@@ -277,9 +305,6 @@ export class VRMManager {
      * 事前に MaterialValueBindingMerger とモーフ名を紐付ける
      */
     private constructMaterialValueBindingMergerMap() {
-        if (!this.ext.blendShapeMaster || !this.ext.blendShapeMaster.blendShapeGroups) {
-            return;
-        }
         const materials = this.scene.materials.slice(this.materialsNodesFrom);
         this.ext.blendShapeMaster.blendShapeGroups.forEach((g) => {
             if (!g.materialValues) {
