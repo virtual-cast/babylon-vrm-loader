@@ -9,7 +9,7 @@ import { HumanoidBone } from './humanoid-bone';
 import { IVRM } from './vrm-interfaces';
 import { MaterialValueBindingMerger } from './material-value-binding-merger';
 
-interface isBinaryMap {
+interface IsBinaryMap {
     [morphName: string]: boolean;
 }
 
@@ -47,7 +47,7 @@ export type HumanBoneName = 'hips' | 'leftUpperLeg' | 'rightUpperLeg' | 'leftLow
  * VRM キャラクターを動作させるためのマネージャ
  */
 export class VRMManager {
-    private isBinaryMorphMap: isBinaryMap = {};
+    private isBinaryMorphMap: IsBinaryMap = {};
     private morphTargetMap: MorphTargetMap = {};
     private materialValueBindingMergerMap: MaterialValueBindingMergerMap = {};
     private presetMorphTargetMap: MorphTargetMap = {};
