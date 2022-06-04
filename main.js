@@ -2223,6 +2223,7 @@ var VRMManager = /** @class */ (function () {
         this.meshesFrom = meshesFrom;
         this.transformNodesFrom = transformNodesFrom;
         this.materialsNodesFrom = materialsNodesFrom;
+        this.isBinaryMorphMap = {};
         this.morphTargetMap = {};
         this.materialValueBindingMergerMap = {};
         this.presetMorphTargetMap = {};
@@ -2233,8 +2234,11 @@ var VRMManager = /** @class */ (function () {
         this.transformNodeCache = this.constructTransformNodeCache();
         this.springBoneController = new _secondary_animation_spring_bone_controller__WEBPACK_IMPORTED_MODULE_2__["SpringBoneController"](this.ext.secondaryAnimation, this.findTransformNode.bind(this));
         this.springBoneController.setup();
-        this.constructMorphTargetMap();
-        this.constructMaterialValueBindingMergerMap();
+        if (this.ext.blendShapeMaster && this.ext.blendShapeMaster.blendShapeGroups) {
+            this.constructIsBinaryMap();
+            this.constructMorphTargetMap();
+            this.constructMaterialValueBindingMergerMap();
+        }
         this.constructTransformNodeMap();
         this._humanoidBone = new _humanoid_bone__WEBPACK_IMPORTED_MODULE_3__["HumanoidBone"](this.transformNodeMap);
     }
@@ -2275,7 +2279,7 @@ var VRMManager = /** @class */ (function () {
      * @param value 値(0〜1)
      */
     VRMManager.prototype.morphing = function (label, value) {
-        var v = Math.max(0, Math.min(1, value));
+        var v = this.calcMorphValue(label, value);
         if (this.morphTargetMap[label]) {
             this.morphTargetMap[label].forEach(function (setting) {
                 setting.target.influence = v * (setting.weight / 100);
@@ -2294,9 +2298,22 @@ var VRMManager = /** @class */ (function () {
         if (!this.presetMorphTargetMap[label]) {
             return;
         }
+        var v = this.calcMorphValue(label, value);
         this.presetMorphTargetMap[label].forEach(function (setting) {
-            setting.target.influence = Math.max(0, Math.min(1, value)) * (setting.weight / 100);
+            setting.target.influence = v * (setting.weight / 100);
         });
+    };
+    /**
+     * モーフィング用の値を計算する
+     * @param label モーフ名
+     * @param value 値
+     */
+    VRMManager.prototype.calcMorphValue = function (label, value) {
+        var v = Math.max(0.0, Math.min(1.0, value));
+        if (this.isBinaryMorphMap[label]) {
+            return v > 0.5 ? 1.0 : 0.0;
+        }
+        return v;
     };
     /**
      * list morphing name
@@ -2382,13 +2399,19 @@ var VRMManager = /** @class */ (function () {
         return this.meshCache[meshIndex] || null;
     };
     /**
+     * 事前に MorphTarget と isBinary を紐付ける
+     */
+    VRMManager.prototype.constructIsBinaryMap = function () {
+        var _this = this;
+        this.ext.blendShapeMaster.blendShapeGroups.forEach(function (g) {
+            _this.isBinaryMorphMap[g.name] = g.isBinary;
+        });
+    };
+    /**
      * 事前に MorphTarget と BlendShape を紐付ける
      */
     VRMManager.prototype.constructMorphTargetMap = function () {
         var _this = this;
-        if (!this.ext.blendShapeMaster || !this.ext.blendShapeMaster.blendShapeGroups) {
-            return;
-        }
         this.ext.blendShapeMaster.blendShapeGroups.forEach(function (g) {
             if (!g.binds) {
                 return;
@@ -2427,9 +2450,6 @@ var VRMManager = /** @class */ (function () {
      */
     VRMManager.prototype.constructMaterialValueBindingMergerMap = function () {
         var _this = this;
-        if (!this.ext.blendShapeMaster || !this.ext.blendShapeMaster.blendShapeGroups) {
-            return;
-        }
         var materials = this.scene.materials.slice(this.materialsNodesFrom);
         this.ext.blendShapeMaster.blendShapeGroups.forEach(function (g) {
             if (!g.materialValues) {
