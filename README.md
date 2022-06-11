@@ -14,7 +14,7 @@ This loader is used as [THE SEED ONLINE](https://seed.online) web VRM/VCI/glb vi
 |---|---|
 |~4.1.0|<1.5.0|
 |~4.2.0|^1.5.0|
-|~5.0.0|unreleased(will be ^1.6.0)|
+|~5.x|unreleased(will be ^2.0.0)|
 
 ## Features
 
