@@ -83,7 +83,6 @@ export class VRMManager {
             this.ext.secondaryAnimation,
             this.findTransformNode.bind(this),
         );
-        this.springBoneController.setup();
 
         if (this.ext.blendShapeMaster && this.ext.blendShapeMaster.blendShapeGroups) {
             this.constructIsBinaryMap();

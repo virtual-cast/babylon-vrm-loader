@@ -1,165 +1,251 @@
-import { Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
+import { Matrix, Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
 import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import { Nullable } from '@babylonjs/core/types';
+import { ColliderGroup } from './collider-group';
 import { QuaternionHelper } from './quaternion-helper';
-import { SphereCollider } from './sphere-collider';
-import { Vector3Helper } from './vector3-helper';
+// based on
+// http://rocketjump.skr.jp/unity3d/109/
+// https://github.com/dwango/UniVRM/blob/master/Scripts/SpringBone/VRMSpringBone.cs
+// https://github.com/pixiv/three-vrm/blob/aad551e041fad553c19d2091e5f5eaff1eb8faa8/packages/three-vrm/src/springbone/VRMSpringBone.ts
+
+const IDENTITY_MATRIX = Matrix.Identity();
+
+const _v3A = new Vector3();
+const _v3B = new Vector3();
+const _v3C = new Vector3();
+const _quatA = new Quaternion();
+const _matA = new Matrix();
+const _matB = new Matrix();
 
 /**
- * Verlet Spring Bone Logic
+ * Verlet Spring Bone
  */
 export class VRMSpringBoneLogic {
     /**
+     * initial local transform Marix
+     */
+    private readonly initialLocalMatrix: Matrix;
+    /**
      * Cloned initial local rotation
      */
-    private readonly localRotation: Quaternion;
+    private readonly initialLocalRotation: Quaternion;
+    /**
+     * Cloned initial local child position
+     */
+    private readonly initialLocalChildPosition: Vector3;
+
+    /**
+     * Length of the bone in relative space unit.
+     */
+    private readonly centerSpaceBoneLength: number;
+    /**
+     * Position of the bone in relative space unit.
+     */
+    private readonly centerSpacePosition: Vector3;
     /**
      * Reference of parent rotation
      */
-    private readonly parentRotation: Quaternion;
     private readonly boneAxis: Vector3;
-    private readonly boneLength: number;
 
-    private currentTail: Vector3;
-    private prevTail: Vector3;
+    private currentTail: Vector3 = new Vector3();
+    private prevTail: Vector3 = new Vector3();
+    private nextTail: Vector3 = new Vector3();
 
     /**
      * @param center Center reference of TransformNode
      * @param radius Collision Radius
      * @param transform Base TransformNode
-     * @param localChildPosition
      */
     public constructor(
-        center: Nullable<TransformNode>,
+        public readonly center: Nullable<TransformNode>,
         public readonly radius: number,
-        public readonly transform: TransformNode,
-        localChildPosition: Vector3,
+        public readonly transform: TransformNode
     ) {
         // Initialize rotationQuaternion when not initialized
         if (!transform.rotationQuaternion) {
             transform.rotationQuaternion = transform.rotation.toQuaternion();
         }
-        const parent = transform.parent as Nullable<TransformNode>;
-        if (parent !== null && parent.rotationQuaternion === null) {
-            parent.rotationQuaternion = parent.rotation.toQuaternion();
-        }
-        this.parentRotation = parent && parent.rotationQuaternion || Quaternion.Identity();
 
-        const worldChildPosition = transform.getAbsolutePosition().add(localChildPosition);
-        this.currentTail = this.getCenterTranslatedPos(center, worldChildPosition);
-        this.prevTail = this.currentTail;
-        this.localRotation = transform.rotationQuaternion.clone();
-        this.boneAxis = Vector3.Normalize(localChildPosition);
-        this.boneLength = localChildPosition.length();
+        const worldMatrix = transform.getWorldMatrix();
+        this.centerSpacePosition = worldMatrix.getTranslation();
+
+        this.initialLocalMatrix = transform._localMatrix.clone();
+        this.initialLocalRotation = transform.rotationQuaternion.clone();
+
+        const children = transform.getChildTransformNodes(true);
+        if (children.length === 0) {
+            this.initialLocalChildPosition = transform.position.clone().normalize().scaleInPlace(0.07);
+        } else {
+            this.initialLocalChildPosition = children[0].position.clone();
+        }
+
+        Vector3.TransformCoordinatesToRef(this.initialLocalChildPosition, worldMatrix, this.currentTail);
+        this.prevTail.copyFrom(this.currentTail);
+        this.nextTail.copyFrom(this.currentTail);
+
+        this.boneAxis = this.initialLocalChildPosition.normalizeToNew();
+        Vector3.TransformCoordinatesToRef(this.initialLocalChildPosition, worldMatrix, _v3A);
+        this.centerSpaceBoneLength = _v3A
+            .subtractInPlace(this.centerSpacePosition)
+            .length();
+
+        if (center) {
+            this.getMatrixWorldToCenter(_matA);
+
+            Vector3.TransformCoordinatesToRef(this.currentTail, _matA, this.currentTail);
+            Vector3.TransformCoordinatesToRef(this.prevTail, _matA, this.prevTail);
+            Vector3.TransformCoordinatesToRef(this.nextTail, _matA, this.nextTail);
+
+            worldMatrix.multiplyToRef(_matA, _matA);
+
+            _matA.getTranslationToRef(this.centerSpacePosition);
+
+            Vector3.TransformCoordinatesToRef(this.initialLocalChildPosition, _matA, _v3A);
+            this.centerSpaceBoneLength = _v3A
+                .subtractInPlace(this.centerSpacePosition)
+                .length();
+        }
     }
 
     /**
      * Update Tail position
      *
-     * @param center Center reference of TransformNode
      * @param stiffnessForce Current frame stiffness
      * @param dragForce Current frame drag force
      * @param external Current frame external force
-     * @param colliders Current frame colliders
+     * @param colliderGroups Current frame colliderGroups
      */
     public update(
-        center: Nullable<TransformNode>,
         stiffnessForce: number,
         dragForce: number,
         external: Vector3,
-        colliders: SphereCollider[],
+        colliderGroups: ColliderGroup[],
     ): void {
-        const absPos = this.transform.getAbsolutePosition();
-        if (Number.isNaN(absPos.x)) {
+        if (Number.isNaN(this.transform.getAbsolutePosition().x)) {
             // Do not update when absolute position is invalid
             return;
         }
-        const currentTail = this.getCenterTranslatedWorldPos(center, this.currentTail);
-        const prevTail = this.getCenterTranslatedWorldPos(center, this.prevTail);
 
-        // verlet 積分で次の位置を計算
-        let nextTail = currentTail;
+        // Get bone position in center space
+        this.getMatrixWorldToCenter(_matA);
+        this.transform.getWorldMatrix().multiplyToRef(_matA, _matA);
+        _matA.getTranslationToRef(this.centerSpacePosition);
+
+        // Get parent position in center space
+        this.getMatrixWorldToCenter(_matB);
+        this.getParentMatrixWorld().multiplyToRef(_matB, _matB);
+
+        // verlet積分で次の位置を計算
+        this.nextTail.copyFrom(this.currentTail);
         {
             // 減衰付きで前のフレームの移動を継続
-            const attenuation = 1.0 - dragForce;
-            const delta = Vector3Helper.multiplyByFloat(currentTail.subtract(prevTail), attenuation);
-            nextTail.addInPlace(delta);
+            _v3A
+                .copyFrom(this.currentTail)
+                .subtractInPlace(this.prevTail)
+                .scaleInPlace(1.0 - dragForce);
+            this.nextTail.addInPlace(_v3A);
         }
         {
             // 親の回転による子ボーンの移動目標
-            const rotation = this.parentRotation.multiply(this.localRotation); // parentRotation * localRotation
-            const rotatedVec = QuaternionHelper.multiplyWithVector3(rotation, this.boneAxis); // rotation * boneAxis
-            const stiffedVec = Vector3Helper.multiplyByFloat(rotatedVec, stiffnessForce); // rotatedVec * stiffnessForce
-            nextTail.addInPlace(stiffedVec); // nextTail + stiffedVec
+            _v3A.copyFrom(this.boneAxis);
+            Vector3.TransformCoordinatesToRef(_v3A, this.initialLocalMatrix, _v3A);
+            Vector3.TransformCoordinatesToRef(_v3A, _matB, _v3A);
+            _v3A
+                .subtractInPlace(this.centerSpacePosition)
+                .normalize()
+                .scaleInPlace(stiffnessForce);
+            this.nextTail.addInPlace(_v3A);
         }
         {
             // 外力による移動量
-            nextTail.addInPlace(external);
+            this.nextTail.addInPlace(external);
         }
-
         {
             // 長さを boneLength に強制
-            const normalized = nextTail.subtract(absPos).normalize();
-            nextTail = absPos.add(Vector3Helper.multiplyByFloat(normalized, this.boneLength));
+            this.nextTail
+                .subtractInPlace(this.centerSpacePosition)
+                .normalize()
+                .scaleInPlace(this.centerSpaceBoneLength)
+                .addInPlace(this.centerSpacePosition);
         }
-
         {
             // Collision で移動
-            nextTail = this.collide(colliders, nextTail);
+            this.collide(colliderGroups, this.nextTail);
         }
 
-        this.prevTail = this.getCenterTranslatedPos(center, currentTail);
-        this.currentTail = this.getCenterTranslatedPos(center, nextTail);
+        this.prevTail.copyFrom(this.currentTail);
+        this.currentTail.copyFrom(this.nextTail);
 
-        // 回転を適用
-        this.transform.rotationQuaternion = this.transformToRotation(nextTail);
-    }
+        this.initialLocalMatrix.multiplyToRef(_matB, _matA);
+        const initialCenterSpaceMatrixInv = _matA.invert();
+        Vector3.TransformCoordinatesToRef(this.nextTail, initialCenterSpaceMatrixInv, _v3A);
+        QuaternionHelper.fromToRotationToRef(this.boneAxis, _v3A, _quatA);
+        const applyRotation = _quatA;
+        this.initialLocalRotation.multiplyToRef(applyRotation, this.transform.rotationQuaternion!);
 
-    private getCenterTranslatedWorldPos(center: Nullable<TransformNode>, pos: Vector3): Vector3 {
-        if (center !== null) {
-            return center.getAbsolutePosition().add(pos);
-        }
-        return pos;
-    }
-
-    private getCenterTranslatedPos(center: Nullable<TransformNode>, pos: Vector3): Vector3 {
-        if (center !== null) {
-            return center.position.add(pos);
-        }
-        return pos;
+        // update WorldMatrix
+        this.transform.computeWorldMatrix(true);
     }
 
     /**
-     * 次のテールの位置情報から回転情報を生成する
-     *
-     * @see https://stackoverflow.com/questions/51549366/what-is-the-math-behind-fromtorotation-unity3d
+      * Create a matrix that converts world space into center space.
+      * @param result Target matrix
+      */
+    private getMatrixWorldToCenter(result: Matrix): Matrix {
+        if (this.center) {
+            this.center.getWorldMatrix().invertToRef(result);
+        } else {
+            result.copyFrom(IDENTITY_MATRIX);
+        }
+        return result;
+    }
+
+    /**
+     * Returns the world matrix of its parent object.
      */
-    private transformToRotation(nextTail: Vector3): Quaternion {
-        const rotation = this.parentRotation.multiply(this.localRotation);
-        const fromAxis = QuaternionHelper.multiplyWithVector3(rotation, this.boneAxis);
-        const toAxis = nextTail.subtract(this.transform.absolutePosition).normalize();
-        const result = QuaternionHelper.fromToRotation(fromAxis, toAxis);
-        return result.multiplyInPlace(rotation);
+    private getParentMatrixWorld(): Matrix {
+        return this.transform.parent ? (this.transform.parent as TransformNode).getWorldMatrix() : IDENTITY_MATRIX;
     }
 
     /**
      * 衝突判定を行う
-     * @param colliders SphereColliders
-     * @param nextTail NextTail
+     * @param colliderGroups
+     * @param tail
      */
-    private collide(colliders: SphereCollider[], nextTail: Vector3): Vector3 {
-        colliders.forEach((collider) => {
-            const r = this.radius + collider.radius;
-            const axis = nextTail.subtract(collider.position);
-            // 少数誤差許容のため 2 cm 判定を小さくする
-            if (axis.lengthSquared() <= (r * r) - 0.02) {
-                // ヒット。 Collider の半径方向に押し出す
-                const posFromCollider = collider.position.add(Vector3Helper.multiplyByFloat(axis.normalize(), r));
-                // 長さを boneLength に強制
-                const absPos = this.transform.absolutePosition;
-                nextTail = absPos.add(Vector3Helper.multiplyByFloat(posFromCollider.subtractInPlace(absPos).normalize(), this.boneLength));
-            }
+    private collide(colliderGroups: ColliderGroup[], tail: Vector3) {
+        colliderGroups.forEach((colliderGroup) => {
+            colliderGroup.colliders.forEach((collider) => {
+                this.getMatrixWorldToCenter(_matA);
+                collider.sphere.computeWorldMatrix().multiplyToRef(_matA, _matA);
+                _matA.getTranslationToRef(_v3A);
+                const colliderCenterSpacePosition = _v3A;
+
+                let maxAbsScale = 0;
+                collider.sphere.absoluteScaling.asArray().forEach((s) => {
+                    maxAbsScale = Math.max(maxAbsScale, Math.abs(s));
+                });
+                const colliderRadius = collider.radius * maxAbsScale;
+                const r = this.radius + colliderRadius;
+
+                tail.subtractToRef(colliderCenterSpacePosition, _v3B);
+                if (_v3B.lengthSquared() <= r * r) {
+                    const normal = _v3B
+                        .copyFrom(tail)
+                        .subtractInPlace(colliderCenterSpacePosition)
+                        .normalize();
+                    const posFromCollider = _v3C
+                        .copyFrom(colliderCenterSpacePosition)
+                        .addInPlace(normal.scaleInPlace(r));
+
+                    tail.copyFrom(
+                        posFromCollider
+                            .subtractInPlace(this.centerSpacePosition)
+                            .normalize()
+                            .scaleInPlace(this.centerSpaceBoneLength)
+                            .addInPlace(this.centerSpacePosition)
+                    );
+                }
+            });
         });
-        return nextTail;
     }
 }
