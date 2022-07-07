@@ -36,15 +36,6 @@ export class SpringBoneController {
     }
 
     /**
-     * Initialize SpringBones
-     */
-    public setup(force = false) {
-        this.springs.forEach((spring) => {
-            spring.setup(force);
-        });
-    }
-
-    /**
      * Update all SpringBones
      *
      * @param deltaTime Elapsed sec from previous frame
@@ -69,7 +60,7 @@ export class SpringBoneController {
             const g = new ColliderGroup(bone);
             colliderGroup.colliders.forEach((collider) => {
                 g.addCollider(
-                    // Unity 座標系からの変換のため X, Z 軸を反転
+                    // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
                     new Vector3(-collider.offset.x, collider.offset.y, -collider.offset.z),
                     collider.radius,
                 );
@@ -96,7 +87,7 @@ export class SpringBoneController {
                 spring.stiffiness,
                 spring.gravityPower,
                 new Vector3(
-                    // Unity 座標系からの変換のため X, Z 軸を反転
+                    // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
                     -spring.gravityDir.x,
                     spring.gravityDir.y,
                     -spring.gravityDir.z,

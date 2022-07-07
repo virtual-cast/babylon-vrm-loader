@@ -1,12 +1,9 @@
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
-import { Color3, Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
-import { Mesh } from '@babylonjs/core/Meshes/mesh';
+import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
 import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
 import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import { Nullable } from '@babylonjs/core/types';
 import { ColliderGroup } from './collider-group';
-import { SphereCollider } from './sphere-collider';
-import { Vector3Helper } from './vector3-helper';
 import { VRMSpringBoneLogic } from './vrm-spring-bone-logic';
 
 /**
@@ -14,13 +11,10 @@ import { VRMSpringBoneLogic } from './vrm-spring-bone-logic';
  */
 export class VRMSpringBone {
     public verlets: VRMSpringBoneLogic[] = [];
-    private initialLocalRotations: Quaternion[] = [];
     private activeBones: TransformNode[] = [];
 
     /** @hidden */
     private drawGizmo = false;
-    private boneGizmoList: Mesh[] = [];
-    private colliderGizmoList: Mesh[] = [];
 
     /**
      * @see https://vrm.dev/en/vrm_spec/
@@ -49,28 +43,50 @@ export class VRMSpringBone {
     ) {
         this.activeBones = this.bones.filter((bone) => bone !== null) as TransformNode[];
         this.activeBones.forEach((bone) => {
-            bone.rotationQuaternion = bone.rotationQuaternion || bone.rotation.toQuaternion();
-            this.initialLocalRotations.push(bone.rotationQuaternion.clone());
+            [bone].concat(bone.getChildTransformNodes()).forEach((b) => {
+                this.verlets.push(new VRMSpringBoneLogic(
+                    this.center,
+                    this.hitRadius,
+                    b
+                ));
+            });
         });
+
+        if (this.drawGizmo) {
+            this.setupGizmo();
+        }
     }
 
-    /**
-     * Initialize bones
-     *
-     * @param force Force reset rotation
-     */
-    public setup(force = false): void {
-        if (!force) {
-            this.activeBones.forEach((bone, index) => {
-                bone.rotationQuaternion = this.initialLocalRotations[index]!.clone();
+    private setupGizmo() {
+        this.activeBones.forEach((bone) => {
+            const scene = bone.getScene();
+            [bone].concat(bone.getChildTransformNodes()).forEach((b) => {
+                const boneGizmo = MeshBuilder.CreateSphere(b.name + '_boneGizmo', {
+                    segments: 6,
+                    diameter: this.hitRadius * 2,
+                    updatable: true,
+                }, scene);
+                const mat = new StandardMaterial(b.name + '_boneGizmomat', scene);
+                mat.emissiveColor = Color3.Red();
+                mat.wireframe = true;
+                boneGizmo.material = mat;
+                boneGizmo.setParent(b);
+                boneGizmo.position = Vector3.Zero();
             });
-        }
-        this.verlets = [];
+        });
 
-        this.activeBones.forEach((bone, index) => {
-            this.initialLocalRotations[index]! = bone.rotationQuaternion!;
-
-            this.setupRecursive(this.center, bone);
+        this.colliderGroups.forEach((group) => {
+            const scene = group.transform.getScene();
+            group.colliders.forEach((collider) => {
+                const sphere = collider.sphere;
+                if (!sphere.isEnabled(false)) {
+                    sphere.setEnabled(true);
+                    const mat = new StandardMaterial(group.transform.name + '_colliderGizmomat', scene);
+                    mat.emissiveColor = Color3.Yellow();
+                    mat.wireframe = true;
+                    sphere.material = mat;
+                }
+            });
         });
     }
 
@@ -80,111 +96,21 @@ export class VRMSpringBone {
      * @param deltaTime
      */
     public async update(deltaTime: number): Promise<void> {
-        if (this.verlets.length === 0) {
-            if (this.activeBones.length === 0) {
-                return;
-            }
-            this.setup();
-        }
-
-        const colliderList: SphereCollider[] = [];
-        this.colliderGroups.forEach((group) => {
-            if (!group) {
-                return;
-            }
-            const absPos = group.transform.getAbsolutePosition();
-            if (Number.isNaN(absPos.x)) {
-                return;
-            }
-            group.colliders.forEach((collider) => {
-                const pos = absPos.add(collider.offset);
-                colliderList.push(new SphereCollider(
-                    pos,
-                    collider.radius,
-                ));
-
-                if (this.drawGizmo) {
-                    if (this.colliderGizmoList.length < colliderList.length) {
-                        const mesh = MeshBuilder.CreateSphere(`${group.transform.name}_colliderGizmo`, {
-                            segments: 8,
-                            diameter: 1,
-                            updatable: true,
-                        }, group.transform.getScene());
-                        const mat = new StandardMaterial(group.transform.name + '_colliderGizmomat', group.transform.getScene());
-                        mat.emissiveColor = Color3.Yellow();
-                        mat.wireframe = true;
-                        mesh.material = mat;
-                        this.colliderGizmoList.push(mesh);
-                    }
-                    this.colliderGizmoList[colliderList.length - 1].position = pos;
-                    this.colliderGizmoList[colliderList.length - 1].scaling = new Vector3(collider.radius * 2, collider.radius * 2, collider.radius * 2);
-                }
-            });
-        });
-
         const stiffness = this.stiffness * deltaTime;
-        const external = Vector3Helper.multiplyByFloat(this.gravityDir, this.gravityPower * deltaTime);
+        const external = this.gravityDir.scale(this.gravityPower * deltaTime);
 
-        const promises = this.verlets.map<Promise<void>>((verlet, index) => {
+        const promises = this.verlets.map<Promise<void>>((verlet) => {
             return new Promise<void>((resolve) => {
                 verlet.update(
-                    this.center,
                     stiffness,
                     this.dragForce,
                     external,
-                    colliderList,
+                    this.colliderGroups,
                 );
-                if (this.drawGizmo && this.boneGizmoList[index]) {
-                    this.boneGizmoList[index].position = verlet.transform.absolutePosition;
-                    this.boneGizmoList[index].rotationQuaternion = verlet.transform.rotationQuaternion;
-                }
                 resolve();
             });
         });
 
         return Promise.all(promises).then(() => { /* Do Nothing */ });
-    }
-
-    private setupRecursive(center: Nullable<TransformNode>, parent: TransformNode): void {
-        if (parent.getChildTransformNodes().length === 0) {
-            // Leaf
-            const ancestor = parent.parent as TransformNode;
-            const delta = parent.getAbsolutePosition().subtract(ancestor.getAbsolutePosition()).normalize();
-            const childPosition = parent.position.add(Vector3Helper.multiplyByFloat(delta, 0.07));
-            this.verlets.push(new VRMSpringBoneLogic(
-                center,
-                this.hitRadius,
-                parent,
-                childPosition,
-            ));
-        } else {
-            // Not leaf
-            const firstChild = parent.getChildTransformNodes().shift()!;
-            const localPosition = firstChild.position;
-            const scale = firstChild.scaling;
-            this.verlets.push(new VRMSpringBoneLogic(
-                center,
-                this.hitRadius,
-                parent,
-                localPosition.multiply(scale),
-            ));
-        }
-
-        if (this.drawGizmo) {
-            const boneGizmo = MeshBuilder.CreateSphere(parent.name + '_boneGizmo', {
-                segments: 8,
-                diameter: this.hitRadius * 2,
-                updatable: true,
-            }, parent.getScene());
-            const mat = new StandardMaterial(parent.name + '_boneGizmomat', parent.getScene());
-            mat.emissiveColor = Color3.Red();
-            mat.wireframe = true;
-            boneGizmo.material = mat;
-            this.boneGizmoList.push(boneGizmo);
-        }
-
-        parent.getChildTransformNodes().forEach((child) => {
-            this.setupRecursive(center, child);
-        });
     }
 }
