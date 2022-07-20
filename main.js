@@ -1163,7 +1163,9 @@ var MaterialValueBindingMerger = /** @class */ (function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ColliderGroup", function() { return ColliderGroup; });
-/* harmony import */ var _collider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./collider */ "./src/secondary-animation/collider.ts");
+/* harmony import */ var _babylonjs_core_Meshes_Builders_sphereBuilder__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babylonjs/core/Meshes/Builders/sphereBuilder */ "./node_modules/@babylonjs/core/Meshes/Builders/sphereBuilder.js");
+/* harmony import */ var _collider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./collider */ "./src/secondary-animation/collider.ts");
+
 
 /**
  * VRM SpringBone ColliderGroup
@@ -1183,7 +1185,15 @@ var ColliderGroup = /** @class */ (function () {
      * @param radius The radius of the collider.
      */
     ColliderGroup.prototype.addCollider = function (offset, radius) {
-        this.colliders.push(new _collider__WEBPACK_IMPORTED_MODULE_0__["Collider"](offset, radius));
+        var sphere = _babylonjs_core_Meshes_Builders_sphereBuilder__WEBPACK_IMPORTED_MODULE_0__["SphereBuilder"].CreateSphere(this.transform.name + "_ColliderSphere", {
+            segments: 6,
+            diameter: radius * 2.0,
+            updatable: true,
+        }, this.transform.getScene());
+        sphere.setParent(this.transform);
+        sphere.setPositionWithLocalVector(offset);
+        sphere.setEnabled(false);
+        this.colliders.push(new _collider__WEBPACK_IMPORTED_MODULE_1__["Collider"](offset, radius, sphere));
     };
     return ColliderGroup;
 }());
@@ -1209,10 +1219,12 @@ var Collider = /** @class */ (function () {
     /**
      * @param offset The local coordinate from the node of the collider group.
      * @param radius The radius of the collider.
+     * @param sphere The spehere mesh for worldMatrix and gizmo.
      */
-    function Collider(offset, radius) {
+    function Collider(offset, radius, sphere) {
         this.offset = offset;
         this.radius = radius;
+        this.sphere = sphere;
     }
     return Collider;
 }());
@@ -1233,6 +1245,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "QuaternionHelper", function() { return QuaternionHelper; });
 /* harmony import */ var _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babylonjs/core/Maths/math */ "./node_modules/@babylonjs/core/Maths/math.js");
 
+var _v3from = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
+var _v3to = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
 /**
  * Quaternion Helper
  */
@@ -1240,79 +1254,30 @@ var QuaternionHelper = /** @class */ (function () {
     function QuaternionHelper() {
     }
     /**
-     * Rotates the point point with rotation.
-     *
-     * Quaternion * Vector3
-     *
-     * @param quat
-     * @param vec
-     * @see https://docs.unity3d.com/2017.4/Documentation/ScriptReference/Quaternion-operator_multiply.html
-     * @see https://answers.unity.com/questions/372371/multiply-quaternion-by-vector3-how-is-done.html
-     * @see https://github.com/adragonite/math3d/blob/master/src/Quaternion.js#L287
-     */
-    QuaternionHelper.multiplyWithVector3 = function (quat, vec) {
-        var num = quat.x * 2;
-        var num2 = quat.y * 2;
-        var num3 = quat.z * 2;
-        var num4 = quat.x * num;
-        var num5 = quat.y * num2;
-        var num6 = quat.z * num3;
-        var num7 = quat.x * num2;
-        var num8 = quat.x * num3;
-        var num9 = quat.y * num3;
-        var num10 = quat.w * num;
-        var num11 = quat.w * num2;
-        var num12 = quat.w * num3;
-        var result = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
-        result.x = (1 - (num5 + num6)) * vec.x + (num7 - num12) * vec.y + (num8 + num11) * vec.z;
-        result.y = (num7 + num12) * vec.x + (1 - (num4 + num6)) * vec.y + (num9 - num10) * vec.z;
-        result.z = (num8 - num11) * vec.x + (num9 + num10) * vec.y + (1 - (num4 + num5)) * vec.z;
-        return result;
-    };
-    /**
      * Creates a rotation which rotates from fromDirection to toDirection.
      *
-     * @see https://docs.unity3d.com/2017.4/Documentation/ScriptReference/Quaternion.FromToRotation.html
-     * @see https://stackoverflow.com/questions/51549366/what-is-the-math-behind-fromtorotation-unity3d
+     * @todo After upgrading babylon.js, use Quaternion.FromUnitVectorsToRef.
+     * @see https://github.com/BabylonJS/Babylon.js/blob/2dbaeaa9761c42b7e39caddf494b920cdcdd2807/packages/dev/core/src/Maths/math.vector.ts#L4149-L4164
      */
-    QuaternionHelper.fromToRotation = function (from, to) {
-        var axis = _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].Cross(from, to).normalize();
-        var a = _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].Dot(from, to);
-        var b = from.length() * to.length();
-        var phi = Math.acos(Math.max(0.0, Math.min(1.0, a / b)));
-        var sin = Math.sin(phi / 2);
-        return new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Quaternion"](sin * axis.x, sin * axis.y, sin * axis.z, Math.cos(phi / 2));
+    QuaternionHelper.fromToRotationToRef = function (from, to, result) {
+        from.normalizeToRef(_v3from);
+        to.normalizeToRef(_v3to);
+        var r = _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].Dot(_v3from, _v3to) + 1;
+        if (r < 0.001) {
+            if (Math.abs(_v3from.x) > Math.abs(_v3from.z)) {
+                result.set(-_v3from.y, _v3from.x, 0, 0);
+            }
+            else {
+                result.set(0, -_v3from.z, _v3from.y, 0);
+            }
+        }
+        else {
+            _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].CrossToRef(_v3from, _v3to, _v3to);
+            result.set(_v3to.x, _v3to.y, _v3to.z, r);
+        }
+        result.normalize();
     };
     return QuaternionHelper;
-}());
-
-
-
-/***/ }),
-
-/***/ "./src/secondary-animation/sphere-collider.ts":
-/*!****************************************************!*\
-  !*** ./src/secondary-animation/sphere-collider.ts ***!
-  \****************************************************/
-/*! exports provided: SphereCollider */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SphereCollider", function() { return SphereCollider; });
-/**
- * Runtime Sphere Collider
- */
-var SphereCollider = /** @class */ (function () {
-    /**
-     * @param position Absolute Collider Position
-     * @param radius Collider radius
-     */
-    function SphereCollider(position, radius) {
-        this.position = position;
-        this.radius = radius;
-    }
-    return SphereCollider;
 }());
 
 
@@ -1354,15 +1319,6 @@ var SpringBoneController = /** @class */ (function () {
         this.springs = [];
     };
     /**
-     * Initialize SpringBones
-     */
-    SpringBoneController.prototype.setup = function (force) {
-        if (force === void 0) { force = false; }
-        this.springs.forEach(function (spring) {
-            spring.setup(force);
-        });
-    };
-    /**
      * Update all SpringBones
      *
      * @param deltaTime Elapsed sec from previous frame
@@ -1391,7 +1347,7 @@ var SpringBoneController = /** @class */ (function () {
             var g = new _collider_group__WEBPACK_IMPORTED_MODULE_2__["ColliderGroup"](bone);
             colliderGroup.colliders.forEach(function (collider) {
                 g.addCollider(
-                // Unity 座標系からの変換のため X, Z 軸を反転
+                // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
                 new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_1__["Vector3"](-collider.offset.x, collider.offset.y, -collider.offset.z), collider.radius);
             });
             colliderGroups.push(g);
@@ -1411,46 +1367,12 @@ var SpringBoneController = /** @class */ (function () {
                 return colliderGroups[g];
             });
             springs.push(new _vrm_spring_bone__WEBPACK_IMPORTED_MODULE_3__["VRMSpringBone"](spring.comment, spring.stiffiness, spring.gravityPower, new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_1__["Vector3"](
-            // Unity 座標系からの変換のため X, Z 軸を反転
+            // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
             -spring.gravityDir.x, spring.gravityDir.y, -spring.gravityDir.z).normalize(), spring.dragForce, getBone(spring.center), spring.hitRadius, rootBones, springColliders));
         });
         return springs;
     };
     return SpringBoneController;
-}());
-
-
-
-/***/ }),
-
-/***/ "./src/secondary-animation/vector3-helper.ts":
-/*!***************************************************!*\
-  !*** ./src/secondary-animation/vector3-helper.ts ***!
-  \***************************************************/
-/*! exports provided: Vector3Helper */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Vector3Helper", function() { return Vector3Helper; });
-/* harmony import */ var _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babylonjs/core/Maths/math */ "./node_modules/@babylonjs/core/Maths/math.js");
-
-/**
- * Vector3 Helper
- */
-var Vector3Helper = /** @class */ (function () {
-    function Vector3Helper() {
-    }
-    /**
-     * Vector3 * float
-     *
-     * @param original
-     * @param amount
-     */
-    Vector3Helper.multiplyByFloat = function (original, amount) {
-        return new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"](original.x * amount, original.y * amount, original.z * amount);
-    };
-    return Vector3Helper;
 }());
 
 
@@ -1469,133 +1391,194 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "VRMSpringBoneLogic", function() { return VRMSpringBoneLogic; });
 /* harmony import */ var _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babylonjs/core/Maths/math */ "./node_modules/@babylonjs/core/Maths/math.js");
 /* harmony import */ var _quaternion_helper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./quaternion-helper */ "./src/secondary-animation/quaternion-helper.ts");
-/* harmony import */ var _vector3_helper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./vector3-helper */ "./src/secondary-animation/vector3-helper.ts");
 
 
-
+// based on
+// http://rocketjump.skr.jp/unity3d/109/
+// https://github.com/dwango/UniVRM/blob/master/Scripts/SpringBone/VRMSpringBone.cs
+// https://github.com/pixiv/three-vrm/blob/aad551e041fad553c19d2091e5f5eaff1eb8faa8/packages/three-vrm/src/springbone/VRMSpringBone.ts
+var IDENTITY_MATRIX = _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Matrix"].Identity();
+var _v3A = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
+var _v3B = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
+var _v3C = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
+var _quatA = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Quaternion"]();
+var _matA = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Matrix"]();
+var _matB = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Matrix"]();
 /**
- * Verlet Spring Bone Logic
+ * Verlet Spring Bone
  */
 var VRMSpringBoneLogic = /** @class */ (function () {
     /**
      * @param center Center reference of TransformNode
      * @param radius Collision Radius
      * @param transform Base TransformNode
-     * @param localChildPosition
      */
-    function VRMSpringBoneLogic(center, radius, transform, localChildPosition) {
+    function VRMSpringBoneLogic(center, radius, transform) {
+        this.center = center;
         this.radius = radius;
         this.transform = transform;
+        this.currentTail = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
+        this.prevTail = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
+        this.nextTail = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"]();
         // Initialize rotationQuaternion when not initialized
         if (!transform.rotationQuaternion) {
             transform.rotationQuaternion = transform.rotation.toQuaternion();
         }
-        var parent = transform.parent;
-        if (parent !== null && parent.rotationQuaternion === null) {
-            parent.rotationQuaternion = parent.rotation.toQuaternion();
+        var worldMatrix = transform.getWorldMatrix();
+        this.centerSpacePosition = worldMatrix.getTranslation();
+        this.initialLocalMatrix = transform._localMatrix.clone();
+        this.initialLocalRotation = transform.rotationQuaternion.clone();
+        var children = transform.getChildTransformNodes(true);
+        if (children.length === 0) {
+            this.initialLocalChildPosition = transform.position.clone().normalize().scaleInPlace(0.07);
         }
-        this.parentRotation = parent && parent.rotationQuaternion || _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Quaternion"].Identity();
-        var worldChildPosition = transform.getAbsolutePosition().add(localChildPosition);
-        this.currentTail = this.getCenterTranslatedPos(center, worldChildPosition);
-        this.prevTail = this.currentTail;
-        this.localRotation = transform.rotationQuaternion.clone();
-        this.boneAxis = _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].Normalize(localChildPosition);
-        this.boneLength = localChildPosition.length();
+        else {
+            this.initialLocalChildPosition = children[0].position.clone();
+        }
+        _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].TransformCoordinatesToRef(this.initialLocalChildPosition, worldMatrix, this.currentTail);
+        this.prevTail.copyFrom(this.currentTail);
+        this.nextTail.copyFrom(this.currentTail);
+        this.boneAxis = this.initialLocalChildPosition.normalizeToNew();
+        _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].TransformCoordinatesToRef(this.initialLocalChildPosition, worldMatrix, _v3A);
+        this.centerSpaceBoneLength = _v3A
+            .subtractInPlace(this.centerSpacePosition)
+            .length();
+        if (center) {
+            this.getMatrixWorldToCenter(_matA);
+            _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].TransformCoordinatesToRef(this.currentTail, _matA, this.currentTail);
+            _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].TransformCoordinatesToRef(this.prevTail, _matA, this.prevTail);
+            _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].TransformCoordinatesToRef(this.nextTail, _matA, this.nextTail);
+            worldMatrix.multiplyToRef(_matA, _matA);
+            _matA.getTranslationToRef(this.centerSpacePosition);
+            _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].TransformCoordinatesToRef(this.initialLocalChildPosition, _matA, _v3A);
+            this.centerSpaceBoneLength = _v3A
+                .subtractInPlace(this.centerSpacePosition)
+                .length();
+        }
     }
     /**
      * Update Tail position
      *
-     * @param center Center reference of TransformNode
      * @param stiffnessForce Current frame stiffness
      * @param dragForce Current frame drag force
      * @param external Current frame external force
-     * @param colliders Current frame colliders
+     * @param colliderGroups Current frame colliderGroups
      */
-    VRMSpringBoneLogic.prototype.update = function (center, stiffnessForce, dragForce, external, colliders) {
-        var absPos = this.transform.getAbsolutePosition();
-        if (Number.isNaN(absPos.x)) {
+    VRMSpringBoneLogic.prototype.update = function (stiffnessForce, dragForce, external, colliderGroups) {
+        if (Number.isNaN(this.transform.getAbsolutePosition().x)) {
             // Do not update when absolute position is invalid
             return;
         }
-        var currentTail = this.getCenterTranslatedWorldPos(center, this.currentTail);
-        var prevTail = this.getCenterTranslatedWorldPos(center, this.prevTail);
-        // verlet 積分で次の位置を計算
-        var nextTail = currentTail;
+        // Get bone position in center space
+        this.getMatrixWorldToCenter(_matA);
+        this.transform.getWorldMatrix().multiplyToRef(_matA, _matA);
+        _matA.getTranslationToRef(this.centerSpacePosition);
+        // Get parent position in center space
+        this.getMatrixWorldToCenter(_matB);
+        this.getParentMatrixWorld().multiplyToRef(_matB, _matB);
+        // verlet積分で次の位置を計算
+        this.nextTail.copyFrom(this.currentTail);
         {
             // 減衰付きで前のフレームの移動を継続
-            var attenuation = 1.0 - dragForce;
-            var delta = _vector3_helper__WEBPACK_IMPORTED_MODULE_2__["Vector3Helper"].multiplyByFloat(currentTail.subtract(prevTail), attenuation);
-            nextTail.addInPlace(delta);
+            _v3A
+                .copyFrom(this.currentTail)
+                .subtractInPlace(this.prevTail)
+                .scaleInPlace(1.0 - dragForce);
+            this.nextTail.addInPlace(_v3A);
         }
         {
             // 親の回転による子ボーンの移動目標
-            var rotation = this.parentRotation.multiply(this.localRotation); // parentRotation * localRotation
-            var rotatedVec = _quaternion_helper__WEBPACK_IMPORTED_MODULE_1__["QuaternionHelper"].multiplyWithVector3(rotation, this.boneAxis); // rotation * boneAxis
-            var stiffedVec = _vector3_helper__WEBPACK_IMPORTED_MODULE_2__["Vector3Helper"].multiplyByFloat(rotatedVec, stiffnessForce); // rotatedVec * stiffnessForce
-            nextTail.addInPlace(stiffedVec); // nextTail + stiffedVec
+            _v3A.copyFrom(this.boneAxis);
+            _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].TransformCoordinatesToRef(_v3A, this.initialLocalMatrix, _v3A);
+            _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].TransformCoordinatesToRef(_v3A, _matB, _v3A);
+            _v3A
+                .subtractInPlace(this.centerSpacePosition)
+                .normalize()
+                .scaleInPlace(stiffnessForce);
+            this.nextTail.addInPlace(_v3A);
         }
         {
             // 外力による移動量
-            nextTail.addInPlace(external);
+            this.nextTail.addInPlace(external);
         }
         {
             // 長さを boneLength に強制
-            var normalized = nextTail.subtract(absPos).normalize();
-            nextTail = absPos.add(_vector3_helper__WEBPACK_IMPORTED_MODULE_2__["Vector3Helper"].multiplyByFloat(normalized, this.boneLength));
+            this.nextTail
+                .subtractInPlace(this.centerSpacePosition)
+                .normalize()
+                .scaleInPlace(this.centerSpaceBoneLength)
+                .addInPlace(this.centerSpacePosition);
         }
         {
             // Collision で移動
-            nextTail = this.collide(colliders, nextTail);
+            this.collide(colliderGroups, this.nextTail);
         }
-        this.prevTail = this.getCenterTranslatedPos(center, currentTail);
-        this.currentTail = this.getCenterTranslatedPos(center, nextTail);
-        // 回転を適用
-        this.transform.rotationQuaternion = this.transformToRotation(nextTail);
-    };
-    VRMSpringBoneLogic.prototype.getCenterTranslatedWorldPos = function (center, pos) {
-        if (center !== null) {
-            return center.getAbsolutePosition().add(pos);
-        }
-        return pos;
-    };
-    VRMSpringBoneLogic.prototype.getCenterTranslatedPos = function (center, pos) {
-        if (center !== null) {
-            return center.position.add(pos);
-        }
-        return pos;
+        this.prevTail.copyFrom(this.currentTail);
+        this.currentTail.copyFrom(this.nextTail);
+        this.initialLocalMatrix.multiplyToRef(_matB, _matA);
+        var initialCenterSpaceMatrixInv = _matA.invert();
+        _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__["Vector3"].TransformCoordinatesToRef(this.nextTail, initialCenterSpaceMatrixInv, _v3A);
+        _quaternion_helper__WEBPACK_IMPORTED_MODULE_1__["QuaternionHelper"].fromToRotationToRef(this.boneAxis, _v3A, _quatA);
+        var applyRotation = _quatA;
+        this.initialLocalRotation.multiplyToRef(applyRotation, this.transform.rotationQuaternion);
+        // update WorldMatrix
+        this.transform.computeWorldMatrix(true);
     };
     /**
-     * 次のテールの位置情報から回転情報を生成する
-     *
-     * @see https://stackoverflow.com/questions/51549366/what-is-the-math-behind-fromtorotation-unity3d
+      * Create a matrix that converts world space into center space.
+      * @param result Target matrix
+      */
+    VRMSpringBoneLogic.prototype.getMatrixWorldToCenter = function (result) {
+        if (this.center) {
+            this.center.getWorldMatrix().invertToRef(result);
+        }
+        else {
+            result.copyFrom(IDENTITY_MATRIX);
+        }
+        return result;
+    };
+    /**
+     * Returns the world matrix of its parent object.
      */
-    VRMSpringBoneLogic.prototype.transformToRotation = function (nextTail) {
-        var rotation = this.parentRotation.multiply(this.localRotation);
-        var fromAxis = _quaternion_helper__WEBPACK_IMPORTED_MODULE_1__["QuaternionHelper"].multiplyWithVector3(rotation, this.boneAxis);
-        var toAxis = nextTail.subtract(this.transform.absolutePosition).normalize();
-        var result = _quaternion_helper__WEBPACK_IMPORTED_MODULE_1__["QuaternionHelper"].fromToRotation(fromAxis, toAxis);
-        return result.multiplyInPlace(rotation);
+    VRMSpringBoneLogic.prototype.getParentMatrixWorld = function () {
+        return this.transform.parent ? this.transform.parent.getWorldMatrix() : IDENTITY_MATRIX;
     };
     /**
      * 衝突判定を行う
-     * @param colliders SphereColliders
-     * @param nextTail NextTail
+     * @param colliderGroups
+     * @param tail
      */
-    VRMSpringBoneLogic.prototype.collide = function (colliders, nextTail) {
+    VRMSpringBoneLogic.prototype.collide = function (colliderGroups, tail) {
         var _this = this;
-        colliders.forEach(function (collider) {
-            var r = _this.radius + collider.radius;
-            var axis = nextTail.subtract(collider.position);
-            // 少数誤差許容のため 2 cm 判定を小さくする
-            if (axis.lengthSquared() <= (r * r) - 0.02) {
-                // ヒット。 Collider の半径方向に押し出す
-                var posFromCollider = collider.position.add(_vector3_helper__WEBPACK_IMPORTED_MODULE_2__["Vector3Helper"].multiplyByFloat(axis.normalize(), r));
-                // 長さを boneLength に強制
-                var absPos = _this.transform.absolutePosition;
-                nextTail = absPos.add(_vector3_helper__WEBPACK_IMPORTED_MODULE_2__["Vector3Helper"].multiplyByFloat(posFromCollider.subtractInPlace(absPos).normalize(), _this.boneLength));
-            }
+        colliderGroups.forEach(function (colliderGroup) {
+            colliderGroup.colliders.forEach(function (collider) {
+                _this.getMatrixWorldToCenter(_matA);
+                collider.sphere.computeWorldMatrix().multiplyToRef(_matA, _matA);
+                _matA.getTranslationToRef(_v3A);
+                var colliderCenterSpacePosition = _v3A;
+                var maxAbsScale = 0;
+                collider.sphere.absoluteScaling.asArray().forEach(function (s) {
+                    maxAbsScale = Math.max(maxAbsScale, Math.abs(s));
+                });
+                var colliderRadius = collider.radius * maxAbsScale;
+                var r = _this.radius + colliderRadius;
+                tail.subtractToRef(colliderCenterSpacePosition, _v3B);
+                if (_v3B.lengthSquared() <= r * r) {
+                    var normal = _v3B
+                        .copyFrom(tail)
+                        .subtractInPlace(colliderCenterSpacePosition)
+                        .normalize();
+                    var posFromCollider = _v3C
+                        .copyFrom(colliderCenterSpacePosition)
+                        .addInPlace(normal.scaleInPlace(r));
+                    tail.copyFrom(posFromCollider
+                        .subtractInPlace(_this.centerSpacePosition)
+                        .normalize()
+                        .scaleInPlace(_this.centerSpaceBoneLength)
+                        .addInPlace(_this.centerSpacePosition));
+                }
+            });
         });
-        return nextTail;
     };
     return VRMSpringBoneLogic;
 }());
@@ -1618,11 +1601,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babylonjs_core_Materials_standardMaterial__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babylonjs/core/Materials/standardMaterial */ "./node_modules/@babylonjs/core/Materials/standardMaterial.js");
 /* harmony import */ var _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babylonjs/core/Maths/math */ "./node_modules/@babylonjs/core/Maths/math.js");
 /* harmony import */ var _babylonjs_core_Meshes_meshBuilder__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babylonjs/core/Meshes/meshBuilder */ "./node_modules/@babylonjs/core/Meshes/meshBuilder.js");
-/* harmony import */ var _sphere_collider__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./sphere-collider */ "./src/secondary-animation/sphere-collider.ts");
-/* harmony import */ var _vector3_helper__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./vector3-helper */ "./src/secondary-animation/vector3-helper.ts");
-/* harmony import */ var _vrm_spring_bone_logic__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./vrm-spring-bone-logic */ "./src/secondary-animation/vrm-spring-bone-logic.ts");
-
-
+/* harmony import */ var _vrm_spring_bone_logic__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./vrm-spring-bone-logic */ "./src/secondary-animation/vrm-spring-bone-logic.ts");
 
 
 
@@ -1658,35 +1637,49 @@ var VRMSpringBone = /** @class */ (function () {
         this.bones = bones;
         this.colliderGroups = colliderGroups;
         this.verlets = [];
-        this.initialLocalRotations = [];
         this.activeBones = [];
         /** @hidden */
         this.drawGizmo = false;
-        this.boneGizmoList = [];
-        this.colliderGizmoList = [];
         this.activeBones = this.bones.filter(function (bone) { return bone !== null; });
         this.activeBones.forEach(function (bone) {
-            bone.rotationQuaternion = bone.rotationQuaternion || bone.rotation.toQuaternion();
-            _this.initialLocalRotations.push(bone.rotationQuaternion.clone());
-        });
-    }
-    /**
-     * Initialize bones
-     *
-     * @param force Force reset rotation
-     */
-    VRMSpringBone.prototype.setup = function (force) {
-        var _this = this;
-        if (force === void 0) { force = false; }
-        if (!force) {
-            this.activeBones.forEach(function (bone, index) {
-                bone.rotationQuaternion = _this.initialLocalRotations[index].clone();
+            [bone].concat(bone.getChildTransformNodes()).forEach(function (b) {
+                _this.verlets.push(new _vrm_spring_bone_logic__WEBPACK_IMPORTED_MODULE_4__["VRMSpringBoneLogic"](_this.center, _this.hitRadius, b));
             });
+        });
+        if (this.drawGizmo) {
+            this.setupGizmo();
         }
-        this.verlets = [];
-        this.activeBones.forEach(function (bone, index) {
-            _this.initialLocalRotations[index] = bone.rotationQuaternion;
-            _this.setupRecursive(_this.center, bone);
+    }
+    VRMSpringBone.prototype.setupGizmo = function () {
+        var _this = this;
+        this.activeBones.forEach(function (bone) {
+            var scene = bone.getScene();
+            [bone].concat(bone.getChildTransformNodes()).forEach(function (b) {
+                var boneGizmo = _babylonjs_core_Meshes_meshBuilder__WEBPACK_IMPORTED_MODULE_3__["MeshBuilder"].CreateSphere(b.name + '_boneGizmo', {
+                    segments: 6,
+                    diameter: _this.hitRadius * 2,
+                    updatable: true,
+                }, scene);
+                var mat = new _babylonjs_core_Materials_standardMaterial__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"](b.name + '_boneGizmomat', scene);
+                mat.emissiveColor = _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_2__["Color3"].Red();
+                mat.wireframe = true;
+                boneGizmo.material = mat;
+                boneGizmo.setParent(b);
+                boneGizmo.position = _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_2__["Vector3"].Zero();
+            });
+        });
+        this.colliderGroups.forEach(function (group) {
+            var scene = group.transform.getScene();
+            group.colliders.forEach(function (collider) {
+                var sphere = collider.sphere;
+                if (!sphere.isEnabled(false)) {
+                    sphere.setEnabled(true);
+                    var mat = new _babylonjs_core_Materials_standardMaterial__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"](group.transform.name + '_colliderGizmomat', scene);
+                    mat.emissiveColor = _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_2__["Color3"].Yellow();
+                    mat.wireframe = true;
+                    sphere.material = mat;
+                }
+            });
         });
     };
     /**
@@ -1696,91 +1689,19 @@ var VRMSpringBone = /** @class */ (function () {
      */
     VRMSpringBone.prototype.update = function (deltaTime) {
         return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function () {
-            var colliderList, stiffness, external, promises;
+            var stiffness, external, promises;
             var _this = this;
             return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"])(this, function (_a) {
-                if (this.verlets.length === 0) {
-                    if (this.activeBones.length === 0) {
-                        return [2 /*return*/];
-                    }
-                    this.setup();
-                }
-                colliderList = [];
-                this.colliderGroups.forEach(function (group) {
-                    if (!group) {
-                        return;
-                    }
-                    var absPos = group.transform.getAbsolutePosition();
-                    if (Number.isNaN(absPos.x)) {
-                        return;
-                    }
-                    group.colliders.forEach(function (collider) {
-                        var pos = absPos.add(collider.offset);
-                        colliderList.push(new _sphere_collider__WEBPACK_IMPORTED_MODULE_4__["SphereCollider"](pos, collider.radius));
-                        if (_this.drawGizmo) {
-                            if (_this.colliderGizmoList.length < colliderList.length) {
-                                var mesh = _babylonjs_core_Meshes_meshBuilder__WEBPACK_IMPORTED_MODULE_3__["MeshBuilder"].CreateSphere(group.transform.name + "_colliderGizmo", {
-                                    segments: 8,
-                                    diameter: 1,
-                                    updatable: true,
-                                }, group.transform.getScene());
-                                var mat = new _babylonjs_core_Materials_standardMaterial__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"](group.transform.name + '_colliderGizmomat', group.transform.getScene());
-                                mat.emissiveColor = _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_2__["Color3"].Yellow();
-                                mat.wireframe = true;
-                                mesh.material = mat;
-                                _this.colliderGizmoList.push(mesh);
-                            }
-                            _this.colliderGizmoList[colliderList.length - 1].position = pos;
-                            _this.colliderGizmoList[colliderList.length - 1].scaling = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_2__["Vector3"](collider.radius * 2, collider.radius * 2, collider.radius * 2);
-                        }
-                    });
-                });
                 stiffness = this.stiffness * deltaTime;
-                external = _vector3_helper__WEBPACK_IMPORTED_MODULE_5__["Vector3Helper"].multiplyByFloat(this.gravityDir, this.gravityPower * deltaTime);
-                promises = this.verlets.map(function (verlet, index) {
+                external = this.gravityDir.scale(this.gravityPower * deltaTime);
+                promises = this.verlets.map(function (verlet) {
                     return new Promise(function (resolve) {
-                        verlet.update(_this.center, stiffness, _this.dragForce, external, colliderList);
-                        if (_this.drawGizmo && _this.boneGizmoList[index]) {
-                            _this.boneGizmoList[index].position = verlet.transform.absolutePosition;
-                            _this.boneGizmoList[index].rotationQuaternion = verlet.transform.rotationQuaternion;
-                        }
+                        verlet.update(stiffness, _this.dragForce, external, _this.colliderGroups);
                         resolve();
                     });
                 });
                 return [2 /*return*/, Promise.all(promises).then(function () { })];
             });
-        });
-    };
-    VRMSpringBone.prototype.setupRecursive = function (center, parent) {
-        var _this = this;
-        if (parent.getChildTransformNodes().length === 0) {
-            // Leaf
-            var ancestor = parent.parent;
-            var delta = parent.getAbsolutePosition().subtract(ancestor.getAbsolutePosition()).normalize();
-            var childPosition = parent.position.add(_vector3_helper__WEBPACK_IMPORTED_MODULE_5__["Vector3Helper"].multiplyByFloat(delta, 0.07));
-            this.verlets.push(new _vrm_spring_bone_logic__WEBPACK_IMPORTED_MODULE_6__["VRMSpringBoneLogic"](center, this.hitRadius, parent, childPosition));
-        }
-        else {
-            // Not leaf
-            var firstChild = parent.getChildTransformNodes().shift();
-            var localPosition = firstChild.position;
-            var scale = firstChild.scaling;
-            this.verlets.push(new _vrm_spring_bone_logic__WEBPACK_IMPORTED_MODULE_6__["VRMSpringBoneLogic"](center, this.hitRadius, parent, localPosition.multiply(scale)));
-        }
-        if (this.drawGizmo) {
-            var boneGizmo = _babylonjs_core_Meshes_meshBuilder__WEBPACK_IMPORTED_MODULE_3__["MeshBuilder"].CreateSphere(parent.name + '_boneGizmo', {
-                segments: 8,
-                diameter: this.hitRadius * 2,
-                updatable: true,
-            }, parent.getScene());
-            var mat = new _babylonjs_core_Materials_standardMaterial__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"](parent.name + '_boneGizmomat', parent.getScene());
-            mat.emissiveColor = _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_2__["Color3"].Red();
-            mat.wireframe = true;
-            boneGizmo.material = mat;
-            this.boneGizmoList.push(boneGizmo);
-        }
-        parent.getChildTransformNodes().forEach(function (child) {
-            _this.setupRecursive(center, child);
         });
     };
     return VRMSpringBone;
@@ -2233,7 +2154,6 @@ var VRMManager = /** @class */ (function () {
         this.meshCache = this.constructMeshCache();
         this.transformNodeCache = this.constructTransformNodeCache();
         this.springBoneController = new _secondary_animation_spring_bone_controller__WEBPACK_IMPORTED_MODULE_2__["SpringBoneController"](this.ext.secondaryAnimation, this.findTransformNode.bind(this));
-        this.springBoneController.setup();
         if (this.ext.blendShapeMaster && this.ext.blendShapeMaster.blendShapeGroups) {
             this.constructIsBinaryMap();
             this.constructMorphTargetMap();
