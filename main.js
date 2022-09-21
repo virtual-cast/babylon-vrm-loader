@@ -1612,7 +1612,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 var VRMSpringBone = /** @class */ (function () {
     /**
-     * @see https://vrm.dev/en/vrm_spec/
+     * @see https://github.com/vrm-c/vrm-specification/tree/master/specification/0.0
      * @param comment Annotation comment
      * @param stiffness The resilience of the swaying object (the power of returning to the initial pose).
      * @param gravityPower The strength of gravity.
@@ -1955,7 +1955,7 @@ __webpack_require__.r(__webpack_exports__);
 var NAME = 'VRM';
 /**
  * VRM 拡張を処理する
- * [Specification](https://github.com/vrm-c/UniVRM/tree/master/specification/)
+ * [Specification](https://github.com/vrm-c/vrm-specification/tree/master/specification/0.0)
  */
 var VRM = /** @class */ (function () {
     /**
@@ -2469,8 +2469,8 @@ __webpack_require__.r(__webpack_exports__);
 
 /**
  * VRM で指定される Material を生成する
- * [VRM が提供するシェーダ](https://vrm.dev/vrm_spec/#vrm%E3%81%8C%E6%8F%90%E4%BE%9B%E3%81%99%E3%82%8B%E3%82%B7%E3%82%A7%E3%83%BC%E3%83%80%E3%83%BC) を特定し読み込む
- * - UnlitTexture: 不透明, VRM ファイル側で [KHR_materials_unlit](https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit/) が定義されているため、何もしない
+ * [VRM が提供するシェーダ](https://vrm.dev/en/univrm/shaders/index.html) を特定し読み込む
+ * - UnlitTexture: 不透明, VRM ファイル側で [KHR_materials_unlit](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_unlit) が定義されているため、何もしない
  * - UnlitCutout: 透明度が閾値以下の部分を透明とする, 同上
  * - UnlitTransparent: アルファブレンド。ZWriteしない, 同上
  * - UnlitTransparentZWrite: アルファブレンド。ZWriteする, 同上に加え、プロパティで ZWrite を強制しています
