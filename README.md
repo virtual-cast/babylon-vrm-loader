@@ -22,9 +22,9 @@ This loader is used as [THE SEED ONLINE](https://seed.online) web VRM/VCI/glb vi
     - with `extensions.VRM` glTF Extension
 - Supports `.vci` file loading
 - Supports [MToonMaterial](https://github.com/virtual-cast/babylon-mtoon-material)
-- Get bone([TransformNode](https://doc.babylonjs.com/api/classes/babylon.transformnode)) from Unity Humanoid bone mapping name
-- [BlendShape](https://vrm.dev/univrm/components/univrm_blendshape/) morphing
-- [Secondary Animation](https://vrm.dev/univrm/components/univrm_secondary/)
+- Get bone([TransformNode](https://doc.babylonjs.com/typedoc/classes/BABYLON.TransformNode)) from Unity Humanoid bone mapping name
+- [BlendShape](https://vrm.dev/en/univrm/blendshape/index.html) morphing
+- [SpringBone](https://vrm.dev/en/univrm/springbone/index.html)
 - Supports [VCI](https://github.com/virtual-cast/VCI) features(partial support)
     - `VCAST_vci_material_unity`
     - TODO: `VCAST_vci_meta`

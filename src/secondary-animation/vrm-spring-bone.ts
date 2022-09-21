@@ -17,7 +17,7 @@ export class VRMSpringBone {
     private drawGizmo = false;
 
     /**
-     * @see https://vrm.dev/en/vrm_spec/
+     * @see https://github.com/vrm-c/vrm-specification/tree/master/specification/0.0
      * @param comment Annotation comment
      * @param stiffness The resilience of the swaying object (the power of returning to the initial pose).
      * @param gravityPower The strength of gravity.

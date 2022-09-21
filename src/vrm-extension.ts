@@ -12,7 +12,7 @@ const NAME = 'VRM';
 
 /**
  * VRM 拡張を処理する
- * [Specification](https://github.com/vrm-c/UniVRM/tree/master/specification/)
+ * [Specification](https://github.com/vrm-c/vrm-specification/tree/master/specification/0.0)
  */
 export class VRM implements IGLTFLoaderExtension {
     /**
