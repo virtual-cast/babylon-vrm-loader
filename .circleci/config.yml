@@ -8,9 +8,12 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - lint:
+      - format:
           requires:
             - build
+      - lint:
+          requires:
+            - format
       - release:
           requires:
             - lint
@@ -42,6 +45,19 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+
+  format:
+    docker:
+      - image: circleci/node:14
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: yarn format:check
 
   lint:
     docker:

@@ -60,6 +60,9 @@
         "lint": "yarn lint:check && yarn lint:fix",
         "lint:check": "eslint src",
         "lint:fix": "eslint src --fix",
+        "format": "yarn format:check && yarn format:fix",
+        "format:check": "prettier --check src",
+        "format:fix": "prettier --write src",
         "debug": "webpack serve --config webpack.test.config.js",
         "release": "semantic-release",
         "release:gh-pages": "gh-pages -d test -u \"Masaru Yamagishi <m-yamagishi@virtualcast.jp>\" -m \"ci(gh-pages): update gh-pages [skip ci]\""
