@@ -1,7 +1,7 @@
 import { Vector3 } from '@babylonjs/core/Maths/math';
-import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import { Nullable } from '@babylonjs/core/types';
-import { IVRMSecondaryAnimation } from '../vrm-interfaces';
+import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
+import type { Nullable } from '@babylonjs/core/types';
+import type { IVRMSecondaryAnimation } from '../vrm-interfaces';
 import { ColliderGroup } from './collider-group';
 import { VRMSpringBone } from './vrm-spring-bone';
 
@@ -23,10 +23,7 @@ export class SpringBoneController {
      * @param ext SecondaryAnimation Object
      * @param getBone
      */
-    public constructor(
-        public readonly ext: IVRMSecondaryAnimation,
-        getBone: getBone,
-    ) {
+    public constructor(public readonly ext: IVRMSecondaryAnimation, getBone: getBone) {
         const colliderGroups = this.constructColliderGroups(getBone);
         this.springs = this.constructSprings(getBone, colliderGroups);
     }
@@ -47,7 +44,9 @@ export class SpringBoneController {
         const promises = this.springs.map<Promise<void>>((spring) => {
             return spring.update(deltaTime);
         });
-        return Promise.all(promises).then(() => { /* Do nothing */ });
+        return Promise.all(promises).then(() => {
+            /* Do nothing */
+        });
     }
 
     private constructColliderGroups(getBone: getBone) {
@@ -62,7 +61,7 @@ export class SpringBoneController {
                 g.addCollider(
                     // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
                     new Vector3(-collider.offset.x, collider.offset.y, -collider.offset.z),
-                    collider.radius,
+                    collider.radius
                 );
             });
             colliderGroups.push(g);
@@ -82,22 +81,24 @@ export class SpringBoneController {
             const springColliders = (spring.colliderGroups || []).map<ColliderGroup>((g) => {
                 return colliderGroups[g];
             });
-            springs.push(new VRMSpringBone(
-                spring.comment,
-                spring.stiffiness,
-                spring.gravityPower,
-                new Vector3(
-                    // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
-                    -spring.gravityDir.x,
-                    spring.gravityDir.y,
-                    -spring.gravityDir.z,
-                ).normalize(),
-                spring.dragForce,
-                getBone(spring.center),
-                spring.hitRadius,
-                rootBones,
-                springColliders,
-            ));
+            springs.push(
+                new VRMSpringBone(
+                    spring.comment,
+                    spring.stiffiness,
+                    spring.gravityPower,
+                    new Vector3(
+                        // VRM 右手系Y_UP, -Z_Front から Babylon.js 左手系Y_UP, +Z_Front にする
+                        -spring.gravityDir.x,
+                        spring.gravityDir.y,
+                        -spring.gravityDir.z
+                    ).normalize(),
+                    spring.dragForce,
+                    getBone(spring.center),
+                    spring.hitRadius,
+                    rootBones,
+                    springColliders
+                )
+            );
         });
         return springs;
     }

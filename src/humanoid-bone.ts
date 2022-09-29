@@ -1,5 +1,5 @@
-import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import { Nullable } from '@babylonjs/core/types';
+import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
+import type { Nullable } from '@babylonjs/core/types';
 import { BoneNotFoundError } from './errors';
 
 interface TransformNodeMap {
@@ -368,6 +368,6 @@ export class HumanoidBone {
      * @param name HumanoidBoneName
      */
     private getOptionalBone(name: string): Nullable<TransformNode> {
-        return this.nodeMap && this.nodeMap[name] || null;
+        return (this.nodeMap && this.nodeMap[name]) || null;
     }
 }

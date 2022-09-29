@@ -1,7 +1,8 @@
-import { Material } from '@babylonjs/core/Materials/material';
-import { Mesh } from '@babylonjs/core/Meshes/mesh';
-import { Nullable } from '@babylonjs/core/types';
-import { GLTFLoader, IGLTFLoaderExtension, IMaterial, IMeshPrimitive } from '@babylonjs/loaders/glTF/2.0';
+import type { Material } from '@babylonjs/core/Materials/material';
+import type { Mesh } from '@babylonjs/core/Meshes/mesh';
+import type { Nullable } from '@babylonjs/core/types';
+import type { IGLTFLoaderExtension, IMaterial, IMeshPrimitive } from '@babylonjs/loaders/glTF/2.0';
+import { GLTFLoader } from '@babylonjs/loaders/glTF/2.0';
 import { VRMManager } from './vrm-manager';
 import { VRMMaterialGenerator } from './vrm-material-generator';
 
@@ -39,9 +40,7 @@ export class VRM implements IGLTFLoaderExtension {
     /**
      * @inheritdoc
      */
-    public constructor(
-        private loader: GLTFLoader,
-    ) {
+    public constructor(private loader: GLTFLoader) {
         // GLTFLoader has already added rootMesh as __root__ before load extension
         // @see glTFLoader._loadData
         this.meshesFrom = this.loader.babylonScene.meshes.length - 1;
@@ -64,13 +63,7 @@ export class VRM implements IGLTFLoaderExtension {
             return;
         }
         const scene = this.loader.babylonScene;
-        const manager = new VRMManager(
-            this.loader.gltf.extensions[NAME],
-            this.loader.babylonScene,
-            this.meshesFrom,
-            this.transformNodesFrom,
-            this.materialsFrom,
-        );
+        const manager = new VRMManager(this.loader.gltf.extensions[NAME], this.loader.babylonScene, this.meshesFrom, this.transformNodesFrom, this.materialsFrom);
         scene.metadata = scene.metadata || {};
         scene.metadata.vrmManagers = scene.metadata.vrmManagers || [];
         scene.metadata.vrmManagers.push(manager);
@@ -84,11 +77,7 @@ export class VRM implements IGLTFLoaderExtension {
     /**
      * @inheritdoc
      */
-    public _loadVertexDataAsync(
-        context: string,
-        primitive: IMeshPrimitive,
-        babylonMesh: Mesh,
-    ) {
+    public _loadVertexDataAsync(context: string, primitive: IMeshPrimitive, babylonMesh: Mesh) {
         if (!primitive.extras || !primitive.extras.targetNames) {
             return null;
         }
@@ -101,15 +90,9 @@ export class VRM implements IGLTFLoaderExtension {
     /**
      * @inheritdoc
      */
-    public _loadMaterialAsync(
-        context: string,
-        material: IMaterial,
-        mesh: Mesh,
-        babylonDrawMode: number,
-        assign: (babylonMaterial: Material) => void,
-    ): Nullable<Promise<Material>> {
+    public _loadMaterialAsync(context: string, material: IMaterial, mesh: Mesh, babylonDrawMode: number, assign: (babylonMaterial: Material) => void): Nullable<Promise<Material>> {
         // ジェネレータでマテリアルを生成する
-        return (new VRMMaterialGenerator(this.loader)).generate(context, material, mesh, babylonDrawMode, assign);
+        return new VRMMaterialGenerator(this.loader).generate(context, material, mesh, babylonDrawMode, assign);
     }
 }
 

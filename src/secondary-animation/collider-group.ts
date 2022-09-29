@@ -1,5 +1,5 @@
-import { Vector3 } from '@babylonjs/core/Maths/math';
-import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
+import type { Vector3 } from '@babylonjs/core/Maths/math';
+import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import { SphereBuilder } from '@babylonjs/core/Meshes/Builders/sphereBuilder';
 import { Collider } from './collider';
 
@@ -12,10 +12,7 @@ export class ColliderGroup {
     /**
      * @param transform The node of the collider group for setting up collision detections.
      */
-    public constructor(
-        public readonly transform: TransformNode,
-    ) {
-    }
+    public constructor(public readonly transform: TransformNode) {}
 
     /**
      * Add offsetted collider
@@ -24,11 +21,15 @@ export class ColliderGroup {
      * @param radius The radius of the collider.
      */
     public addCollider(offset: Vector3, radius: number) {
-        const sphere = SphereBuilder.CreateSphere(`${this.transform.name}_ColliderSphere`, {
-            segments: 6,
-            diameter: radius * 2.0,
-            updatable: true,
-        }, this.transform.getScene());
+        const sphere = SphereBuilder.CreateSphere(
+            `${this.transform.name}_ColliderSphere`,
+            {
+                segments: 6,
+                diameter: radius * 2.0,
+                updatable: true,
+            },
+            this.transform.getScene()
+        );
         sphere.setParent(this.transform);
         sphere.setPositionWithLocalVector(offset);
         sphere.setEnabled(false);

@@ -1,7 +1,8 @@
-import { Material } from '@babylonjs/core/Materials/material';
-import { Mesh } from '@babylonjs/core/Meshes/mesh';
-import { Nullable } from '@babylonjs/core/types';
-import { GLTFLoader, IGLTFLoaderExtension, IMaterial } from '@babylonjs/loaders/glTF/2.0';
+import type { Material } from '@babylonjs/core/Materials/material';
+import type { Mesh } from '@babylonjs/core/Meshes/mesh';
+import type { Nullable } from '@babylonjs/core/types';
+import type { IGLTFLoaderExtension, IMaterial } from '@babylonjs/loaders/glTF/2.0';
+import { GLTFLoader } from '@babylonjs/loaders/glTF/2.0';
 import { VRMMaterialGenerator } from './vrm-material-generator';
 
 /**
@@ -25,9 +26,7 @@ export class VCAST_vci_material_unity implements IGLTFLoaderExtension {
     /**
      * @inheritdoc
      */
-    public constructor(
-        private loader: GLTFLoader,
-    ) {}
+    public constructor(private loader: GLTFLoader) {}
 
     /**
      * @inheritdoc
@@ -39,15 +38,9 @@ export class VCAST_vci_material_unity implements IGLTFLoaderExtension {
     /**
      * @inheritdoc
      */
-    public _loadMaterialAsync(
-        context: string,
-        material: IMaterial,
-        mesh: Mesh,
-        babylonDrawMode: number,
-        assign: (babylonMaterial: Material) => void,
-    ): Nullable<Promise<Material>> {
+    public _loadMaterialAsync(context: string, material: IMaterial, mesh: Mesh, babylonDrawMode: number, assign: (babylonMaterial: Material) => void): Nullable<Promise<Material>> {
         // ジェネレータでマテリアルを生成する
-        return (new VRMMaterialGenerator(this.loader)).generate(context, material, mesh, babylonDrawMode, assign);
+        return new VRMMaterialGenerator(this.loader).generate(context, material, mesh, babylonDrawMode, assign);
     }
 }
 

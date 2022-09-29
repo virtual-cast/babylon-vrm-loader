@@ -1,4 +1,4 @@
-import { IVRMMaterialProperty } from './vrm-interfaces';
+import type { IVRMMaterialProperty } from './vrm-interfaces';
 
 export type IVCIVector3 = [number, number, number];
 
