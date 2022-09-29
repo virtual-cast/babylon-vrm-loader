@@ -1,7 +1,8 @@
-import { Material } from '@babylonjs/core/Materials/material';
-import { Mesh } from '@babylonjs/core/Meshes/mesh';
-import { Nullable } from '@babylonjs/core/types';
-import { GLTFLoader, IGLTFLoaderExtension, IMaterial } from '@babylonjs/loaders/glTF/2.0';
+import type { Material } from '@babylonjs/core/Materials/material';
+import type { Mesh } from '@babylonjs/core/Meshes/mesh';
+import type { Nullable } from '@babylonjs/core/types';
+import type { IGLTFLoaderExtension, IMaterial } from '@babylonjs/loaders/glTF/2.0';
+import { GLTFLoader } from '@babylonjs/loaders/glTF/2.0';
 import { VRMMaterialGenerator } from './vrm-material-generator';
 
 /**

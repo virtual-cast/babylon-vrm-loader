@@ -1,12 +1,12 @@
 import { Vector3 } from '@babylonjs/core/Maths/math';
-import { Mesh } from '@babylonjs/core/Meshes/mesh';
-import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
-import { Scene } from '@babylonjs/core/scene';
-import { Nullable } from '@babylonjs/core/types';
+import type { Mesh } from '@babylonjs/core/Meshes/mesh';
+import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
+import type { MorphTarget } from '@babylonjs/core/Morph/morphTarget';
+import type { Scene } from '@babylonjs/core/scene';
+import type { Nullable } from '@babylonjs/core/types';
 import { SpringBoneController } from './secondary-animation/spring-bone-controller';
 import { HumanoidBone } from './humanoid-bone';
-import { IVRM } from './vrm-interfaces';
+import type { IVRM } from './vrm-interfaces';
 import { MaterialValueBindingMerger } from './material-value-binding-merger';
 
 interface IsBinaryMap {
@@ -184,7 +184,7 @@ export class VRMManager {
             return null;
         }
 
-        let basePos = firstPersonBone.getAbsolutePosition();
+        const basePos = firstPersonBone.getAbsolutePosition();
         const offsetPos = this.ext.firstPerson.firstPersonBoneOffset;
         return new Vector3(
             basePos.x + offsetPos.x,

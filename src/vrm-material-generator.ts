@@ -1,12 +1,13 @@
-import { Material } from '@babylonjs/core/Materials/material';
-import { BaseTexture } from '@babylonjs/core/Materials/Textures/baseTexture';
-import { Texture } from '@babylonjs/core/Materials/Textures/texture';
+import type { Material } from '@babylonjs/core/Materials/material';
+import type { BaseTexture } from '@babylonjs/core/Materials/Textures/baseTexture';
+import type { Texture } from '@babylonjs/core/Materials/Textures/texture';
 import { Color3 } from '@babylonjs/core/Maths/math';
-import { Mesh } from '@babylonjs/core/Meshes/mesh';
-import { Nullable } from '@babylonjs/core/types';
-import { GLTFLoader, IMaterial } from '@babylonjs/loaders/glTF/2.0';
+import type { Mesh } from '@babylonjs/core/Meshes/mesh';
+import type { Nullable } from '@babylonjs/core/types';
+import type { GLTFLoader, IMaterial } from '@babylonjs/loaders/glTF/2.0';
 import { MToonMaterial } from 'babylon-mtoon-material';
-import { IVRMMaterialProperty, IVRMMaterialPropertyShader, IVRMVectorMaterialProperty } from './vrm-interfaces';
+import type { IVRMMaterialProperty, IVRMVectorMaterialProperty } from './vrm-interfaces';
+import { IVRMMaterialPropertyShader } from './vrm-interfaces';
 import { Engine } from '@babylonjs/core/Engines/engine';
 
 /**

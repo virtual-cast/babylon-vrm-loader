@@ -1,4 +1,5 @@
-import { Vector3, Quaternion } from '@babylonjs/core/Maths/math';
+import type { Quaternion } from '@babylonjs/core/Maths/math';
+import { Vector3 } from '@babylonjs/core/Maths/math';
 
 const _v3from = new Vector3();
 const _v3to = new Vector3();

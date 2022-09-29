@@ -1,5 +1,5 @@
-import { Mesh } from '@babylonjs/core';
-import { Vector3 } from '@babylonjs/core/Maths/math';
+import type { Mesh } from '@babylonjs/core';
+import type { Vector3 } from '@babylonjs/core/Maths/math';
 
 /**
  * Collider

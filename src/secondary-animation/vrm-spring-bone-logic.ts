@@ -1,7 +1,7 @@
 import { Matrix, Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
-import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import { Nullable } from '@babylonjs/core/types';
-import { ColliderGroup } from './collider-group';
+import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
+import type { Nullable } from '@babylonjs/core/types';
+import type { ColliderGroup } from './collider-group';
 import { QuaternionHelper } from './quaternion-helper';
 // based on
 // http://rocketjump.skr.jp/unity3d/109/

@@ -1,9 +1,9 @@
 import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial';
 import { Color3, Vector3 } from '@babylonjs/core/Maths/math';
 import { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder';
-import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import { Nullable } from '@babylonjs/core/types';
-import { ColliderGroup } from './collider-group';
+import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
+import type { Nullable } from '@babylonjs/core/types';
+import type { ColliderGroup } from './collider-group';
 import { VRMSpringBoneLogic } from './vrm-spring-bone-logic';
 
 /**

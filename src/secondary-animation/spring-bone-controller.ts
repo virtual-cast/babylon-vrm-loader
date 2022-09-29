@@ -1,7 +1,7 @@
 import { Vector3 } from '@babylonjs/core/Maths/math';
-import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import { Nullable } from '@babylonjs/core/types';
-import { IVRMSecondaryAnimation } from '../vrm-interfaces';
+import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
+import type { Nullable } from '@babylonjs/core/types';
+import type { IVRMSecondaryAnimation } from '../vrm-interfaces';
 import { ColliderGroup } from './collider-group';
 import { VRMSpringBone } from './vrm-spring-bone';
 

@@ -1,6 +1,8 @@
-import { Color3, Vector4 } from '@babylonjs/core/Maths/math';
-import { Material, PBRMaterial, BaseTexture, Texture, Nullable } from '@babylonjs/core';
-import { IVRMBlendShapeMaterialBind } from './vrm-interfaces';
+import type { Color3} from '@babylonjs/core/Maths/math';
+import { Vector4 } from '@babylonjs/core/Maths/math';
+import type { Material, BaseTexture, Texture, Nullable } from '@babylonjs/core';
+import { PBRMaterial } from '@babylonjs/core';
+import type { IVRMBlendShapeMaterialBind } from './vrm-interfaces';
 import { MToonMaterial } from 'babylon-mtoon-material';
 
 type SupportedMaterial = MToonMaterial | PBRMaterial;
