@@ -26,9 +26,7 @@ export class VCAST_vci_material_unity implements IGLTFLoaderExtension {
     /**
      * @inheritdoc
      */
-    public constructor(
-        private loader: GLTFLoader,
-    ) {}
+    public constructor(private loader: GLTFLoader) {}
 
     /**
      * @inheritdoc
@@ -40,15 +38,9 @@ export class VCAST_vci_material_unity implements IGLTFLoaderExtension {
     /**
      * @inheritdoc
      */
-    public _loadMaterialAsync(
-        context: string,
-        material: IMaterial,
-        mesh: Mesh,
-        babylonDrawMode: number,
-        assign: (babylonMaterial: Material) => void,
-    ): Nullable<Promise<Material>> {
+    public _loadMaterialAsync(context: string, material: IMaterial, mesh: Mesh, babylonDrawMode: number, assign: (babylonMaterial: Material) => void): Nullable<Promise<Material>> {
         // ジェネレータでマテリアルを生成する
-        return (new VRMMaterialGenerator(this.loader)).generate(context, material, mesh, babylonDrawMode, assign);
+        return new VRMMaterialGenerator(this.loader).generate(context, material, mesh, babylonDrawMode, assign);
     }
 }
 

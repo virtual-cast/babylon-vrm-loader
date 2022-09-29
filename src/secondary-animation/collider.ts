@@ -10,10 +10,5 @@ export class Collider {
      * @param radius The radius of the collider.
      * @param sphere The spehere mesh for worldMatrix and gizmo.
      */
-    public constructor(
-        public readonly offset: Vector3,
-        public readonly radius: number,
-        public readonly sphere: Mesh,
-    ) {
-    }
+    public constructor(public readonly offset: Vector3, public readonly radius: number, public readonly sphere: Mesh) {}
 }

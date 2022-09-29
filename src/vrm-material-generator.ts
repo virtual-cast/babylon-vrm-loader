@@ -23,25 +23,14 @@ export class VRMMaterialGenerator {
     /**
      * @inheritdoc
      */
-    public constructor(
-        private readonly loader: GLTFLoader,
-    ) {}
+    public constructor(private readonly loader: GLTFLoader) {}
 
     /**
      * マテリアルを生成する Promise を返す
      * VRM 対象外の場合は null
      */
-    public generate(
-        context: string,
-        material: IMaterial,
-        mesh: Mesh,
-        babylonDrawMode: number,
-        assign: (babylonMaterial: Material) => void,
-    ): Nullable<Promise<Material>> {
-        const materialProp = this.findMaterialPropertyByName(
-            material.name,
-            this.getMaterialProperties(),
-        );
+    public generate(context: string, material: IMaterial, mesh: Mesh, babylonDrawMode: number, assign: (babylonMaterial: Material) => void): Nullable<Promise<Material>> {
+        const materialProp = this.findMaterialPropertyByName(material.name, this.getMaterialProperties());
         if (!materialProp) {
             return null;
         }
@@ -97,11 +86,7 @@ export class VRMMaterialGenerator {
      * @param material 生成した MToonMaterial
      * @param prop 生成した MToonMaterial のマテリアルプロパティ
      */
-    private loadMToonTexturesAsync(
-        context: string,
-        material: MToonMaterial,
-        prop: IVRMMaterialProperty,
-    ): Promise<Material> {
+    private loadMToonTexturesAsync(context: string, material: MToonMaterial, prop: IVRMMaterialProperty): Promise<Material> {
         const promises: Array<Promise<BaseTexture>> = [];
         // 全てのテクスチャの UV Offset & Scale はメインテクスチャのものを流用する
         const uvOffsetScale = prop.vectorProperties._MainTex;
@@ -110,10 +95,8 @@ export class VRMMaterialGenerator {
         }
         const applyTexture = (index: number | undefined, callback: (texture: BaseTexture) => void) => {
             applyPropertyWhenDefined<number>(index, (value) => {
-                promises.push(this.loader.loadTextureInfoAsync(
-                    `${context}/textures/${index}`,
-                    { index: value },
-                    (babylonTexture: BaseTexture) => {
+                promises.push(
+                    this.loader.loadTextureInfoAsync(`${context}/textures/${index}`, { index: value }, (babylonTexture: BaseTexture) => {
                         // 実際は Texture インスタンスが来るのでキャスト
                         const t = babylonTexture as Texture;
                         t.uOffset = uvOffsetScale[0];
@@ -121,8 +104,8 @@ export class VRMMaterialGenerator {
                         t.uScale = uvOffsetScale[2];
                         t.vScale = uvOffsetScale[3];
                         callback(babylonTexture);
-                    },
-                ));
+                    })
+                );
             });
         };
 
@@ -132,15 +115,15 @@ export class VRMMaterialGenerator {
             }
             material.diffuseTexture = texture;
         });
-        applyTexture(prop.textureProperties._ShadeTexture, (texture) => material.shadeTexture = texture);
-        applyTexture(prop.textureProperties._BumpMap, (texture) => material.bumpTexture = texture);
-        applyTexture(prop.textureProperties._ReceiveShadowTexture, (texture) => material.receiveShadowTexture = texture);
-        applyTexture(prop.textureProperties._ShadingGradeTexture, (texture) => material.shadingGradeTexture = texture);
-        applyTexture(prop.textureProperties._RimTexture, (texture) => material.rimTexture = texture);
-        applyTexture(prop.textureProperties._SphereAdd, (texture) => material.matCapTexture = texture);
-        applyTexture(prop.textureProperties._EmissionMap, (texture) => material.emissiveTexture = texture);
-        applyTexture(prop.textureProperties._OutlineWidthTexture, (texture) => material.outlineWidthTexture = texture);
-        applyTexture(prop.textureProperties._UvAnimMaskTexture, (texture) => material.uvAnimationMaskTexture = texture);
+        applyTexture(prop.textureProperties._ShadeTexture, (texture) => (material.shadeTexture = texture));
+        applyTexture(prop.textureProperties._BumpMap, (texture) => (material.bumpTexture = texture));
+        applyTexture(prop.textureProperties._ReceiveShadowTexture, (texture) => (material.receiveShadowTexture = texture));
+        applyTexture(prop.textureProperties._ShadingGradeTexture, (texture) => (material.shadingGradeTexture = texture));
+        applyTexture(prop.textureProperties._RimTexture, (texture) => (material.rimTexture = texture));
+        applyTexture(prop.textureProperties._SphereAdd, (texture) => (material.matCapTexture = texture));
+        applyTexture(prop.textureProperties._EmissionMap, (texture) => (material.emissiveTexture = texture));
+        applyTexture(prop.textureProperties._OutlineWidthTexture, (texture) => (material.outlineWidthTexture = texture));
+        applyTexture(prop.textureProperties._UvAnimMaskTexture, (texture) => (material.uvAnimationMaskTexture = texture));
 
         return Promise.all(promises).then(() => material);
     }
@@ -152,17 +135,9 @@ export class VRMMaterialGenerator {
      * @param babylonDrawMode 描画種類
      * @param prop 生成するマテリアルプロパティ
      */
-    private createMaterialByShader(
-        context: string,
-        material: IMaterial,
-        babylonDrawMode: number,
-        prop: IVRMMaterialProperty,
-    ): Nullable<Material> {
+    private createMaterialByShader(context: string, material: IMaterial, babylonDrawMode: number, prop: IVRMMaterialProperty): Nullable<Material> {
         if (prop.shader === IVRMMaterialPropertyShader.VRMMToon) {
-            const mtoonMaterial = new MToonMaterial(
-                material.name || `MToonMaterial${material.index}`,
-                this.loader.babylonScene,
-            );
+            const mtoonMaterial = new MToonMaterial(material.name || `MToonMaterial${material.index}`, this.loader.babylonScene);
             this.setMToonMaterialProperties(mtoonMaterial, prop);
             return mtoonMaterial;
         }
@@ -182,7 +157,7 @@ export class VRMMaterialGenerator {
      * 初期値はマテリアル実装側に持っているため、値がある場合のみ上書きする
      */
     private setMToonMaterialProperties(material: MToonMaterial, prop: IVRMMaterialProperty) {
-        applyPropertyWhenDefined<number>(prop.floatProperties._Cutoff, (value) => material.alphaCutOff = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._Cutoff, (value) => (material.alphaCutOff = value));
         applyPropertyWhenDefined<IVRMVectorMaterialProperty>(prop.vectorProperties._Color, (value) => {
             material.diffuseColor = new Color3(value[0], value[1], value[2]);
             material.alpha = value[3];
@@ -190,33 +165,33 @@ export class VRMMaterialGenerator {
         applyPropertyWhenDefined<IVRMVectorMaterialProperty>(prop.vectorProperties._ShadeColor, (value) => {
             material.shadeColor = new Color3(value[0], value[1], value[2]);
         });
-        applyPropertyWhenDefined<number>(prop.floatProperties._BumpScale, (value) => material.bumpScale = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._ReceiveShadowRate, (value) => material.receiveShadowRate = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._ShadingGradeRate, (value) => material.shadingGradeRate = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._ShadeShift, (value) => material.shadeShift = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._ShadeToony, (value) => material.shadeToony = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._LightColorAttenuation, (value) => material.lightColorAttenuation = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._IndirectLightIntensity, (value) => material.indirectLightIntensity = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._BumpScale, (value) => (material.bumpScale = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._ReceiveShadowRate, (value) => (material.receiveShadowRate = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._ShadingGradeRate, (value) => (material.shadingGradeRate = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._ShadeShift, (value) => (material.shadeShift = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._ShadeToony, (value) => (material.shadeToony = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._LightColorAttenuation, (value) => (material.lightColorAttenuation = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._IndirectLightIntensity, (value) => (material.indirectLightIntensity = value));
         applyPropertyWhenDefined<IVRMVectorMaterialProperty>(prop.vectorProperties._RimColor, (value) => {
             material.rimColor = new Color3(value[0], value[1], value[2]);
         });
-        applyPropertyWhenDefined<number>(prop.floatProperties._RimLightingMix, (value) => material.rimLightingMix = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._RimFresnelPower, (value) => material.rimFresnelPower = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._RimLift, (value) => material.rimLift = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._RimLightingMix, (value) => (material.rimLightingMix = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._RimFresnelPower, (value) => (material.rimFresnelPower = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._RimLift, (value) => (material.rimLift = value));
         applyPropertyWhenDefined<IVRMVectorMaterialProperty>(prop.vectorProperties._EmissionColor, (value) => {
             material.emissiveColor = new Color3(value[0], value[1], value[2]);
         });
-        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineWidth, (value) => material.outlineWidth = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineScaledMaxDistance, (value) => material.outlineScaledMaxDistance = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineWidth, (value) => (material.outlineWidth = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineScaledMaxDistance, (value) => (material.outlineScaledMaxDistance = value));
         applyPropertyWhenDefined<IVRMVectorMaterialProperty>(prop.vectorProperties._OutlineColor, (value) => {
             material.outlineColor = new Color3(value[0], value[1], value[2]);
         });
-        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineLightingMix, (value) => material.outlineLightingMix = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._UvAnimScrollX, (value) => material.uvAnimationScrollX = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._UvAnimScrollY, (value) => material.uvAnimationScrollY = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._UvAnimRotation, (value) => material.uvAnimationRotation = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineLightingMix, (value) => (material.outlineLightingMix = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._UvAnimScrollX, (value) => (material.uvAnimationScrollX = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._UvAnimScrollY, (value) => (material.uvAnimationScrollY = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._UvAnimRotation, (value) => (material.uvAnimationRotation = value));
 
-        applyPropertyWhenDefined<number>(prop.floatProperties._DebugMode, (value) => material.debugMode = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._DebugMode, (value) => (material.debugMode = value));
         applyPropertyWhenDefined<number>(prop.floatProperties._BlendMode, (value) => {
             switch (value) {
                 case 0: // Opaque
@@ -235,14 +210,14 @@ export class VRMMaterialGenerator {
                     break;
             }
         });
-        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineWidthMode, (value) => material.outlineWidthMode = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineColorMode, (value) => material.outlineColorMode = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._CullMode, (value) => material.cullMode = value);
-        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineCullMode, (value) => material.outlineCullMode = value);
-        applyPropertyWhenDefined<boolean>(prop.keywordMap._ALPHABLEND_ON, (value) => material.alphaBlend = value);
-        applyPropertyWhenDefined<boolean>(prop.keywordMap._ALPHATEST_ON, (value) => material.alphaTest = value);
+        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineWidthMode, (value) => (material.outlineWidthMode = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineColorMode, (value) => (material.outlineColorMode = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._CullMode, (value) => (material.cullMode = value));
+        applyPropertyWhenDefined<number>(prop.floatProperties._OutlineCullMode, (value) => (material.outlineCullMode = value));
+        applyPropertyWhenDefined<boolean>(prop.keywordMap._ALPHABLEND_ON, (value) => (material.alphaBlend = value));
+        applyPropertyWhenDefined<boolean>(prop.keywordMap._ALPHATEST_ON, (value) => (material.alphaTest = value));
         applyPropertyWhenDefined<number>(prop.floatProperties._ZWrite, (value) => {
-            material.forceDepthWrite = (Math.round(value) === 1);
+            material.forceDepthWrite = Math.round(value) === 1;
             if (material.forceDepthWrite) {
                 material.disableDepthWrite = false;
             }

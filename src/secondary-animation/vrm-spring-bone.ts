@@ -39,16 +39,12 @@ export class VRMSpringBone {
         public readonly center: Nullable<TransformNode>,
         public readonly hitRadius: number,
         public readonly bones: Array<Nullable<TransformNode>>,
-        public readonly colliderGroups: ColliderGroup[],
+        public readonly colliderGroups: ColliderGroup[]
     ) {
         this.activeBones = this.bones.filter((bone) => bone !== null) as TransformNode[];
         this.activeBones.forEach((bone) => {
             [bone].concat(bone.getChildTransformNodes()).forEach((b) => {
-                this.verlets.push(new VRMSpringBoneLogic(
-                    this.center,
-                    this.hitRadius,
-                    b
-                ));
+                this.verlets.push(new VRMSpringBoneLogic(this.center, this.hitRadius, b));
             });
         });
 
@@ -61,11 +57,15 @@ export class VRMSpringBone {
         this.activeBones.forEach((bone) => {
             const scene = bone.getScene();
             [bone].concat(bone.getChildTransformNodes()).forEach((b) => {
-                const boneGizmo = MeshBuilder.CreateSphere(b.name + '_boneGizmo', {
-                    segments: 6,
-                    diameter: this.hitRadius * 2,
-                    updatable: true,
-                }, scene);
+                const boneGizmo = MeshBuilder.CreateSphere(
+                    b.name + '_boneGizmo',
+                    {
+                        segments: 6,
+                        diameter: this.hitRadius * 2,
+                        updatable: true,
+                    },
+                    scene
+                );
                 const mat = new StandardMaterial(b.name + '_boneGizmomat', scene);
                 mat.emissiveColor = Color3.Red();
                 mat.wireframe = true;
@@ -101,16 +101,13 @@ export class VRMSpringBone {
 
         const promises = this.verlets.map<Promise<void>>((verlet) => {
             return new Promise<void>((resolve) => {
-                verlet.update(
-                    stiffness,
-                    this.dragForce,
-                    external,
-                    this.colliderGroups,
-                );
+                verlet.update(stiffness, this.dragForce, external, this.colliderGroups);
                 resolve();
             });
         });
 
-        return Promise.all(promises).then(() => { /* Do Nothing */ });
+        return Promise.all(promises).then(() => {
+            /* Do Nothing */
+        });
     }
 }

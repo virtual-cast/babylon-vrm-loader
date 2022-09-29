@@ -1,4 +1,4 @@
-import type { Color3} from '@babylonjs/core/Maths/math';
+import type { Color3 } from '@babylonjs/core/Maths/math';
 import { Vector4 } from '@babylonjs/core/Maths/math';
 import type { Material, BaseTexture, Texture, Nullable } from '@babylonjs/core';
 import { PBRMaterial } from '@babylonjs/core';
@@ -12,15 +12,15 @@ type SupportedMaterial = MToonMaterial | PBRMaterial;
  */
 type Setter = (value: number, firstValue: boolean) => void;
 
-const PBRMaterialTextureMap: {[propertyName: string]: keyof PBRMaterial} = {
+const PBRMaterialTextureMap: { [propertyName: string]: keyof PBRMaterial } = {
     _MainTex: 'albedoTexture',
 };
 
-const PBRMaterialColorMap: {[propertyName: string]: keyof PBRMaterial} = {
+const PBRMaterialColorMap: { [propertyName: string]: keyof PBRMaterial } = {
     _Color: 'albedoColor',
 };
 
-const MToonMaterialTextureMap: {[propertyName: string]: keyof MToonMaterial} = {
+const MToonMaterialTextureMap: { [propertyName: string]: keyof MToonMaterial } = {
     _MainTex: 'diffuseTexture',
     _EmissionMap: 'emissiveTexture',
     _BumpMap: 'bumpTexture',
@@ -33,7 +33,7 @@ const MToonMaterialTextureMap: {[propertyName: string]: keyof MToonMaterial} = {
     _UvAnimMaskTexture: 'uvAnimationMaskTexture',
 };
 
-const MToonMaterialColorMap: {[propertyName: string]: keyof MToonMaterial} = {
+const MToonMaterialColorMap: { [propertyName: string]: keyof MToonMaterial } = {
     _Color: 'diffuseColor',
     _ShadeColor: 'shadeColor',
     _RimColor: 'rimColor',
@@ -45,22 +45,19 @@ const MToonMaterialColorMap: {[propertyName: string]: keyof MToonMaterial} = {
  * @see https://github.com/vrm-c/UniVRM/blob/4ffd97c2e9339683ce9bf21e73f510bd90c2a5b2/Assets/VRM/Runtime/BlendShape/MaterialValueBindingMerger.cs
  */
 export class MaterialValueBindingMerger {
-    private readonly m_materialMap: {[materialName: string]: SupportedMaterial} = {};
-    private readonly m_materialSetterMap: {[bindingKey: string]: Setter} = {};
-    private m_materialValueMap: {[bindingKey: string]: number} = {};
-    private m_used: {[targetKey: string]: any} = {};
+    private readonly m_materialMap: { [materialName: string]: SupportedMaterial } = {};
+    private readonly m_materialSetterMap: { [bindingKey: string]: Setter } = {};
+    private m_materialValueMap: { [bindingKey: string]: number } = {};
+    private m_used: { [targetKey: string]: any } = {};
 
-    private readonly baseValueCache: {[bindingKey: string]: Vector4} = {};
-    private materialValuesToApply: {[bindingKey: string]: IVRMBlendShapeMaterialBind} = {};
+    private readonly baseValueCache: { [bindingKey: string]: Vector4 } = {};
+    private materialValuesToApply: { [bindingKey: string]: IVRMBlendShapeMaterialBind } = {};
 
     /**
      * @param materials VRMの全 Material
      * @param materialValues
      */
-    public constructor(
-        materials: Material[],
-        private readonly materialValues: IVRMBlendShapeMaterialBind[]
-    ) {
+    public constructor(materials: Material[], private readonly materialValues: IVRMBlendShapeMaterialBind[]) {
         if (materials.length === 0 || materialValues.length === 0) {
             return;
         }
@@ -101,7 +98,7 @@ export class MaterialValueBindingMerger {
                 // テクスチャの u方向 のみ更新する
                 const setter: Setter = (value, firstValue) => {
                     const propValue = firstValue
-                        ? baseValue.add((targetValue.subtract(baseValue)).scale(value))
+                        ? baseValue.add(targetValue.subtract(baseValue).scale(value))
                         : this.getMaterialProperty(material, valueName)!.add(targetValue.subtract(baseValue).scale(value));
                     const src = this.getMaterialProperty(material, valueName)!;
                     src.x = propValue.x;
@@ -113,7 +110,7 @@ export class MaterialValueBindingMerger {
                 // テクスチャの v方向 のみ更新する
                 const setter: Setter = (value, firstValue) => {
                     const propValue = firstValue
-                        ? baseValue.add((targetValue.subtract(baseValue)).scale(value))
+                        ? baseValue.add(targetValue.subtract(baseValue).scale(value))
                         : this.getMaterialProperty(material, valueName)!.add(targetValue.subtract(baseValue).scale(value));
                     const src = this.getMaterialProperty(material, valueName)!;
                     src.y = propValue.y;
@@ -124,7 +121,7 @@ export class MaterialValueBindingMerger {
             } else {
                 const setter: Setter = (value, firstValue) => {
                     const propValue = firstValue
-                        ? baseValue.add((targetValue.subtract(baseValue)).scale(value))
+                        ? baseValue.add(targetValue.subtract(baseValue).scale(value))
                         : this.getMaterialProperty(material, valueName)!.add(targetValue.subtract(baseValue).scale(value));
                     this.updateMaterialProperty(material, valueName, propValue);
                 };
@@ -244,24 +241,14 @@ export class MaterialValueBindingMerger {
             return null;
         }
         const t = texture as Texture;
-        return new Vector4(
-            t.uScale,
-            t.vScale,
-            t.uOffset,
-            t.vOffset,
-        );
+        return new Vector4(t.uScale, t.vScale, t.uOffset, t.vOffset);
     }
 
     /**
      * Color3 に alpha を加えて Vector4 に変換する
      */
     private convertColorIntoVector4(color: Color3, alpha: number): Vector4 {
-        return new Vector4(
-            color.r,
-            color.g,
-            color.b,
-            alpha,
-        );
+        return new Vector4(color.r, color.g, color.b, alpha);
     }
 
     /**

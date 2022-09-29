@@ -20,14 +20,10 @@ import '../index';
 async function main() {
     const debugProperties = getDebugProperties();
     const canvas = document.getElementById('main-canvas') as HTMLCanvasElement;
-    const engine = new Engine(
-        canvas,
-        true,
-        {
-            alpha: false,
-            disableWebGL2Support: debugProperties.webgl1,
-        },
-    );
+    const engine = new Engine(canvas, true, {
+        alpha: false,
+        disableWebGL2Support: debugProperties.webgl1,
+    });
 
     const scene = new Scene(engine);
     const camera = new ArcRotateCamera('MainCamera1', 0, 0, 3, new Vector3(0, 1.2, 0), scene, true);

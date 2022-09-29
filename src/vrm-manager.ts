@@ -41,7 +41,63 @@ interface MeshCache {
 /**
  * Unity Humanoid Bone 名
  */
-export type HumanBoneName = 'hips' | 'leftUpperLeg' | 'rightUpperLeg' | 'leftLowerLeg' | 'rightLowerLeg' | 'leftFoot' | 'rightFoot' | 'spine' | 'chest' | 'neck' | 'head' | 'leftShoulder' | 'rightShoulder' | 'leftUpperArm' | 'rightUpperArm' | 'leftLowerArm' | 'rightLowerArm' | 'leftHand' | 'rightHand' | 'leftToes' | 'rightToes' | 'leftEye' | 'rightEye' | 'jaw' | 'leftThumbProximal' | 'leftThumbIntermediate' | 'leftThumbDistal' | 'leftIndexProximal' | 'leftIndexIntermediate' | 'leftIndexDistal' | 'leftMiddleProximal' | 'leftMiddleIntermediate' | 'leftMiddleDistal' | 'leftRingProximal' | 'leftRingIntermediate' | 'leftRingDistal' | 'leftLittleProximal' | 'leftLittleIntermediate' | 'leftLittleDistal' | 'rightThumbProximal' | 'rightThumbIntermediate' | 'rightThumbDistal' | 'rightIndexProximal' | 'rightIndexIntermediate' | 'rightIndexDistal' | 'rightMiddleProximal' | 'rightMiddleIntermediate' | 'rightMiddleDistal' | 'rightRingProximal' | 'rightRingIntermediate' | 'rightRingDistal' | 'rightLittleProximal' | 'rightLittleIntermediate' | 'rightLittleDistal' | 'upperChest' | string;
+export type HumanBoneName =
+    | 'hips'
+    | 'leftUpperLeg'
+    | 'rightUpperLeg'
+    | 'leftLowerLeg'
+    | 'rightLowerLeg'
+    | 'leftFoot'
+    | 'rightFoot'
+    | 'spine'
+    | 'chest'
+    | 'neck'
+    | 'head'
+    | 'leftShoulder'
+    | 'rightShoulder'
+    | 'leftUpperArm'
+    | 'rightUpperArm'
+    | 'leftLowerArm'
+    | 'rightLowerArm'
+    | 'leftHand'
+    | 'rightHand'
+    | 'leftToes'
+    | 'rightToes'
+    | 'leftEye'
+    | 'rightEye'
+    | 'jaw'
+    | 'leftThumbProximal'
+    | 'leftThumbIntermediate'
+    | 'leftThumbDistal'
+    | 'leftIndexProximal'
+    | 'leftIndexIntermediate'
+    | 'leftIndexDistal'
+    | 'leftMiddleProximal'
+    | 'leftMiddleIntermediate'
+    | 'leftMiddleDistal'
+    | 'leftRingProximal'
+    | 'leftRingIntermediate'
+    | 'leftRingDistal'
+    | 'leftLittleProximal'
+    | 'leftLittleIntermediate'
+    | 'leftLittleDistal'
+    | 'rightThumbProximal'
+    | 'rightThumbIntermediate'
+    | 'rightThumbDistal'
+    | 'rightIndexProximal'
+    | 'rightIndexIntermediate'
+    | 'rightIndexDistal'
+    | 'rightMiddleProximal'
+    | 'rightMiddleIntermediate'
+    | 'rightMiddleDistal'
+    | 'rightRingProximal'
+    | 'rightRingIntermediate'
+    | 'rightRingDistal'
+    | 'rightLittleProximal'
+    | 'rightLittleIntermediate'
+    | 'rightLittleDistal'
+    | 'upperChest'
+    | string;
 
 /**
  * VRM キャラクターを動作させるためのマネージャ
@@ -75,14 +131,11 @@ export class VRMManager {
         public readonly scene: Scene,
         private readonly meshesFrom: number,
         private readonly transformNodesFrom: number,
-        private readonly materialsNodesFrom: number,
+        private readonly materialsNodesFrom: number
     ) {
         this.meshCache = this.constructMeshCache();
         this.transformNodeCache = this.constructTransformNodeCache();
-        this.springBoneController = new SpringBoneController(
-            this.ext.secondaryAnimation,
-            this.findTransformNode.bind(this),
-        );
+        this.springBoneController = new SpringBoneController(this.ext.secondaryAnimation, this.findTransformNode.bind(this));
 
         if (this.ext.blendShapeMaster && this.ext.blendShapeMaster.blendShapeGroups) {
             this.constructIsBinaryMap();
@@ -186,11 +239,7 @@ export class VRMManager {
 
         const basePos = firstPersonBone.getAbsolutePosition();
         const offsetPos = this.ext.firstPerson.firstPersonBoneOffset;
-        return new Vector3(
-            basePos.x + offsetPos.x,
-            basePos.y + offsetPos.y,
-            basePos.z + offsetPos.z,
-        );
+        return new Vector3(basePos.x + offsetPos.x, basePos.y + offsetPos.y, basePos.z + offsetPos.z);
     }
 
     /**
@@ -242,7 +291,7 @@ export class VRMManager {
      * @deprecated Use findMeshes instead. This method has broken.
      */
     public findMesh(meshIndex: number): Nullable<Mesh> {
-        return this.meshCache[meshIndex] && this.meshCache[meshIndex][0] || null;
+        return (this.meshCache[meshIndex] && this.meshCache[meshIndex][0]) || null;
     }
 
     /**
@@ -309,10 +358,7 @@ export class VRMManager {
             if (!g.materialValues) {
                 return;
             }
-            this.materialValueBindingMergerMap[g.name] = new MaterialValueBindingMerger(
-                materials,
-                g.materialValues
-            );
+            this.materialValueBindingMergerMap[g.name] = new MaterialValueBindingMerger(materials, g.materialValues);
         });
     }
 

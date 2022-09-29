@@ -368,6 +368,6 @@ export class HumanoidBone {
      * @param name HumanoidBoneName
      */
     private getOptionalBone(name: string): Nullable<TransformNode> {
-        return this.nodeMap && this.nodeMap[name] || null;
+        return (this.nodeMap && this.nodeMap[name]) || null;
     }
 }
