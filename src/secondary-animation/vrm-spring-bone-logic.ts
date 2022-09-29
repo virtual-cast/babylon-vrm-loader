@@ -2,7 +2,6 @@ import { Matrix, Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
 import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
 import type { Nullable } from '@babylonjs/core/types';
 import type { ColliderGroup } from './collider-group';
-import { QuaternionHelper } from './quaternion-helper';
 // based on
 // http://rocketjump.skr.jp/unity3d/109/
 // https://github.com/dwango/UniVRM/blob/master/Scripts/SpringBone/VRMSpringBone.cs
@@ -158,7 +157,8 @@ export class VRMSpringBoneLogic {
         this.initialLocalMatrix.multiplyToRef(_matB, _matA);
         const initialCenterSpaceMatrixInv = _matA.invert();
         Vector3.TransformCoordinatesToRef(this.nextTail, initialCenterSpaceMatrixInv, _v3A);
-        QuaternionHelper.fromToRotationToRef(this.boneAxis, _v3A, _quatA);
+        _v3A.normalizeToRef(_v3B);
+        Quaternion.FromUnitVectorsToRef(this.boneAxis, _v3B, _quatA);
         const applyRotation = _quatA;
         this.initialLocalRotation.multiplyToRef(applyRotation, this.transform.rotationQuaternion!);
 
