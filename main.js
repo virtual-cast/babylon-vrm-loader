@@ -408,7 +408,7 @@ class HumanoidBone {
      * @param name HumanoidBoneName
      */
     getOptionalBone(name) {
-        return this.nodeMap && this.nodeMap[name] || null;
+        return (this.nodeMap && this.nodeMap[name]) || null;
     }
 }
 
@@ -554,7 +554,7 @@ class MaterialValueBindingMerger {
                 // テクスチャの u方向 のみ更新する
                 const setter = (value, firstValue) => {
                     const propValue = firstValue
-                        ? baseValue.add((targetValue.subtract(baseValue)).scale(value))
+                        ? baseValue.add(targetValue.subtract(baseValue).scale(value))
                         : this.getMaterialProperty(material, valueName).add(targetValue.subtract(baseValue).scale(value));
                     const src = this.getMaterialProperty(material, valueName);
                     src.x = propValue.x;
@@ -567,7 +567,7 @@ class MaterialValueBindingMerger {
                 // テクスチャの v方向 のみ更新する
                 const setter = (value, firstValue) => {
                     const propValue = firstValue
-                        ? baseValue.add((targetValue.subtract(baseValue)).scale(value))
+                        ? baseValue.add(targetValue.subtract(baseValue).scale(value))
                         : this.getMaterialProperty(material, valueName).add(targetValue.subtract(baseValue).scale(value));
                     const src = this.getMaterialProperty(material, valueName);
                     src.y = propValue.y;
@@ -579,7 +579,7 @@ class MaterialValueBindingMerger {
             else {
                 const setter = (value, firstValue) => {
                     const propValue = firstValue
-                        ? baseValue.add((targetValue.subtract(baseValue)).scale(value))
+                        ? baseValue.add(targetValue.subtract(baseValue).scale(value))
                         : this.getMaterialProperty(material, valueName).add(targetValue.subtract(baseValue).scale(value));
                     this.updateMaterialProperty(material, valueName, propValue);
                 };
@@ -923,7 +923,9 @@ class SpringBoneController {
         const promises = this.springs.map((spring) => {
             return spring.update(deltaTime);
         });
-        return Promise.all(promises).then(() => { });
+        return Promise.all(promises).then(() => {
+            /* Do nothing */
+        });
     }
     constructColliderGroups(getBone) {
         if (!this.ext.colliderGroups || !this.ext.colliderGroups.length) {
@@ -1026,9 +1028,7 @@ class VRMSpringBoneLogic {
         this.nextTail.copyFrom(this.currentTail);
         this.boneAxis = this.initialLocalChildPosition.normalizeToNew();
         _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Vector3.TransformCoordinatesToRef(this.initialLocalChildPosition, worldMatrix, _v3A);
-        this.centerSpaceBoneLength = _v3A
-            .subtractInPlace(this.centerSpacePosition)
-            .length();
+        this.centerSpaceBoneLength = _v3A.subtractInPlace(this.centerSpacePosition).length();
         if (center) {
             this.getMatrixWorldToCenter(_matA);
             _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Vector3.TransformCoordinatesToRef(this.currentTail, _matA, this.currentTail);
@@ -1037,9 +1037,7 @@ class VRMSpringBoneLogic {
             worldMatrix.multiplyToRef(_matA, _matA);
             _matA.getTranslationToRef(this.centerSpacePosition);
             _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Vector3.TransformCoordinatesToRef(this.initialLocalChildPosition, _matA, _v3A);
-            this.centerSpaceBoneLength = _v3A
-                .subtractInPlace(this.centerSpacePosition)
-                .length();
+            this.centerSpaceBoneLength = _v3A.subtractInPlace(this.centerSpacePosition).length();
         }
     }
     /**
@@ -1066,8 +1064,7 @@ class VRMSpringBoneLogic {
         this.nextTail.copyFrom(this.currentTail);
         {
             // 減衰付きで前のフレームの移動を継続
-            _v3A
-                .copyFrom(this.currentTail)
+            _v3A.copyFrom(this.currentTail)
                 .subtractInPlace(this.prevTail)
                 .scaleInPlace(1.0 - dragForce);
             this.nextTail.addInPlace(_v3A);
@@ -1077,10 +1074,7 @@ class VRMSpringBoneLogic {
             _v3A.copyFrom(this.boneAxis);
             _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Vector3.TransformCoordinatesToRef(_v3A, this.initialLocalMatrix, _v3A);
             _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Vector3.TransformCoordinatesToRef(_v3A, _matB, _v3A);
-            _v3A
-                .subtractInPlace(this.centerSpacePosition)
-                .normalize()
-                .scaleInPlace(stiffnessForce);
+            _v3A.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(stiffnessForce);
             this.nextTail.addInPlace(_v3A);
         }
         {
@@ -1089,11 +1083,7 @@ class VRMSpringBoneLogic {
         }
         {
             // 長さを boneLength に強制
-            this.nextTail
-                .subtractInPlace(this.centerSpacePosition)
-                .normalize()
-                .scaleInPlace(this.centerSpaceBoneLength)
-                .addInPlace(this.centerSpacePosition);
+            this.nextTail.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(this.centerSpaceBoneLength).addInPlace(this.centerSpacePosition);
         }
         {
             // Collision で移動
@@ -1111,9 +1101,9 @@ class VRMSpringBoneLogic {
         this.transform.computeWorldMatrix(true);
     }
     /**
-      * Create a matrix that converts world space into center space.
-      * @param result Target matrix
-      */
+     * Create a matrix that converts world space into center space.
+     * @param result Target matrix
+     */
     getMatrixWorldToCenter(result) {
         if (this.center) {
             this.center.getWorldMatrix().invertToRef(result);
@@ -1149,18 +1139,9 @@ class VRMSpringBoneLogic {
                 const r = this.radius + colliderRadius;
                 tail.subtractToRef(colliderCenterSpacePosition, _v3B);
                 if (_v3B.lengthSquared() <= r * r) {
-                    const normal = _v3B
-                        .copyFrom(tail)
-                        .subtractInPlace(colliderCenterSpacePosition)
-                        .normalize();
-                    const posFromCollider = _v3C
-                        .copyFrom(colliderCenterSpacePosition)
-                        .addInPlace(normal.scaleInPlace(r));
-                    tail.copyFrom(posFromCollider
-                        .subtractInPlace(this.centerSpacePosition)
-                        .normalize()
-                        .scaleInPlace(this.centerSpaceBoneLength)
-                        .addInPlace(this.centerSpacePosition));
+                    const normal = _v3B.copyFrom(tail).subtractInPlace(colliderCenterSpacePosition).normalize();
+                    const posFromCollider = _v3C.copyFrom(colliderCenterSpacePosition).addInPlace(normal.scaleInPlace(r));
+                    tail.copyFrom(posFromCollider.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(this.centerSpaceBoneLength).addInPlace(this.centerSpacePosition));
                 }
             });
         });
@@ -1275,7 +1256,9 @@ class VRMSpringBone {
                 resolve();
             });
         });
-        return Promise.all(promises).then(() => { });
+        return Promise.all(promises).then(() => {
+            /* Do Nothing */
+        });
     }
 }
 
@@ -1319,6 +1302,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+// eslint-disable-next-line import/no-internal-modules
 
 async function main() {
     const debugProperties = getDebugProperties();
@@ -1463,7 +1447,7 @@ class VCAST_vci_material_unity {
      */
     _loadMaterialAsync(context, material, mesh, babylonDrawMode, assign) {
         // ジェネレータでマテリアルを生成する
-        return (new _vrm_material_generator__WEBPACK_IMPORTED_MODULE_1__.VRMMaterialGenerator(this.loader)).generate(context, material, mesh, babylonDrawMode, assign);
+        return new _vrm_material_generator__WEBPACK_IMPORTED_MODULE_1__.VRMMaterialGenerator(this.loader).generate(context, material, mesh, babylonDrawMode, assign);
     }
 }
 // ローダーに登録する
@@ -1569,7 +1553,7 @@ class VRM {
      */
     _loadMaterialAsync(context, material, mesh, babylonDrawMode, assign) {
         // ジェネレータでマテリアルを生成する
-        return (new _vrm_material_generator__WEBPACK_IMPORTED_MODULE_2__.VRMMaterialGenerator(this.loader)).generate(context, material, mesh, babylonDrawMode, assign);
+        return new _vrm_material_generator__WEBPACK_IMPORTED_MODULE_2__.VRMMaterialGenerator(this.loader).generate(context, material, mesh, babylonDrawMode, assign);
     }
 }
 // ローダーに登録する
@@ -1772,7 +1756,7 @@ class VRMManager {
         if (!firstPersonBone) {
             return null;
         }
-        let basePos = firstPersonBone.getAbsolutePosition();
+        const basePos = firstPersonBone.getAbsolutePosition();
         const offsetPos = this.ext.firstPerson.firstPersonBoneOffset;
         return new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Vector3(basePos.x + offsetPos.x, basePos.y + offsetPos.y, basePos.z + offsetPos.z);
     }
@@ -1820,7 +1804,7 @@ class VRMManager {
      * @deprecated Use findMeshes instead. This method has broken.
      */
     findMesh(meshIndex) {
-        return this.meshCache[meshIndex] && this.meshCache[meshIndex][0] || null;
+        return (this.meshCache[meshIndex] && this.meshCache[meshIndex][0]) || null;
     }
     /**
      * mesh 番号からメッシュを探す
@@ -2071,15 +2055,15 @@ class VRMMaterialGenerator {
             }
             material.diffuseTexture = texture;
         });
-        applyTexture(prop.textureProperties._ShadeTexture, (texture) => material.shadeTexture = texture);
-        applyTexture(prop.textureProperties._BumpMap, (texture) => material.bumpTexture = texture);
-        applyTexture(prop.textureProperties._ReceiveShadowTexture, (texture) => material.receiveShadowTexture = texture);
-        applyTexture(prop.textureProperties._ShadingGradeTexture, (texture) => material.shadingGradeTexture = texture);
-        applyTexture(prop.textureProperties._RimTexture, (texture) => material.rimTexture = texture);
-        applyTexture(prop.textureProperties._SphereAdd, (texture) => material.matCapTexture = texture);
-        applyTexture(prop.textureProperties._EmissionMap, (texture) => material.emissiveTexture = texture);
-        applyTexture(prop.textureProperties._OutlineWidthTexture, (texture) => material.outlineWidthTexture = texture);
-        applyTexture(prop.textureProperties._UvAnimMaskTexture, (texture) => material.uvAnimationMaskTexture = texture);
+        applyTexture(prop.textureProperties._ShadeTexture, (texture) => (material.shadeTexture = texture));
+        applyTexture(prop.textureProperties._BumpMap, (texture) => (material.bumpTexture = texture));
+        applyTexture(prop.textureProperties._ReceiveShadowTexture, (texture) => (material.receiveShadowTexture = texture));
+        applyTexture(prop.textureProperties._ShadingGradeTexture, (texture) => (material.shadingGradeTexture = texture));
+        applyTexture(prop.textureProperties._RimTexture, (texture) => (material.rimTexture = texture));
+        applyTexture(prop.textureProperties._SphereAdd, (texture) => (material.matCapTexture = texture));
+        applyTexture(prop.textureProperties._EmissionMap, (texture) => (material.emissiveTexture = texture));
+        applyTexture(prop.textureProperties._OutlineWidthTexture, (texture) => (material.outlineWidthTexture = texture));
+        applyTexture(prop.textureProperties._UvAnimMaskTexture, (texture) => (material.uvAnimationMaskTexture = texture));
         return Promise.all(promises).then(() => material);
     }
     /**
@@ -2110,7 +2094,7 @@ class VRMMaterialGenerator {
      * 初期値はマテリアル実装側に持っているため、値がある場合のみ上書きする
      */
     setMToonMaterialProperties(material, prop) {
-        applyPropertyWhenDefined(prop.floatProperties._Cutoff, (value) => material.alphaCutOff = value);
+        applyPropertyWhenDefined(prop.floatProperties._Cutoff, (value) => (material.alphaCutOff = value));
         applyPropertyWhenDefined(prop.vectorProperties._Color, (value) => {
             material.diffuseColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Color3(value[0], value[1], value[2]);
             material.alpha = value[3];
@@ -2118,32 +2102,32 @@ class VRMMaterialGenerator {
         applyPropertyWhenDefined(prop.vectorProperties._ShadeColor, (value) => {
             material.shadeColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Color3(value[0], value[1], value[2]);
         });
-        applyPropertyWhenDefined(prop.floatProperties._BumpScale, (value) => material.bumpScale = value);
-        applyPropertyWhenDefined(prop.floatProperties._ReceiveShadowRate, (value) => material.receiveShadowRate = value);
-        applyPropertyWhenDefined(prop.floatProperties._ShadingGradeRate, (value) => material.shadingGradeRate = value);
-        applyPropertyWhenDefined(prop.floatProperties._ShadeShift, (value) => material.shadeShift = value);
-        applyPropertyWhenDefined(prop.floatProperties._ShadeToony, (value) => material.shadeToony = value);
-        applyPropertyWhenDefined(prop.floatProperties._LightColorAttenuation, (value) => material.lightColorAttenuation = value);
-        applyPropertyWhenDefined(prop.floatProperties._IndirectLightIntensity, (value) => material.indirectLightIntensity = value);
+        applyPropertyWhenDefined(prop.floatProperties._BumpScale, (value) => (material.bumpScale = value));
+        applyPropertyWhenDefined(prop.floatProperties._ReceiveShadowRate, (value) => (material.receiveShadowRate = value));
+        applyPropertyWhenDefined(prop.floatProperties._ShadingGradeRate, (value) => (material.shadingGradeRate = value));
+        applyPropertyWhenDefined(prop.floatProperties._ShadeShift, (value) => (material.shadeShift = value));
+        applyPropertyWhenDefined(prop.floatProperties._ShadeToony, (value) => (material.shadeToony = value));
+        applyPropertyWhenDefined(prop.floatProperties._LightColorAttenuation, (value) => (material.lightColorAttenuation = value));
+        applyPropertyWhenDefined(prop.floatProperties._IndirectLightIntensity, (value) => (material.indirectLightIntensity = value));
         applyPropertyWhenDefined(prop.vectorProperties._RimColor, (value) => {
             material.rimColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Color3(value[0], value[1], value[2]);
         });
-        applyPropertyWhenDefined(prop.floatProperties._RimLightingMix, (value) => material.rimLightingMix = value);
-        applyPropertyWhenDefined(prop.floatProperties._RimFresnelPower, (value) => material.rimFresnelPower = value);
-        applyPropertyWhenDefined(prop.floatProperties._RimLift, (value) => material.rimLift = value);
+        applyPropertyWhenDefined(prop.floatProperties._RimLightingMix, (value) => (material.rimLightingMix = value));
+        applyPropertyWhenDefined(prop.floatProperties._RimFresnelPower, (value) => (material.rimFresnelPower = value));
+        applyPropertyWhenDefined(prop.floatProperties._RimLift, (value) => (material.rimLift = value));
         applyPropertyWhenDefined(prop.vectorProperties._EmissionColor, (value) => {
             material.emissiveColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Color3(value[0], value[1], value[2]);
         });
-        applyPropertyWhenDefined(prop.floatProperties._OutlineWidth, (value) => material.outlineWidth = value);
-        applyPropertyWhenDefined(prop.floatProperties._OutlineScaledMaxDistance, (value) => material.outlineScaledMaxDistance = value);
+        applyPropertyWhenDefined(prop.floatProperties._OutlineWidth, (value) => (material.outlineWidth = value));
+        applyPropertyWhenDefined(prop.floatProperties._OutlineScaledMaxDistance, (value) => (material.outlineScaledMaxDistance = value));
         applyPropertyWhenDefined(prop.vectorProperties._OutlineColor, (value) => {
             material.outlineColor = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Color3(value[0], value[1], value[2]);
         });
-        applyPropertyWhenDefined(prop.floatProperties._OutlineLightingMix, (value) => material.outlineLightingMix = value);
-        applyPropertyWhenDefined(prop.floatProperties._UvAnimScrollX, (value) => material.uvAnimationScrollX = value);
-        applyPropertyWhenDefined(prop.floatProperties._UvAnimScrollY, (value) => material.uvAnimationScrollY = value);
-        applyPropertyWhenDefined(prop.floatProperties._UvAnimRotation, (value) => material.uvAnimationRotation = value);
-        applyPropertyWhenDefined(prop.floatProperties._DebugMode, (value) => material.debugMode = value);
+        applyPropertyWhenDefined(prop.floatProperties._OutlineLightingMix, (value) => (material.outlineLightingMix = value));
+        applyPropertyWhenDefined(prop.floatProperties._UvAnimScrollX, (value) => (material.uvAnimationScrollX = value));
+        applyPropertyWhenDefined(prop.floatProperties._UvAnimScrollY, (value) => (material.uvAnimationScrollY = value));
+        applyPropertyWhenDefined(prop.floatProperties._UvAnimRotation, (value) => (material.uvAnimationRotation = value));
+        applyPropertyWhenDefined(prop.floatProperties._DebugMode, (value) => (material.debugMode = value));
         applyPropertyWhenDefined(prop.floatProperties._BlendMode, (value) => {
             switch (value) {
                 case 0: // Opaque
@@ -2162,14 +2146,14 @@ class VRMMaterialGenerator {
                     break;
             }
         });
-        applyPropertyWhenDefined(prop.floatProperties._OutlineWidthMode, (value) => material.outlineWidthMode = value);
-        applyPropertyWhenDefined(prop.floatProperties._OutlineColorMode, (value) => material.outlineColorMode = value);
-        applyPropertyWhenDefined(prop.floatProperties._CullMode, (value) => material.cullMode = value);
-        applyPropertyWhenDefined(prop.floatProperties._OutlineCullMode, (value) => material.outlineCullMode = value);
-        applyPropertyWhenDefined(prop.keywordMap._ALPHABLEND_ON, (value) => material.alphaBlend = value);
-        applyPropertyWhenDefined(prop.keywordMap._ALPHATEST_ON, (value) => material.alphaTest = value);
+        applyPropertyWhenDefined(prop.floatProperties._OutlineWidthMode, (value) => (material.outlineWidthMode = value));
+        applyPropertyWhenDefined(prop.floatProperties._OutlineColorMode, (value) => (material.outlineColorMode = value));
+        applyPropertyWhenDefined(prop.floatProperties._CullMode, (value) => (material.cullMode = value));
+        applyPropertyWhenDefined(prop.floatProperties._OutlineCullMode, (value) => (material.outlineCullMode = value));
+        applyPropertyWhenDefined(prop.keywordMap._ALPHABLEND_ON, (value) => (material.alphaBlend = value));
+        applyPropertyWhenDefined(prop.keywordMap._ALPHATEST_ON, (value) => (material.alphaTest = value));
         applyPropertyWhenDefined(prop.floatProperties._ZWrite, (value) => {
-            material.forceDepthWrite = (Math.round(value) === 1);
+            material.forceDepthWrite = Math.round(value) === 1;
             if (material.forceDepthWrite) {
                 material.disableDepthWrite = false;
             }
