@@ -832,53 +832,6 @@ class Collider {
 
 /***/ }),
 
-/***/ "./src/secondary-animation/quaternion-helper.ts":
-/*!******************************************************!*\
-  !*** ./src/secondary-animation/quaternion-helper.ts ***!
-  \******************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "QuaternionHelper": () => (/* binding */ QuaternionHelper)
-/* harmony export */ });
-/* harmony import */ var _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babylonjs/core/Maths/math */ "./node_modules/@babylonjs/core/Maths/math.js");
-
-const _v3from = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Vector3();
-const _v3to = new _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Vector3();
-/**
- * Quaternion Helper
- */
-class QuaternionHelper {
-    /**
-     * Creates a rotation which rotates from fromDirection to toDirection.
-     *
-     * @todo After upgrading babylon.js, use Quaternion.FromUnitVectorsToRef.
-     * @see https://github.com/BabylonJS/Babylon.js/blob/2dbaeaa9761c42b7e39caddf494b920cdcdd2807/packages/dev/core/src/Maths/math.vector.ts#L4149-L4164
-     */
-    static fromToRotationToRef(from, to, result) {
-        from.normalizeToRef(_v3from);
-        to.normalizeToRef(_v3to);
-        const r = _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Vector3.Dot(_v3from, _v3to) + 1;
-        if (r < 0.001) {
-            if (Math.abs(_v3from.x) > Math.abs(_v3from.z)) {
-                result.set(-_v3from.y, _v3from.x, 0, 0);
-            }
-            else {
-                result.set(0, -_v3from.z, _v3from.y, 0);
-            }
-        }
-        else {
-            _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Vector3.CrossToRef(_v3from, _v3to, _v3to);
-            result.set(_v3to.x, _v3to.y, _v3to.z, r);
-        }
-        result.normalize();
-    }
-}
-
-
-/***/ }),
-
 /***/ "./src/secondary-animation/spring-bone-controller.ts":
 /*!***********************************************************!*\
   !*** ./src/secondary-animation/spring-bone-controller.ts ***!
@@ -978,8 +931,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "VRMSpringBoneLogic": () => (/* binding */ VRMSpringBoneLogic)
 /* harmony export */ });
 /* harmony import */ var _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babylonjs/core/Maths/math */ "./node_modules/@babylonjs/core/Maths/math.js");
-/* harmony import */ var _quaternion_helper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./quaternion-helper */ "./src/secondary-animation/quaternion-helper.ts");
-
 
 // based on
 // http://rocketjump.skr.jp/unity3d/109/
@@ -1094,7 +1045,8 @@ class VRMSpringBoneLogic {
         this.initialLocalMatrix.multiplyToRef(_matB, _matA);
         const initialCenterSpaceMatrixInv = _matA.invert();
         _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Vector3.TransformCoordinatesToRef(this.nextTail, initialCenterSpaceMatrixInv, _v3A);
-        _quaternion_helper__WEBPACK_IMPORTED_MODULE_1__.QuaternionHelper.fromToRotationToRef(this.boneAxis, _v3A, _quatA);
+        _v3A.normalizeToRef(_v3B);
+        _babylonjs_core_Maths_math__WEBPACK_IMPORTED_MODULE_0__.Quaternion.FromUnitVectorsToRef(this.boneAxis, _v3B, _quatA);
         const applyRotation = _quatA;
         this.initialLocalRotation.multiplyToRef(applyRotation, this.transform.rotationQuaternion);
         // update WorldMatrix
