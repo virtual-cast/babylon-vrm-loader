@@ -8,7 +8,7 @@ const baseConfig = {
         rules: [
             {
                 test: /\.ts$/,
-                use: 'ts-loader',
+                loader: 'ts-loader',
             },
         ],
     },
@@ -25,8 +25,10 @@ module.exports = [
      */
     merge(baseConfig, {
         output: {
-            library: 'babylon-vrm-loader',
-            libraryTarget: 'umd',
+            library: {
+                name: 'babylon-vrm-loader',
+                type: 'umd',
+            },
             filename: 'index.module.js',
             path: resolve(__dirname, 'dist'),
         },
@@ -39,13 +41,15 @@ module.exports = [
      */
     merge(baseConfig, {
         output: {
-            library: 'VRMLoader',
-            libraryTarget: 'window',
+            library: {
+                name: 'VRMLoader',
+                type: 'window',
+            },
             filename: 'index.js',
             path: resolve(__dirname, 'dist'),
         },
         externals: [
-            function (context, request, callback) {
+            ({context, request}, callback) => {
                 if (/^@babylonjs\/core.*$/.test(request)) {
                     return callback(null, 'var BABYLON');
                 }

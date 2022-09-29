@@ -23,35 +23,36 @@
     "typings": "dist/index.d.ts",
     "main": "dist/index.module.js",
     "dependencies": {
-        "babylon-mtoon-material": "^3.0.0"
+        "babylon-mtoon-material": "^5.0.0"
     },
     "devDependencies": {
-        "@babylonjs/core": "~4.2.0",
-        "@babylonjs/inspector": "~4.2.0",
-        "@babylonjs/loaders": "~4.2.0",
-        "@semantic-release/commit-analyzer": "^8.0.1",
-        "@semantic-release/git": "^9.0.0",
-        "@semantic-release/github": "^7.2.3",
-        "@semantic-release/npm": "^7.1.3",
-        "@semantic-release/release-notes-generator": "^9.0.2",
+        "@babylonjs/core": "^5.19.0",
+        "@babylonjs/gui": "^5.19.0",
+        "@babylonjs/gui-editor": "^5.19.0",
+        "@babylonjs/inspector": "^5.19.0",
+        "@babylonjs/loaders": "^5.19.0",
+        "@babylonjs/materials": "^5.19.0",
+        "@babylonjs/serializers": "^5.19.0",
+        "@semantic-release/git": "^10.0.1",
         "@types/node": "^15.12.2",
+        "babylonjs-gltf2interface": "^5.0.0",
         "cz-conventional-changelog": "3.3.0",
-        "gh-pages": "^3.2.0",
-        "raw-loader": "^4.0.2",
+        "gh-pages": "^4.0.0",
         "semantic-release": "^19.0.3",
-        "ts-loader": "^8.2.0",
+        "ts-loader": "^9.2.6",
+        "tslib": "^2.4.0",
         "tslint": "^6.1.3",
-        "typescript": "^4.3.2",
-        "webpack": "^4.30.0",
-        "webpack-cli": "^3.2.1",
-        "webpack-dev-server": "^3.11.2",
+        "typescript": "~4.6.2",
+        "webpack": "^5.73.0",
+        "webpack-cli": "^4.10.0",
+        "webpack-dev-server": "^4.9.3",
         "webpack-merge": "^5.8.0"
     },
     "scripts": {
         "build": "webpack",
         "build:gh-pages": "webpack --config webpack.test.config.js",
         "lint": "tslint -p .",
-        "debug": "webpack-dev-server --config webpack.test.config.js",
+        "debug": "webpack serve --config webpack.test.config.js",
         "release": "semantic-release",
         "release:gh-pages": "gh-pages -d test -u \"Masaru Yamagishi <m-yamagishi@virtualcast.jp>\" -m \"ci(gh-pages): update gh-pages [skip ci]\""
     },
@@ -87,7 +88,7 @@
         ]
     },
     "peerDependencies": {
-        "@babylonjs/core": "~4.2.0",
-        "@babylonjs/loaders": "~4.2.0"
+        "@babylonjs/core": "^5.19.0",
+        "@babylonjs/loaders": "^5.19.0"
     }
 }
