@@ -16,7 +16,9 @@ workflows:
             - lint
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - alpha
 
 jobs:
   build:
