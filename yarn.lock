@@ -1309,9 +1309,9 @@ async@^2.6.1:
     lodash "^4.17.14"
 
 babylon-mtoon-material@^5.0.0:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/babylon-mtoon-material/-/babylon-mtoon-material-5.0.1.tgz#bdfab3d695ee1ac54fb5ee3980d632cb3ac38a20"
-  integrity sha512-3NH5nepbY2etAC/QUTfCxc/K7RiApoWaYmwBCI3j9AbT0hDDr8nUG/gP/FwjF/hv9szd4768kUVb4soosiALCQ==
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/babylon-mtoon-material/-/babylon-mtoon-material-5.1.0.tgz#27cce49041c0b15f094959f32a911ac169b3c541"
+  integrity sha512-zn/vlOWVH8Pj8kRgtM8IYFyztS2XeMLS1wqCspjA/8Qigi9dDKKxOi2yDd3WyNZuboaPbBqrHuOjg9oYEbSZCw==
 
 babylonjs-gltf2interface@^5.0.0:
   version "5.25.0"
