@@ -1,8 +1,7 @@
 import { Matrix, Quaternion, Vector3 } from '@babylonjs/core/Maths/math';
-import { TransformNode } from '@babylonjs/core/Meshes/transformNode';
-import { Nullable } from '@babylonjs/core/types';
-import { ColliderGroup } from './collider-group';
-import { QuaternionHelper } from './quaternion-helper';
+import type { TransformNode } from '@babylonjs/core/Meshes/transformNode';
+import type { Nullable } from '@babylonjs/core/types';
+import type { ColliderGroup } from './collider-group';
 // based on
 // http://rocketjump.skr.jp/unity3d/109/
 // https://github.com/dwango/UniVRM/blob/master/Scripts/SpringBone/VRMSpringBone.cs
@@ -56,11 +55,7 @@ export class VRMSpringBoneLogic {
      * @param radius Collision Radius
      * @param transform Base TransformNode
      */
-    public constructor(
-        public readonly center: Nullable<TransformNode>,
-        public readonly radius: number,
-        public readonly transform: TransformNode
-    ) {
+    public constructor(public readonly center: Nullable<TransformNode>, public readonly radius: number, public readonly transform: TransformNode) {
         // Initialize rotationQuaternion when not initialized
         if (!transform.rotationQuaternion) {
             transform.rotationQuaternion = transform.rotation.toQuaternion();
@@ -85,9 +80,7 @@ export class VRMSpringBoneLogic {
 
         this.boneAxis = this.initialLocalChildPosition.normalizeToNew();
         Vector3.TransformCoordinatesToRef(this.initialLocalChildPosition, worldMatrix, _v3A);
-        this.centerSpaceBoneLength = _v3A
-            .subtractInPlace(this.centerSpacePosition)
-            .length();
+        this.centerSpaceBoneLength = _v3A.subtractInPlace(this.centerSpacePosition).length();
 
         if (center) {
             this.getMatrixWorldToCenter(_matA);
@@ -101,9 +94,7 @@ export class VRMSpringBoneLogic {
             _matA.getTranslationToRef(this.centerSpacePosition);
 
             Vector3.TransformCoordinatesToRef(this.initialLocalChildPosition, _matA, _v3A);
-            this.centerSpaceBoneLength = _v3A
-                .subtractInPlace(this.centerSpacePosition)
-                .length();
+            this.centerSpaceBoneLength = _v3A.subtractInPlace(this.centerSpacePosition).length();
         }
     }
 
@@ -115,12 +106,7 @@ export class VRMSpringBoneLogic {
      * @param external Current frame external force
      * @param colliderGroups Current frame colliderGroups
      */
-    public update(
-        stiffnessForce: number,
-        dragForce: number,
-        external: Vector3,
-        colliderGroups: ColliderGroup[],
-    ): void {
+    public update(stiffnessForce: number, dragForce: number, external: Vector3, colliderGroups: ColliderGroup[]): void {
         if (Number.isNaN(this.transform.getAbsolutePosition().x)) {
             // Do not update when absolute position is invalid
             return;
@@ -139,8 +125,7 @@ export class VRMSpringBoneLogic {
         this.nextTail.copyFrom(this.currentTail);
         {
             // 減衰付きで前のフレームの移動を継続
-            _v3A
-                .copyFrom(this.currentTail)
+            _v3A.copyFrom(this.currentTail)
                 .subtractInPlace(this.prevTail)
                 .scaleInPlace(1.0 - dragForce);
             this.nextTail.addInPlace(_v3A);
@@ -150,10 +135,7 @@ export class VRMSpringBoneLogic {
             _v3A.copyFrom(this.boneAxis);
             Vector3.TransformCoordinatesToRef(_v3A, this.initialLocalMatrix, _v3A);
             Vector3.TransformCoordinatesToRef(_v3A, _matB, _v3A);
-            _v3A
-                .subtractInPlace(this.centerSpacePosition)
-                .normalize()
-                .scaleInPlace(stiffnessForce);
+            _v3A.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(stiffnessForce);
             this.nextTail.addInPlace(_v3A);
         }
         {
@@ -162,11 +144,7 @@ export class VRMSpringBoneLogic {
         }
         {
             // 長さを boneLength に強制
-            this.nextTail
-                .subtractInPlace(this.centerSpacePosition)
-                .normalize()
-                .scaleInPlace(this.centerSpaceBoneLength)
-                .addInPlace(this.centerSpacePosition);
+            this.nextTail.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(this.centerSpaceBoneLength).addInPlace(this.centerSpacePosition);
         }
         {
             // Collision で移動
@@ -179,7 +157,8 @@ export class VRMSpringBoneLogic {
         this.initialLocalMatrix.multiplyToRef(_matB, _matA);
         const initialCenterSpaceMatrixInv = _matA.invert();
         Vector3.TransformCoordinatesToRef(this.nextTail, initialCenterSpaceMatrixInv, _v3A);
-        QuaternionHelper.fromToRotationToRef(this.boneAxis, _v3A, _quatA);
+        _v3A.normalizeToRef(_v3B);
+        Quaternion.FromUnitVectorsToRef(this.boneAxis, _v3B, _quatA);
         const applyRotation = _quatA;
         this.initialLocalRotation.multiplyToRef(applyRotation, this.transform.rotationQuaternion!);
 
@@ -188,9 +167,9 @@ export class VRMSpringBoneLogic {
     }
 
     /**
-      * Create a matrix that converts world space into center space.
-      * @param result Target matrix
-      */
+     * Create a matrix that converts world space into center space.
+     * @param result Target matrix
+     */
     private getMatrixWorldToCenter(result: Matrix): Matrix {
         if (this.center) {
             this.center.getWorldMatrix().invertToRef(result);
@@ -229,20 +208,11 @@ export class VRMSpringBoneLogic {
 
                 tail.subtractToRef(colliderCenterSpacePosition, _v3B);
                 if (_v3B.lengthSquared() <= r * r) {
-                    const normal = _v3B
-                        .copyFrom(tail)
-                        .subtractInPlace(colliderCenterSpacePosition)
-                        .normalize();
-                    const posFromCollider = _v3C
-                        .copyFrom(colliderCenterSpacePosition)
-                        .addInPlace(normal.scaleInPlace(r));
+                    const normal = _v3B.copyFrom(tail).subtractInPlace(colliderCenterSpacePosition).normalize();
+                    const posFromCollider = _v3C.copyFrom(colliderCenterSpacePosition).addInPlace(normal.scaleInPlace(r));
 
                     tail.copyFrom(
-                        posFromCollider
-                            .subtractInPlace(this.centerSpacePosition)
-                            .normalize()
-                            .scaleInPlace(this.centerSpaceBoneLength)
-                            .addInPlace(this.centerSpacePosition)
+                        posFromCollider.subtractInPlace(this.centerSpacePosition).normalize().scaleInPlace(this.centerSpaceBoneLength).addInPlace(this.centerSpacePosition)
                     );
                 }
             });

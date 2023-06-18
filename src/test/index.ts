@@ -8,25 +8,22 @@ import { SceneLoader } from '@babylonjs/core/Loading/sceneLoader';
 import { Vector3 } from '@babylonjs/core/Maths/math';
 import { Mesh } from '@babylonjs/core/Meshes/mesh';
 import { Scene } from '@babylonjs/core/scene';
-import { VRMManager } from '../vrm-manager';
+import type { VRMManager } from '../vrm-manager';
 
 import '@babylonjs/core/Helpers/sceneHelpers';
 import '@babylonjs/core/Meshes/Builders/sphereBuilder';
 import '@babylonjs/core/Meshes/Builders/torusKnotBuilder';
 import '@babylonjs/inspector';
+// eslint-disable-next-line import/no-internal-modules
 import '../index';
 
 async function main() {
     const debugProperties = getDebugProperties();
     const canvas = document.getElementById('main-canvas') as HTMLCanvasElement;
-    const engine = new Engine(
-        canvas,
-        true,
-        {
-            alpha: false,
-            disableWebGL2Support: debugProperties.webgl1,
-        },
-    );
+    const engine = new Engine(canvas, true, {
+        alpha: false,
+        disableWebGL2Support: debugProperties.webgl1,
+    });
 
     const scene = new Scene(engine);
     const camera = new ArcRotateCamera('MainCamera1', 0, 0, 3, new Vector3(0, 1.2, 0), scene, true);

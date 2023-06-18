@@ -1,5 +1,5 @@
-import { Mesh } from '@babylonjs/core';
-import { Vector3 } from '@babylonjs/core/Maths/math';
+import type { Mesh } from '@babylonjs/core';
+import type { Vector3 } from '@babylonjs/core/Maths/math';
 
 /**
  * Collider
@@ -10,10 +10,5 @@ export class Collider {
      * @param radius The radius of the collider.
      * @param sphere The spehere mesh for worldMatrix and gizmo.
      */
-    public constructor(
-        public readonly offset: Vector3,
-        public readonly radius: number,
-        public readonly sphere: Mesh,
-    ) {
-    }
+    public constructor(public readonly offset: Vector3, public readonly radius: number, public readonly sphere: Mesh) {}
 }
