@@ -6,7 +6,7 @@
 
 VRM porting to babylon.js.
 
-This loader is used as [THE SEED ONLINE](https://seed.online) web VRM/VCI/glb viewer.
+This loader is used as [VirtualCast](https://virtualcast.jp/) web VRM/VCI/glb viewer.
 
 ## Supported version table
 
@@ -14,12 +14,14 @@ This loader is used as [THE SEED ONLINE](https://seed.online) web VRM/VCI/glb vi
 |---|---|
 |~4.1.0|<1.5.0|
 |~4.2.0|^1.5.0|
-|~5.x|unreleased(will be ^2.0.0)|
+|^5.19.0|^2.0.0|
+|^6.0.0|will be ^3.0.0|
 
 ## Features
 
-- Supports `.vrm` file loading
+- Supports `.vrm` v0.x file loading
     - with `extensions.VRM` glTF Extension
+    - TODO VRM v1.0 file loading
 - Supports `.vci` file loading
 - Supports [MToonMaterial](https://github.com/virtual-cast/babylon-mtoon-material)
 - Get bone([TransformNode](https://doc.babylonjs.com/typedoc/classes/BABYLON.TransformNode)) from Unity Humanoid bone mapping name
